@@ -5,7 +5,7 @@ class explosion:
         self.rect = pygame.Rect((x, y, 50, 50))
         self.lifetime = 100
 
-    def explode_branch(self, direction, offset, times, explosions, walls, crumbly_walls, monsters, player):
+    def explode_branch(self, direction, offset, times, explosions, bombs, walls, crumbly_walls):
         if times > 0:
 
             if direction == "UP":
@@ -24,15 +24,12 @@ class explosion:
                 if pygame.Rect.colliderect(crumbly_wall_instance.rect, explosions[-1].rect):
                     crumbly_wall_instance.destroyed = True
                     times = 0
-            for monster_instance in monsters:
-                if pygame.Rect.colliderect(monster_instance.rect, explosions[-1].rect):
-                    monster_instance.is_alive = False
-            if pygame.Rect.colliderect(player.rect, explosions[-1].rect):
-                player.player_died()
-            self.explode_branch(direction, offset+50, times-1, explosions, walls, crumbly_walls, monsters, player)
 
-    def explode(self, times, explosions, walls, crumbly_walls, monsters, player):
-        self.explode_branch("UP", 50, times, explosions, walls, crumbly_walls, monsters, player)
-        self.explode_branch("DOWN", 50, times, explosions, walls, crumbly_walls, monsters, player)
-        self.explode_branch("LEFT", 50, times, explosions, walls, crumbly_walls, monsters, player)
-        self.explode_branch("RIGHT", 50, times, explosions, walls, crumbly_walls, monsters, player)
+
+            self.explode_branch(direction, offset+50, times-1, explosions, bombs, walls, crumbly_walls)
+
+    def explode(self, times, explosions, bombs, walls, crumbly_walls):
+        self.explode_branch("UP", 50, times, explosions, bombs, walls, crumbly_walls)
+        self.explode_branch("DOWN", 50, times, explosions, bombs, walls, crumbly_walls)
+        self.explode_branch("LEFT", 50, times, explosions, bombs, walls, crumbly_walls)
+        self.explode_branch("RIGHT", 50, times, explosions, bombs, walls, crumbly_walls)

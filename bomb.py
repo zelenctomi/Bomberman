@@ -5,3 +5,4 @@ class bomb:
     self.rect = pygame.Rect((x, y, 50, 50))
     self.fuse_time = 150
     self.owner = player
+    self.stood_on = True
