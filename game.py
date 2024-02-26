@@ -18,7 +18,8 @@ SCREEN_HEIGHT = 650
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 player1_surface = pygame.image.load('player1.png').convert()
 player2_surface = pygame.image.load('player2.png').convert()
-dead_surface = pygame.image.load('dead_player.png').convert()
+dead_surface1 = pygame.image.load('dead_player1.png').convert()
+dead_surface2 = pygame.image.load('dead_player2.png').convert()
 crumbly_wall_surface = pygame.image.load('crumbly_wall.png').convert()
 wall_surface = pygame.image.load('wall.png').convert()
 bomb_surface = pygame.image.load('bomb.png').convert()
@@ -34,8 +35,8 @@ monster_surface.set_colorkey((0,200,0))
 pygame.display.set_caption('Bomberman')
 clock = pygame.time.Clock()
 
-player1 = player(50, 50, player1_surface)
-player2 = player(675, 575, player2_surface)
+player1 = player(50, 50, player1_surface, dead_surface1)
+player2 = player(675, 575, player2_surface, dead_surface2)
 players = []
 players.append(player1)
 players.append(player2)
@@ -91,11 +92,12 @@ def move_or_collide(player_param, x, y):
             elif type(powerup_instance) is longer_explosion:
                 player_param.explosion_length += 1
             powerups.remove(powerup_instance)
-    #for bomb_obj in bombs:
-    #    if not bomb_obj.stood_on and pygame.Rect.colliderect(player_param.rect, bomb_obj.rect): 
-    #        player_param.rect.x -= 2*x
-    #        player_param.rect.y -= 2*y
-    #        return
+    for bomb_obj in bombs:
+        print(bomb_obj.stood_on)
+        if not bomb_obj.stood_on and pygame.Rect.colliderect(player_param.rect, bomb_obj.rect): 
+            player_param.rect.x -= 2*x
+            player_param.rect.y -= 2*y
+    return
 
 
 def render_map():
@@ -123,7 +125,7 @@ def render_map():
         if player.is_alive:
             screen.blit(player.surface, player.rect)
         else:
-            screen.blit(dead_surface, player.rect)
+            screen.blit(player.dead_surface, player.rect)
     for monster_instance in monsters:
         if monster_instance.is_alive:
             screen.blit(monster_surface, monster_instance.rect)
@@ -204,8 +206,6 @@ def move_monsters():
             for player in players:
                 if pygame.Rect.colliderect(player.rect, monster_instance.rect):
                     player.player_died()
-
-                    
             
 def spawn_powerup(x, y):
     if random.randint(0,9) > 5:
@@ -275,9 +275,11 @@ def spawn_monsters(count):
 
 def update_bomb_trampling(): 
     for bomb_instance in bombs:
-        for player in players:
-            if not pygame.Rect.colliderect(player.rect, bomb_instance.rect):
-                bomb_instance.stood_on = False
+        bomb_instance.stood_on = False
+        if pygame.Rect.colliderect(player1.rect, bomb_instance.rect):
+            bomb_instance.stood_on = True
+        elif pygame.Rect.colliderect(player2.rect, bomb_instance.rect):
+            bomb_instance.stood_on = True
     return
 
 
@@ -293,12 +295,12 @@ while run:
         if event.type == pygame.QUIT:
             run = False
     render_map()
+    update_bomb_trampling()
     move_monsters()
     move_player1()
     move_player2()
     handle_explosion()
     handle_bombs()
-    update_bomb_trampling()
     remove_destroyed_entities()
     # Updating display and looping game at rate of 150 FPS
     pygame.display.update()
