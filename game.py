@@ -14,7 +14,7 @@ pygame.init()
 
 SCREEN_WIDTH = 750
 SCREEN_HEIGHT = 650
-
+# loading assets
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 player1_surface = pygame.image.load('player1.png').convert()
 player2_surface = pygame.image.load('player2.png').convert()
@@ -34,7 +34,7 @@ monster_surface = pygame.image.load('monster.png').convert()
 monster_surface.set_colorkey((0,200,0))
 pygame.display.set_caption('Bomberman')
 clock = pygame.time.Clock()
-
+# initialising objects
 player1 = player(50, 50, player1_surface, dead_surface1)
 player2 = player(675, 575, player2_surface, dead_surface2)
 players = []
@@ -46,7 +46,7 @@ walls = []
 crumbly_walls = []
 powerups = []
 monsters = []
-
+# Spawning non-braekable walls
 def spawn_walls():
     wall_start_x = 0
     for x in range(15):
@@ -58,7 +58,7 @@ def spawn_walls():
                 walls.append(wall_instance)
             wall_start_y += 50
         wall_start_x += 50
-
+# Spawning breakable walls
 def spawn_crumbly_walls():
     forbidden_crumbly_wall_spots = [[50, 50], [50, 100], [100, 50], [650, 550], [600, 550], [650, 500]]
     crumbly_wall_start_x = 50
@@ -71,7 +71,7 @@ def spawn_crumbly_walls():
                 crumbly_walls.append(crumbly_wall_instance)
             crumbly_wall_start_y += 50
         crumbly_wall_start_x += 50
-
+# Tries moving the player if no collision occurs and collects pickups
 def move_or_collide(player_param, x, y):
 
     player_param.rect.x += 2*x
@@ -97,9 +97,8 @@ def move_or_collide(player_param, x, y):
         if not bomb_obj.stood_on and pygame.Rect.colliderect(player_param.rect, bomb_obj.rect): 
             player_param.rect.x -= 2*x
             player_param.rect.y -= 2*y
-    return
 
-
+# Pairs objects with textures
 def render_map():
     screen.fill((0, 200, 0))
 
@@ -129,7 +128,7 @@ def render_map():
     for monster_instance in monsters:
         if monster_instance.is_alive:
             screen.blit(monster_surface, monster_instance.rect)
-
+# Moves player1 
 def move_player1():
     if player1.is_alive:
         key = pygame.key.get_pressed()
@@ -149,8 +148,10 @@ def move_player1():
             move_or_collide(player1, 0, -1)
         if key[pygame.K_s] == True:
             move_or_collide(player1, 0, 1)
-
+        # Restricts player movement
         player1.rect.clamp_ip(screen.get_rect())
+
+# Moves player2
 def move_player2():
     if player2.is_alive:
         key = pygame.key.get_pressed()
@@ -172,6 +173,8 @@ def move_player2():
             move_or_collide(player2, 0, 1)
 
         player2.rect.clamp_ip(screen.get_rect())
+
+    
 def turn_monster_if_obstacle(monster_instance, collision_object):
     if pygame.Rect.colliderect(monster_instance.rect, collision_object.rect):
         monster_instance.rect.x -= monster_instance.x_direction
@@ -286,7 +289,7 @@ def update_bomb_trampling():
 # Spawning walls and crumbly walls
 spawn_walls()
 spawn_crumbly_walls()
-spawn_monsters(1)
+spawn_monsters(10)
 # Main loop
 run = True
 while run:
