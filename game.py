@@ -16,23 +16,23 @@ class Game:
     SCREEN_HEIGHT = 650
     # loading assets
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    player1_surface = pygame.image.load('player1.png').convert()
-    player2_surface = pygame.image.load('player2.png').convert()
-    dead_surface1 = pygame.image.load('dead_player1.png').convert()
-    dead_surface2 = pygame.image.load('dead_player2.png').convert()
-    crumbly_wall_surface = pygame.image.load('crumbly_wall.png').convert()
-    wall_surface = pygame.image.load('wall.png').convert()
-    bomb_surface = pygame.image.load('bomb.png').convert()
+    player1_surface = pygame.image.load('assets/player1.png').convert()
+    player2_surface = pygame.image.load('assets/player2.png').convert()
+    dead_surface1 = pygame.image.load('assets/dead_player1.png').convert()
+    dead_surface2 = pygame.image.load('assets/dead_player2.png').convert()
+    crumbly_wall_surface = pygame.image.load('assets/crumbly_wall.png').convert()
+    wall_surface = pygame.image.load('assets/wall.png').convert()
+    bomb_surface = pygame.image.load('assets/bomb.png').convert()
     bomb_surface.set_colorkey((0,200,0))
-    explosion_surface = pygame.image.load('explosion_center.png').convert()
+    explosion_surface = pygame.image.load('assets/explosion_center.png').convert()
     explosion_surface.set_colorkey((0,200,0))
-    extra_bomb_surface = pygame.image.load('extra_bomb.png').convert()
+    extra_bomb_surface = pygame.image.load('assets/extra_bomb.png').convert()
     extra_bomb_surface.set_colorkey((0,200,0))
-    longer_explosion_surface = pygame.image.load('longer_explosion.png').convert()
+    longer_explosion_surface = pygame.image.load('assets/longer_explosion.png').convert()
     longer_explosion_surface.set_colorkey((0,200,0))
-    monster_surface = pygame.image.load('monster.png').convert()
+    monster_surface = pygame.image.load('assets/monster.png').convert()
     monster_surface.set_colorkey((0,200,0))
-    pygame.display.set_caption('Bomberman')
+    pygame.display.set_caption('assets/Bomberman')
     clock = pygame.time.Clock()
     # initialising objects
     player1 = player(50, 50, player1_surface, dead_surface1)
@@ -69,9 +69,7 @@ class Game:
     def field_has_bomb(x, y):
         for list_element in Game.get_objects_at_coords(x, y):
             if type(list_element) is bomb:
-                print("BOMB HERE")
                 return True
-        print("NO BOMB HERE")
         return False
 
     # Spawning non-breakable walls
@@ -192,7 +190,7 @@ class Game:
                 bomb_instance = bomb((Game.player2.rect.x+10) - ((Game.player2.rect.x+10) % 50), 
                                      (Game.player2.rect.y+10) - ((Game.player2.rect.y+10) % 50), Game.player2)
                 Game.bombs.append(bomb_instance)
-                Game.get_objects_at_coords(Game.player2.rect.x+10, Game.player.rect.y+10).append(bomb_instance)
+                Game.get_objects_at_coords(Game.player2.rect.x+10, Game.player2.rect.y+10).append(bomb_instance)
                 Game.player2.bombs_deployed += 1
 
             if key[pygame.K_LEFT] == True:
@@ -244,12 +242,10 @@ class Game:
                 extrabomb_instance = extra_bomb(x, y)
                 Game.powerups.append(extrabomb_instance)
                 Game.get_objects_at_coords(x, y).append(extrabomb_instance)
-                print(Game.get_objects_at_coords(x, y))
             else:
                 longerexplosion_instance = longer_explosion(x, y)
                 Game.powerups.append(longerexplosion_instance)
                 Game.get_objects_at_coords(x, y).append(longerexplosion_instance)
-                print(Game.get_objects_at_coords(x, y))
 
     def remove_destroyed_entities():
         for crumbly_wall_instance in Game.crumbly_walls:
@@ -323,7 +319,6 @@ class Game:
         return
     
     def tick_explosion():
-        print(explosion.delay)
         if explosion.delay > 0:
             explosion.delay -= 1
         else:
