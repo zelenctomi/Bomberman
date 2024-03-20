@@ -1,6 +1,7 @@
 import pygame
-from powerup import powerup
+from powerup import Powerup
 
-class extra_bomb(powerup):
+
+class Extra_bomb(Powerup):
   def __init__(self, x, y):
     super().__init__(x, y)

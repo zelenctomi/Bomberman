@@ -1,7 +1,8 @@
 import pygame
 
-from powerup import powerup
+from powerup import Powerup
 
-class longer_explosion(powerup):
+
+class Longer_explosion(Powerup):
   def __init__(self, x, y):
     super().__init__(x, y)
