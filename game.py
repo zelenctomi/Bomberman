@@ -9,13 +9,15 @@ from extra_bomb import Extra_bomb
 from longer_explosion import Longer_explosion
 from monster import Monster
 
+
 class Game:
   SCREEN_WIDTH = 750
   SCREEN_HEIGHT = 650
 
   def __init__(self):
     pygame.init()
-    self.screen = pygame.display.set_mode((Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT))
+    self.screen = pygame.display.set_mode(
+      (Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT))
     pygame.display.set_caption('Bomberman')
     self.clock = pygame.time.Clock()
 
@@ -27,15 +29,19 @@ class Game:
     self.player2_surface = pygame.image.load('assets/player2.png').convert()
     self.dead_surface1 = pygame.image.load('assets/dead_player1.png').convert()
     self.dead_surface2 = pygame.image.load('assets/dead_player2.png').convert()
-    self.crumbly_wall_surface = pygame.image.load('assets/crumbly_wall.png').convert()
+    self.crumbly_wall_surface = pygame.image.load(
+      'assets/crumbly_wall.png').convert()
     self.wall_surface = pygame.image.load('assets/wall.png').convert()
     self.bomb_surface = pygame.image.load('assets/bomb.png').convert()
     self.bomb_surface.set_colorkey((0, 200, 0))
-    self.explosion_surface = pygame.image.load('assets/explosion_center.png').convert()
+    self.explosion_surface = pygame.image.load(
+      'assets/explosion_center.png').convert()
     self.explosion_surface.set_colorkey((0, 200, 0))
-    self.extra_bomb_surface = pygame.image.load('assets/extra_bomb.png').convert()
+    self.extra_bomb_surface = pygame.image.load(
+      'assets/extra_bomb.png').convert()
     self.extra_bomb_surface.set_colorkey((0, 200, 0))
-    self.longer_explosion_surface = pygame.image.load('assets/longer_explosion.png').convert()
+    self.longer_explosion_surface = pygame.image.load(
+      'assets/longer_explosion.png').convert()
     self.longer_explosion_surface.set_colorkey((0, 200, 0))
     self.monster_surface = pygame.image.load('assets/monster.png').convert()
     self.monster_surface.set_colorkey((0, 200, 0))
@@ -61,7 +67,7 @@ class Game:
   def get_objects_at_object(self, obj):
     potential_collisons = []
     for corner in [(obj.rect.topleft[0], obj.rect.topleft[1]), (obj.rect.topright[0], obj.rect.topright[1]),
-             (obj.rect.bottomleft[0], obj.rect.bottomleft[1]), (obj.rect.bottomright[0], obj.rect.bottomright[1])]:
+                   (obj.rect.bottomleft[0], obj.rect.bottomleft[1]), (obj.rect.bottomright[0], obj.rect.bottomright[1])]:
       for list_element in self.get_objects_at_coords(corner[0], corner[1]):
         if list_element not in potential_collisons:
           potential_collisons.append(list_element)
@@ -79,7 +85,7 @@ class Game:
       wall_start_y = 0
       for y in range(13):
         if wall_start_x in [0, 700] or wall_start_y in [0, 600] or \
-            (wall_start_x in [100, 200, 300, 400, 500, 600] and wall_start_y in [100, 200, 300, 400, 500]):
+                (wall_start_x in [100, 200, 300, 400, 500, 600] and wall_start_y in [100, 200, 300, 400, 500]):
           wall_instance = Wall(wall_start_x, wall_start_y)
           self.walls.append(wall_instance)
           self.fields[y][x].append(wall_instance)
@@ -87,14 +93,16 @@ class Game:
       wall_start_x += 50
 
   def spawn_crumbly_walls(self):
-    forbidden_crumbly_wall_spots = [[50, 50], [50, 100], [100, 50], [650, 550], [600, 550], [650, 500]]
+    forbidden_crumbly_wall_spots = [[50, 50], [50, 100], [
+      100, 50], [650, 550], [600, 550], [650, 500]]
     crumbly_wall_start_x = 50
     for x in range(13):
       crumbly_wall_start_y = 50
       for y in range(11):
         if (crumbly_wall_start_x in [100, 200, 300, 400, 500, 600] and crumbly_wall_start_y not in [100, 200, 300, 400, 500]) and \
-            [crumbly_wall_start_x, crumbly_wall_start_y] not in forbidden_crumbly_wall_spots and random.randint(0, 9) > 7:
-          crumbly_wall_instance = Crumbly_wall(crumbly_wall_start_x, crumbly_wall_start_y)
+                [crumbly_wall_start_x, crumbly_wall_start_y] not in forbidden_crumbly_wall_spots and random.randint(0, 9) > 7:
+          crumbly_wall_instance = Crumbly_wall(
+            crumbly_wall_start_x, crumbly_wall_start_y)
           self.crumbly_walls.append(crumbly_wall_instance)
           self.fields[y + 1][x + 1].append(crumbly_wall_instance)
         crumbly_wall_start_y += 50
@@ -160,11 +168,12 @@ class Game:
     if self.player1.is_alive:
       key = pygame.key.get_pressed()
       if key[pygame.K_SPACE] and self.player1.bombs_deployed < self.player1.max_bomb_count \
-          and not self.field_has_bomb(self.player1.rect.x + 10, self.player1.rect.y + 10):
+              and not self.field_has_bomb(self.player1.rect.x + 10, self.player1.rect.y + 10):
         bomb_instance = Bomb((self.player1.rect.x + 10) - ((self.player1.rect.x + 10) % 50),
-                   (self.player1.rect.y + 10) - ((self.player1.rect.y + 10) % 50), self.player1)
+                             (self.player1.rect.y + 10) - ((self.player1.rect.y + 10) % 50), self.player1)
         self.bombs.append(bomb_instance)
-        self.get_objects_at_coords(self.player1.rect.x + 10, self.player1.rect.y + 10).append(bomb_instance)
+        self.get_objects_at_coords(
+          self.player1.rect.x + 10, self.player1.rect.y + 10).append(bomb_instance)
         self.player1.bombs_deployed += 1
 
       if key[pygame.K_a]:
@@ -182,11 +191,12 @@ class Game:
     if self.player2.is_alive:
       key = pygame.key.get_pressed()
       if key[pygame.K_o] and self.player2.bombs_deployed < self.player2.max_bomb_count \
-          and not self.field_has_bomb(self.player2.rect.x + 10, self.player2.rect.y + 10):
+              and not self.field_has_bomb(self.player2.rect.x + 10, self.player2.rect.y + 10):
         bomb_instance = Bomb((self.player2.rect.x + 10) - ((self.player2.rect.x + 10) % 50),
-                   (self.player2.rect.y + 10) - ((self.player2.rect.y + 10) % 50), self.player2)
+                             (self.player2.rect.y + 10) - ((self.player2.rect.y + 10) % 50), self.player2)
         self.bombs.append(bomb_instance)
-        self.get_objects_at_coords(self.player2.rect.x + 10, self.player2.rect.y + 10).append(bomb_instance)
+        self.get_objects_at_coords(
+          self.player2.rect.x + 10, self.player2.rect.y + 10).append(bomb_instance)
         self.player2.bombs_deployed += 1
 
       if key[pygame.K_LEFT]:
@@ -248,7 +258,8 @@ class Game:
         self.get_objects_at_coords(crumbly_wall_instance.rect.x, crumbly_wall_instance.rect.y).remove(
           crumbly_wall_instance)
         self.crumbly_walls.remove(crumbly_wall_instance)
-        self.spawn_powerup(crumbly_wall_instance.rect.x, crumbly_wall_instance.rect.y)
+        self.spawn_powerup(crumbly_wall_instance.rect.x,
+                           crumbly_wall_instance.rect.y)
     for monster_instance in self.monsters:
       if not monster_instance.is_alive:
         self.monsters.remove(monster_instance)
@@ -268,9 +279,12 @@ class Game:
           monster_instance.is_alive = False
       for bomb_instance in self.bombs:
         if pygame.Rect.colliderect(explosion_instance.rect, bomb_instance.rect):
-          self.explosions.append(Explosion(explosion_instance.rect.x, explosion_instance.rect.y))
-          self.explosions[-1].explode(bomb_instance.owner.explosion_length, self)
-          self.get_objects_at_coords(explosion_instance.rect.x, explosion_instance.rect.y).remove(bomb_instance)
+          self.explosions.append(
+            Explosion(explosion_instance.rect.x, explosion_instance.rect.y))
+          self.explosions[-1].explode(
+            bomb_instance.owner.explosion_length, self)
+          self.get_objects_at_coords(
+            explosion_instance.rect.x, explosion_instance.rect.y).remove(bomb_instance)
           self.bombs.remove(bomb_instance)
           bomb_instance.owner.bombs_deployed -= 1
 
@@ -279,14 +293,17 @@ class Game:
       if bomb_instance.fuse_time > 0:
         bomb_instance.fuse_time -= 1
       else:
-        self.explosions.append(Explosion(bomb_instance.rect.x, bomb_instance.rect.y))
+        self.explosions.append(
+          Explosion(bomb_instance.rect.x, bomb_instance.rect.y))
         self.explosions[-1].explode(bomb_instance.owner.explosion_length, self)
-        self.get_objects_at_coords(bomb_instance.rect.x, bomb_instance.rect.y).remove(bomb_instance)
+        self.get_objects_at_coords(
+          bomb_instance.rect.x, bomb_instance.rect.y).remove(bomb_instance)
         self.bombs.remove(bomb_instance)
         bomb_instance.owner.bombs_deployed -= 1
 
   def spawn_monsters(self, count):
-    forbidden_monster_spots = [[50, 50], [50, 100], [100, 50], [650, 550], [600, 550], [650, 500]]
+    forbidden_monster_spots = [[50, 50], [50, 100],
+                               [100, 50], [650, 550], [600, 550], [650, 500]]
     for _ in range(count):
       can_spawn = False
       while not can_spawn:
@@ -343,6 +360,7 @@ class Game:
       pygame.display.update()
       self.clock.tick(150)
       self.game_lapse_time = self.clock.get_time()
+
 
 # Starting the Game
 game = Game()
