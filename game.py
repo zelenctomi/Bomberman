@@ -24,7 +24,7 @@ class Game:
     self.load_assets()
     self.initialize_objects()
 
-  def load_assets(self):
+  def load_assets(self) -> None:
     self.player1_surface: pygame.image = pygame.image.load(
       'assets/player1.png').convert()
     self.player2_surface: pygame.image = pygame.image.load(
@@ -53,7 +53,7 @@ class Game:
       'assets/monster.png').convert()
     self.monster_surface.set_colorkey((0, 200, 0))
 
-  def initialize_objects(self):
+  def initialize_objects(self) -> None:
     self.player1: Player = Player(
       50, 50, self.player1_surface, self.dead_surface1)
     self.player2: Player = Player(
