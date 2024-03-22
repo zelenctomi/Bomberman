@@ -3,14 +3,14 @@ import random
 
 
 class Monster:
-  def __init__(self, x, y):
-    self.rect = pygame.Rect((x, y, 25, 25))
-    self.lapse = random.randint(400, 1600)
+  def __init__(self, x: int, y: int):
+    self.rect: pygame.Rect = pygame.Rect((x, y, 25, 25))
+    self.lapse: int = random.randint(400, 1600)
+    self.is_alive: bool = True
     self.change_direction_randomly()
-    self.is_alive = True
 
-  def change_direction_randomly(self):
-    initial_decision = random.randint(0, 3)
+  def change_direction_randomly(self) -> None:    # TODO: Rewrite this method to make it more readable
+    initial_decision: int = random.randint(0, 3)
     if initial_decision == 0:
       self.x_direction = 0
       self.y_direction = -1
