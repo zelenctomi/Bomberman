@@ -1,14 +1,14 @@
 import pygame
 
 
-class Explosion:
-  delay = 50
+class Explosion:  # TODO: Modify methods to not use Game class as an argument
+  delay: int = 50
 
-  def __init__(self, x, y):
-    self.rect = pygame.Rect((x, y, 50, 50))
-    self.lifetime = 100
+  def __init__(self, x: int, y: int):
+    self.rect: pygame.Rect = pygame.Rect((x, y, 50, 50))
+    self.lifetime: int = 100
 
-  def explode_branch(self, direction, offset, times, game):
+  def explode_branch(self, direction: str, offset: int, times: int, game) -> None:
     if times > 0:
       if direction == "UP":
         game.explosions.append(Explosion(self.rect.x, self.rect.y - offset))
@@ -29,7 +29,7 @@ class Explosion:
 
       self.explode_branch(direction, offset + 50, times - 1, game)
 
-  def explode(self, times, game):
+  def explode(self, times: int, game) -> None:
     self.explode_branch("UP", 50, times, game)
     self.explode_branch("DOWN", 50, times, game)
     self.explode_branch("LEFT", 50, times, game)

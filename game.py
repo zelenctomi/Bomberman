@@ -5,67 +5,77 @@ from crumbly_wall import Crumbly_wall
 from player import Player
 from bomb import Bomb
 from explosion import Explosion
-from extra_bomb import Extra_bomb
+from extra_bomb import Extra_bomb, Powerup
 from longer_explosion import Longer_explosion
 from monster import Monster
 
 
 class Game:
-  SCREEN_WIDTH = 750
-  SCREEN_HEIGHT = 650
+  SCREEN_WIDTH: int = 750
+  SCREEN_HEIGHT: int = 650
 
   def __init__(self):
     pygame.init()
-    self.screen = pygame.display.set_mode(
+    self.screen: pygame.display = pygame.display.set_mode(
       (Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT))
     pygame.display.set_caption('Bomberman')
-    self.clock = pygame.time.Clock()
+    self.clock: pygame.time = pygame.time.Clock()
 
     self.load_assets()
     self.initialize_objects()
 
   def load_assets(self):
-    self.player1_surface = pygame.image.load('assets/player1.png').convert()
-    self.player2_surface = pygame.image.load('assets/player2.png').convert()
-    self.dead_surface1 = pygame.image.load('assets/dead_player1.png').convert()
-    self.dead_surface2 = pygame.image.load('assets/dead_player2.png').convert()
-    self.crumbly_wall_surface = pygame.image.load(
+    self.player1_surface: pygame.image = pygame.image.load(
+      'assets/player1.png').convert()
+    self.player2_surface: pygame.image = pygame.image.load(
+      'assets/player2.png').convert()
+    self.dead_surface1: pygame.image = pygame.image.load(
+      'assets/dead_player1.png').convert()
+    self.dead_surface2: pygame.image = pygame.image.load(
+      'assets/dead_player2.png').convert()
+    self.crumbly_wall_surface: pygame.image = pygame.image.load(
       'assets/crumbly_wall.png').convert()
-    self.wall_surface = pygame.image.load('assets/wall.png').convert()
-    self.bomb_surface = pygame.image.load('assets/bomb.png').convert()
+    self.wall_surface: pygame.image = pygame.image.load(
+      'assets/wall.png').convert()
+    self.bomb_surface: pygame.image = pygame.image.load(
+      'assets/bomb.png').convert()
     self.bomb_surface.set_colorkey((0, 200, 0))
-    self.explosion_surface = pygame.image.load(
+    self.explosion_surface: pygame.image = pygame.image.load(
       'assets/explosion_center.png').convert()
     self.explosion_surface.set_colorkey((0, 200, 0))
-    self.extra_bomb_surface = pygame.image.load(
+    self.extra_bomb_surface: pygame.image = pygame.image.load(
       'assets/extra_bomb.png').convert()
     self.extra_bomb_surface.set_colorkey((0, 200, 0))
-    self.longer_explosion_surface = pygame.image.load(
+    self.longer_explosion_surface: pygame.image = pygame.image.load(
       'assets/longer_explosion.png').convert()
     self.longer_explosion_surface.set_colorkey((0, 200, 0))
-    self.monster_surface = pygame.image.load('assets/monster.png').convert()
+    self.monster_surface: pygame.image = pygame.image.load(
+      'assets/monster.png').convert()
     self.monster_surface.set_colorkey((0, 200, 0))
 
   def initialize_objects(self):
-    self.player1 = Player(50, 50, self.player1_surface, self.dead_surface1)
-    self.player2 = Player(675, 575, self.player2_surface, self.dead_surface2)
-    self.players = [self.player1, self.player2]
-    self.bombs = []
-    self.explosions = []
-    self.walls = []
-    self.crumbly_walls = []
-    self.powerups = []
-    self.monsters = []
-    self.game_lapse_time = 0
-    self.fields = [[[] for _ in range(15)] for _ in range(13)]
+    self.player1: Player = Player(
+      50, 50, self.player1_surface, self.dead_surface1)
+    self.player2: Player = Player(
+      675, 575, self.player2_surface, self.dead_surface2)
+    self.players: list[Player] = [self.player1, self.player2]
+    self.bombs: list[Bomb] = []
+    self.explosions: list[Explosion] = []
+    self.walls: list[Wall] = []
+    self.crumbly_walls: list[Crumbly_wall] = []
+    self.powerups: list[Powerup] = []
+    self.monsters: list[Monster] = []
+    self.game_lapse_time: int = 0
+    self.fields: list[list[list[pygame.Rect]]] = [[[]
+                                                   for _ in range(15)] for _ in range(13)]
 
-  def get_objects_at_coords(self, x, y):
-    row_index = y // 50
-    column_index = x // 50
+  def get_objects_at_coords(self, x: int, y: int) -> list[pygame.Rect]:
+    row_index: int = y // 50
+    column_index: int = x // 50
     return self.fields[row_index][column_index]
 
-  def get_objects_at_object(self, obj):
-    potential_collisons = []
+  def get_objects_at_object(self, obj: pygame.Rect) -> list[pygame.Rect]:
+    potential_collisons: list[pygame.Rect] = []
     for corner in [(obj.rect.topleft[0], obj.rect.topleft[1]), (obj.rect.topright[0], obj.rect.topright[1]),
                    (obj.rect.bottomleft[0], obj.rect.bottomleft[1]), (obj.rect.bottomright[0], obj.rect.bottomright[1])]:
       for list_element in self.get_objects_at_coords(corner[0], corner[1]):
@@ -73,46 +83,47 @@ class Game:
           potential_collisons.append(list_element)
     return sum([potential_collisons], [])
 
-  def field_has_bomb(self, x, y):
+  def field_has_bomb(self, x: int, y: int) -> bool:
     for list_element in self.get_objects_at_coords(x, y):
       if isinstance(list_element, Bomb):
         return True
     return False
 
-  def spawn_walls(self):
-    wall_start_x = 0
+  def spawn_walls(self) -> None:
+    wall_start_x: int = 0
     for x in range(15):
-      wall_start_y = 0
+      wall_start_y: int = 0
       for y in range(13):
         if wall_start_x in [0, 700] or wall_start_y in [0, 600] or \
                 (wall_start_x in [100, 200, 300, 400, 500, 600] and wall_start_y in [100, 200, 300, 400, 500]):
-          wall_instance = Wall(wall_start_x, wall_start_y)
+          wall_instance: Wall = Wall(wall_start_x, wall_start_y)
           self.walls.append(wall_instance)
           self.fields[y][x].append(wall_instance)
         wall_start_y += 50
       wall_start_x += 50
 
-  def spawn_crumbly_walls(self):
-    forbidden_crumbly_wall_spots = [[50, 50], [50, 100], [
+  def spawn_crumbly_walls(self) -> None:
+    forbidden_crumbly_wall_spots: list[list[int]] = [[50, 50], [50, 100], [
       100, 50], [650, 550], [600, 550], [650, 500]]
-    crumbly_wall_start_x = 50
+    crumbly_wall_start_x: int = 50
     for x in range(13):
-      crumbly_wall_start_y = 50
+      crumbly_wall_start_y: int = 50
       for y in range(11):
         if (crumbly_wall_start_x in [100, 200, 300, 400, 500, 600] and crumbly_wall_start_y not in [100, 200, 300, 400, 500]) and \
                 [crumbly_wall_start_x, crumbly_wall_start_y] not in forbidden_crumbly_wall_spots and random.randint(0, 9) > 7:
-          crumbly_wall_instance = Crumbly_wall(
+          crumbly_wall_instance: Crumbly_wall = Crumbly_wall(
             crumbly_wall_start_x, crumbly_wall_start_y)
           self.crumbly_walls.append(crumbly_wall_instance)
           self.fields[y + 1][x + 1].append(crumbly_wall_instance)
         crumbly_wall_start_y += 50
       crumbly_wall_start_x += 50
 
-  def move_or_collide(self, player_param, x, y):
+  def move_or_collide(self, player_param: Player, x: int, y: int) -> None:
     player_param.rect.x += x * (self.game_lapse_time / 1000)
     player_param.rect.y += y * (self.game_lapse_time / 1000)
 
-    potential_collisons = self.get_objects_at_object(player_param)
+    potential_collisons: list[pygame.Rect] = self.get_objects_at_object(
+      player_param)
 
     for obj in potential_collisons:
       if isinstance(obj, (Wall, Crumbly_wall)) and pygame.Rect.colliderect(player_param.rect, obj.rect):
@@ -133,7 +144,7 @@ class Game:
         player_param.rect.x -= 2 * x
         player_param.rect.y -= 2 * y
 
-  def render_map(self):
+  def render_map(self) -> None:
     self.screen.fill((0, 200, 0))
 
     for wall_obj in self.walls:
@@ -164,13 +175,13 @@ class Game:
       if monster_instance.is_alive:
         self.screen.blit(self.monster_surface, monster_instance.rect)
 
-  def move_player1(self):
+  def move_player1(self) -> None:
     if self.player1.is_alive:
       key = pygame.key.get_pressed()
       if key[pygame.K_SPACE] and self.player1.bombs_deployed < self.player1.max_bomb_count \
               and not self.field_has_bomb(self.player1.rect.x + 10, self.player1.rect.y + 10):
-        bomb_instance = Bomb((self.player1.rect.x + 10) - ((self.player1.rect.x + 10) % 50),
-                             (self.player1.rect.y + 10) - ((self.player1.rect.y + 10) % 50), self.player1)
+        bomb_instance: Bomb = Bomb((self.player1.rect.x + 10) - ((self.player1.rect.x + 10) % 50),
+                                   (self.player1.rect.y + 10) - ((self.player1.rect.y + 10) % 50), self.player1)
         self.bombs.append(bomb_instance)
         self.get_objects_at_coords(
           self.player1.rect.x + 10, self.player1.rect.y + 10).append(bomb_instance)
@@ -187,13 +198,13 @@ class Game:
 
       self.player1.rect.clamp_ip(self.screen.get_rect())
 
-  def move_player2(self):
+  def move_player2(self) -> None:
     if self.player2.is_alive:
       key = pygame.key.get_pressed()
       if key[pygame.K_o] and self.player2.bombs_deployed < self.player2.max_bomb_count \
               and not self.field_has_bomb(self.player2.rect.x + 10, self.player2.rect.y + 10):
-        bomb_instance = Bomb((self.player2.rect.x + 10) - ((self.player2.rect.x + 10) % 50),
-                             (self.player2.rect.y + 10) - ((self.player2.rect.y + 10) % 50), self.player2)
+        bomb_instance: Bomb = Bomb((self.player2.rect.x + 10) - ((self.player2.rect.x + 10) % 50),
+                                   (self.player2.rect.y + 10) - ((self.player2.rect.y + 10) % 50), self.player2)
         self.bombs.append(bomb_instance)
         self.get_objects_at_coords(
           self.player2.rect.x + 10, self.player2.rect.y + 10).append(bomb_instance)
@@ -210,7 +221,7 @@ class Game:
 
       self.player2.rect.clamp_ip(self.screen.get_rect())
 
-  def turn_monster_if_obstacle(self, monster_instance, collision_object):
+  def turn_monster_if_obstacle(self, monster_instance: Monster, collision_object: pygame.Rect) -> bool:
     if pygame.Rect.colliderect(monster_instance.rect, collision_object.rect):
       monster_instance.rect.x -= monster_instance.x_direction
       monster_instance.rect.y -= monster_instance.y_direction
@@ -222,7 +233,7 @@ class Game:
       return True
     return False
 
-  def move_monsters(self):
+  def move_monsters(self) -> None:
     for monster_instance in self.monsters:
       if monster_instance.lapse == 0:
         monster_instance.change_direction_randomly()
@@ -232,7 +243,8 @@ class Game:
         monster_instance.rect.x += monster_instance.x_direction
         monster_instance.rect.y += monster_instance.y_direction
 
-        potential_collisions = self.get_objects_at_object(monster_instance)
+        potential_collisions: list[pygame.Rect] = self.get_objects_at_object(
+          monster_instance)
         for obj in potential_collisions:
           if isinstance(obj, (Wall, Crumbly_wall, Bomb)):
             if self.turn_monster_if_obstacle(monster_instance, obj):
@@ -241,10 +253,10 @@ class Game:
           if pygame.Rect.colliderect(player.rect, monster_instance.rect):
             player.player_died()
 
-  def spawn_powerup(self, x, y):
+  def spawn_powerup(self, x: int, y: int) -> None:
     if random.randint(0, 9) > 5:
       if random.randint(0, 9) > 4:
-        extrabomb_instance = Extra_bomb(x, y)
+        extrabomb_instance: Extra_bomb = Extra_bomb(x, y)
         self.powerups.append(extrabomb_instance)
         self.get_objects_at_coords(x, y).append(extrabomb_instance)
       else:
@@ -252,7 +264,7 @@ class Game:
         self.powerups.append(longerexplosion_instance)
         self.get_objects_at_coords(x, y).append(longerexplosion_instance)
 
-  def remove_destroyed_entities(self):
+  def remove_destroyed_entities(self) -> None:
     for crumbly_wall_instance in self.crumbly_walls:
       if crumbly_wall_instance.destroyed:
         self.get_objects_at_coords(crumbly_wall_instance.rect.x, crumbly_wall_instance.rect.y).remove(
@@ -264,7 +276,7 @@ class Game:
       if not monster_instance.is_alive:
         self.monsters.remove(monster_instance)
 
-  def handle_explosion(self):
+  def handle_explosion(self) -> None:
     for explosion_instance in self.explosions:
       if explosion_instance.lifetime > 0:
         explosion_instance.lifetime -= 1
@@ -288,7 +300,7 @@ class Game:
           self.bombs.remove(bomb_instance)
           bomb_instance.owner.bombs_deployed -= 1
 
-  def handle_bombs(self):
+  def handle_bombs(self) -> None:
     for bomb_instance in self.bombs:
       if bomb_instance.fuse_time > 0:
         bomb_instance.fuse_time -= 1
@@ -301,14 +313,14 @@ class Game:
         self.bombs.remove(bomb_instance)
         bomb_instance.owner.bombs_deployed -= 1
 
-  def spawn_monsters(self, count):
-    forbidden_monster_spots = [[50, 50], [50, 100],
-                               [100, 50], [650, 550], [600, 550], [650, 500]]
+  def spawn_monsters(self, count: int) -> None:
+    forbidden_monster_spots: list[list[int]] = [[50, 50],
+                                                [50, 100], [100, 50], [650, 550], [600, 550], [650, 500]]
     for _ in range(count):
-      can_spawn = False
+      can_spawn: bool = False
       while not can_spawn:
-        spawn_x = random.randint(1, 13) * 50
-        spawn_y = random.randint(1, 11) * 50
+        spawn_x: int = random.randint(1, 13) * 50
+        spawn_y: int = random.randint(1, 11) * 50
         spawn_x += random.randint(0, 24)
         spawn_y += random.randint(0, 24)
         if [spawn_x, spawn_y] in forbidden_monster_spots:
@@ -322,7 +334,7 @@ class Game:
             can_spawn = False
       self.monsters.append(Monster(spawn_x, spawn_y))
 
-  def update_bomb_trampling(self):
+  def update_bomb_trampling(self) -> None:
     for bomb_instance in self.bombs:
       bomb_instance.stood_on = False
       if pygame.Rect.colliderect(self.player1.rect, bomb_instance.rect):
@@ -331,17 +343,17 @@ class Game:
         bomb_instance.stood_on = True
     return
 
-  def tick_explosion(self):
+  def tick_explosion(self) -> None:
     if Explosion.delay > 0:
       Explosion.delay -= 1
     else:
       Explosion.delay = 50
 
-  def run(self):
+  def run(self) -> None:
     self.spawn_walls()
     self.spawn_crumbly_walls()
     self.spawn_monsters(1)
-    run = True
+    run: bool = True
     while run:
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -359,9 +371,9 @@ class Game:
 
       pygame.display.update()
       self.clock.tick(150)
-      self.game_lapse_time = self.clock.get_time()
+      self.game_lapse_time: int = self.clock.get_time()
 
 
 # Starting the Game
-game = Game()
+game: Game = Game()
 game.run()
