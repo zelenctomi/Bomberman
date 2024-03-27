@@ -1,25 +1,45 @@
-import pygame
-import random
+import pygame, random
+from fields import Fields
 
 
 class Monster:
-  def __init__(self, x: int, y: int):
-    self.rect: pygame.Rect = pygame.Rect((x, y, 25, 25))
-    self.lapse: int = random.randint(400, 1600)
-    self.is_alive: bool = True
-    self.change_direction_randomly()
+  DIRECTIONS: list[tuple[int, int]] = [(0, -1), (0, 1), (-1, 0), (1, 0)]
 
-  def change_direction_randomly(self) -> None:    # TODO: Rewrite this method to make it more readable
-    initial_decision: int = random.randint(0, 3)
-    if initial_decision == 0:
-      self.x_direction = 0
-      self.y_direction = -1
-    elif initial_decision == 1:
-      self.x_direction = 0
-      self.y_direction = 1
-    elif initial_decision == 2:
-      self.x_direction = -1
-      self.y_direction = 0
-    else:
-      self.x_direction = 1
-      self.y_direction = 0
+  def __init__(self, x: int, y: int, fields: Fields):
+    self.rect: pygame.Rect = pygame.Rect((x, y, 25, 25))
+    self.fields: Fields = fields
+    self.x_direction: int
+    self.y_direction: int
+    self.x_direction, self.y_direction = Monster.DIRECTIONS[random.randint(0, 3)]
+    self.is_alive: bool = True
+    self.change_direction()
+
+  def die(self) -> None:
+    self.is_alive = False
+
+  def change_direction(self) -> None:
+    directions: list[tuple[int, int]] = Monster.DIRECTIONS.copy()
+    directions.remove((self.x_direction, self.y_direction))
+    self.x_direction, self.y_direction = directions[random.randint(0, 2)]
+
+  def turn_on_collision(self, obj: pygame.Rect) -> bool:
+    dummy = self.rect.copy()
+    dummy.x += self.x_direction
+    dummy.y += self.y_direction
+    if pygame.Rect.colliderect(obj.rect, dummy):
+      self.change_direction()
+      return True
+    del dummy
+    return False
+  
+  def move(self) -> None:
+    rotate = random.randint(0, 100)
+    if rotate == 50:
+      self.change_direction()
+    
+    potential_collisions: list[pygame.Rect] = self.fields.get_objects_at_object(self)
+    for obj in potential_collisions:
+      if self.turn_on_collision(obj):
+        return
+    self.rect.x += self.x_direction
+    self.rect.y += self.y_direction

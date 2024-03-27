@@ -1,36 +1,37 @@
 import pygame
 
 
-class Explosion:  # TODO: Modify methods to not use Game class as an argument
-  delay: int = 50
-
-  def __init__(self, x: int, y: int):
+class Explosion:
+  def __init__(self, x: int, y: int, walls: list[pygame.Rect]):
     self.rect: pygame.Rect = pygame.Rect((x, y, 50, 50))
     self.lifetime: int = 100
+    self.walls: list[pygame.Rect] = walls
 
-  def explode_branch(self, direction: str, offset: int, times: int, game) -> None:
+  def spread(self, direction: str, offset: int, times: int): # Typehint -> list[Explosion] doesn't work due to recursion
+    explosions: list[Explosion] = []
     if times > 0:
       if direction == "UP":
-        game.explosions.append(Explosion(self.rect.x, self.rect.y - offset))
+        explosions.append(Explosion(self.rect.x, self.rect.y - offset, self.walls))
       elif direction == "DOWN":
-        game.explosions.append(Explosion(self.rect.x, self.rect.y + offset))
+        explosions.append(Explosion(self.rect.x, self.rect.y + offset, self.walls))
       elif direction == "LEFT":
-        game.explosions.append(Explosion(self.rect.x - offset, self.rect.y))
+        explosions.append(Explosion(self.rect.x - offset, self.rect.y, self.walls))
       elif direction == "RIGHT":
-        game.explosions.append(Explosion(self.rect.x + offset, self.rect.y))
-      for wall_instance in game.walls:
-        if pygame.Rect.colliderect(wall_instance.rect, game.explosions[-1].rect):
-          game.explosions.remove(game.explosions[-1])
-          return
-      for crumbly_wall_instance in game.crumbly_walls:
-        if pygame.Rect.colliderect(crumbly_wall_instance.rect, game.explosions[-1].rect):
-          crumbly_wall_instance.destroyed = True
-          return
+        explosions.append(Explosion(self.rect.x + offset, self.rect.y, self.walls))
+      for wall in self.walls:
+        if pygame.Rect.colliderect(wall, explosions[-1].rect):
+          explosions.pop()
+          return explosions
+      return explosions + self.spread(direction, offset + 50, times - 1)
+    return []
 
-      self.explode_branch(direction, offset + 50, times - 1, game)
-
-  def explode(self, times: int, game) -> None:
-    self.explode_branch("UP", 50, times, game)
-    self.explode_branch("DOWN", 50, times, game)
-    self.explode_branch("LEFT", 50, times, game)
-    self.explode_branch("RIGHT", 50, times, game)
+  def initiate(self, times: int): # Typehint -> list[Explosion] doesn't work due to recursion
+    return [Explosion(self.rect.x, self.rect.y, self.walls)]  \
+            + self.spread("UP", 50, times)                    \
+            + self.spread("DOWN", 50, times)                  \
+            + self.spread("LEFT", 50, times)                  \
+            + self.spread("RIGHT", 50, times)
+  
+  def update(self) -> int:
+    self.lifetime -= 1
+    return self.lifetime
