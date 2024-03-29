@@ -2,15 +2,15 @@ from fields import *
 
 
 class Player:
-  def __init__(self, x: int, y: int, fields: Fields, controls: dict[str, pygame.key.key_code]):
-    self.rect: pygame.Rect = pygame.Rect((x, y, 25, 25))
+  def __init__(self, spawn: tuple[int, int], fields: Fields, controls: dict[str, pygame.key.key_code]):
+    self.rect: pygame.Rect = pygame.Rect(spawn, (fields.BLOCK_SIZE, fields.BLOCK_SIZE))
     self.controls: dict[str, pygame.key.key_code] = controls
     self.fields: Fields = fields
     self.bomb: (Bomb | None) = None
     self.is_alive: bool = True
     # Stats #
     self.stats: dict[str, int] = {
-      'bomb': 2,
+      'bomb': 1,
       'explosion': 2
     }
 
@@ -26,18 +26,18 @@ class Player:
       key: list[bool] = pygame.key.get_pressed()
       if key[self.controls['place']] and self.stats['bomb'] > 0 \
               and not self.fields.field_has_bomb(self.rect.x + 10, self.rect.y + 10):
-        self.place_bomb(self.rect.x, self.rect.y)
+        self.__place_bomb(self.rect.x, self.rect.y)
       if key[self.controls['left']]:
-        self.move_or_collide(-300, 0, elapsed)
+        self.__move_or_collide(-300, 0, elapsed)
       if key[self.controls['right']]:
-        self.move_or_collide(300, 0, elapsed)
+        self.__move_or_collide(300, 0, elapsed)
       if key[self.controls['up']]:
-        self.move_or_collide(0, -300, elapsed)
+        self.__move_or_collide(0, -300, elapsed)
       if key[self.controls['down']]:
-        self.move_or_collide(0, 300, elapsed)
+        self.__move_or_collide(0, 300, elapsed)
       self.rect.clamp_ip(screen.get_rect())
 
-  def move_or_collide(self, x: int, y: int, elapsed: int) -> None:
+  def __move_or_collide(self, x: int, y: int, elapsed: int) -> None:
     self.rect.x += x * (elapsed / 1000)
     self.rect.y += y * (elapsed / 1000)
     potential_collisons: list[pygame.Rect] = self.fields.get_objects_at_object(self)
@@ -49,17 +49,17 @@ class Player:
           self.rect.x -= x * (elapsed / 1000)
           self.rect.y -= y * (elapsed / 1000)
       elif isinstance(obj, Powerup):
-        self.apply_powerup(obj)
+        self.__apply_powerup(obj)
         self.fields.get_objects_at_coords(obj.rect.x, obj.rect.y).remove(obj)
         self.fields.powerups.remove(obj)
 
-  def apply_powerup(self, powerup: Powerup) -> None:
+  def __apply_powerup(self, powerup: Powerup) -> None:
     stat: str
     value: int
     stat, value = powerup.get_bonus()
     self.stats[stat] += value
 
-  def place_bomb(self, x: int, y: int) -> None:
+  def __place_bomb(self, x: int, y: int) -> None:
     bomb: Bomb = Bomb((x + 10) - ((x + 10) % 50), (y + 10) - ((y + 10) % 50), self)
     self.fields.set_bomb(x, y, bomb)
     self.stats['bomb'] -= 1
