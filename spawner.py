@@ -10,27 +10,40 @@ class Spawner:
     self.monsters: list[Monster] = []
     self.fields: Fields = fields
 
-  def spawn_players(self, spawn_points: list[tuple[int, int]], controls: list[dict[str, int]]) -> list[Player]:
-    for i in range(len(spawn_points)):
-      coord: tuple[int, int] = spawn_points[i]
-      player: Player = Player(coord[0], coord[1], self.fields, controls[i])
+  def spawn_players(self, controls: list[dict[str, int]]) -> list[Player]:
+    spawn_points: list[tuple[int, int]] = self.__get_player_spawn_points()
+    for i in range(len(controls)):
+      spawn: tuple[int, int] = spawn_points[i]
+      player: Player = Player(spawn, self.fields, controls[i])
       self.players.append(player)
     return self.players
-
-  def spawn_monsters(self, count: int) -> list[Monster]: # TODO: Rewrite this method
-    forbidden_spots: list[list[int]] = [[50, 50], [50, 100], [100, 50], [650, 550], [600, 550], [650, 500]]
+  
+  def spawn_monsters(self, count: int) -> list[Monster]:
+    '''
+    > Spawns monsters at random locations
+    > The 3 most outer layers of the map are forbidden
+    '''
+    OFFSET: int = 3 # Forbidden outer layers
+    spawn_points: list[tuple[int, int]] = []
+    for row in range(self.fields.HEIGHT - (OFFSET * 2)):
+      for col in range(self.fields.WIDTH - (OFFSET * 2)):
+        if self.fields.get_objects(col + OFFSET, row + OFFSET) == []:
+          x: int = (col + OFFSET) * self.fields.BLOCK_SIZE
+          y: int = (row + OFFSET) * self.fields.BLOCK_SIZE
+          spawn_points.append((x, y))
     for _ in range(count):
-      can_spawn: bool = False
-      while not can_spawn:
-        spawn_x: int = random.randint(1, 13) * 50
-        spawn_y: int = random.randint(1, 11) * 50
-        spawn_x += random.randint(0, 24)
-        spawn_y += random.randint(0, 24)
-        if [spawn_x, spawn_y] in forbidden_spots:
-          continue
-        can_spawn = True
-        for wall in self.fields.walls:
-          if wall.rect.collidepoint(spawn_x, spawn_y):
-            can_spawn = False
-      self.monsters.append(Monster(spawn_x, spawn_y, self.fields))
+      spawn: tuple[int, int] = spawn_points[random.randint(0, len(spawn_points) - 1)]
+      monster: Monster = Monster(spawn, self.fields)
+      self.monsters.append(monster)
     return self.monsters
+  
+  def __get_player_spawn_points(self) -> list[tuple[int, int]]:
+    spawn_points: list[tuple[int, int]] = []
+    WIDTH: int = self.fields.WIDTH
+    HEIGHT: int = self.fields.HEIGHT
+    BLOCK_SIZE: int = self.fields.BLOCK_SIZE
+    spawn_points.append((BLOCK_SIZE, BLOCK_SIZE))
+    spawn_points.append((WIDTH * BLOCK_SIZE - BLOCK_SIZE * 2, HEIGHT * BLOCK_SIZE - BLOCK_SIZE * 2))
+    spawn_points.append((BLOCK_SIZE, HEIGHT * BLOCK_SIZE - BLOCK_SIZE * 2))
+    spawn_points.append((WIDTH * BLOCK_SIZE - BLOCK_SIZE * 2, BLOCK_SIZE))
+    return spawn_points

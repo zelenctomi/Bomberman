@@ -2,6 +2,7 @@ from fields import *
 from spawner import *
 
 class Game:
+  BLOCK_SIZE: int = 50
   SCREEN_WIDTH: int = 750
   SCREEN_HEIGHT: int = 650
   P1_CONTROLS: dict[str, int] = {'left': pygame.K_a, 'right': pygame.K_d, 'up': pygame.K_w, 'down': pygame.K_s, 'place': pygame.K_SPACE}
@@ -12,10 +13,8 @@ class Game:
     pygame.display.set_caption('Bomberman')
     self.screen: pygame.Surface = pygame.display.set_mode((Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT))
     self.clock: pygame.Clock = pygame.time.Clock()
-    self.load_assets()
-    self.initialize_objects()
 
-  def load_assets(self) -> None:
+  def __load_assets(self) -> None:
     self.player1_surface: pygame.Surface = pygame.image.load(
       'assets/player1.png').convert()
     self.player2_surface: pygame.Surface = pygame.image.load(
@@ -44,16 +43,18 @@ class Game:
       'assets/monster.png').convert()
     self.monster_surface.set_colorkey((0, 200, 0))
 
-  def initialize_objects(self) -> None:
+  def __initialize_objects(self) -> None:
     self.fields: Fields = Fields()
+    self.fields.load_walls()
+    self.fields.load_crumbly_walls()
     self.spawner: Spawner = Spawner(self.fields)
-    self.players: list[Player] = self.spawner.spawn_players([(50, 50), (675, 575)], [Game.P1_CONTROLS, Game.P2_CONTROLS])
+    self.players: list[Player] = self.spawner.spawn_players([Game.P1_CONTROLS, Game.P2_CONTROLS])
     self.players[0].draw(self.player1_surface, self.dead_surface1)
     self.players[1].draw(self.player2_surface, self.dead_surface2)
     self.monsters: list[Monster] = self.spawner.spawn_monsters(1)
     self.elapsed: int = 0
 
-  def render_map(self) -> None:
+  def __render_map(self) -> None:
     self.screen.fill((0, 200, 0))
 
     for wall in self.fields.walls:
@@ -73,19 +74,21 @@ class Game:
     for monster in self.monsters:
       if monster.is_alive:
         self.screen.blit(self.monster_surface, monster.rect)
+        # show outline of monster surface
+        pygame.draw.rect(self.screen, (255, 0, 0), monster.rect, 3)
     for player in self.players:
       if player.is_alive:
         self.screen.blit(player.surface, player.rect)
       else:
         self.screen.blit(player.dead_surface, player.rect)
 
-  def move_entities(self) -> None:
+  def __move_entities(self) -> None:
     for player in self.players:
       player.move(self.screen, self.elapsed)
     for monster in self.monsters:
       monster.move()
 
-  def handle_explosions(self) -> None:
+  def __handle_explosions(self) -> None:
     self.fields.update_explosions()
     for explosion in self.fields.explosions:
       for player in self.players:
@@ -100,17 +103,17 @@ class Game:
           bomb.update(0)
 
   def run(self) -> None:
-    self.fields.load_walls()
-    self.fields.load_crumbly_walls()
+    self.__load_assets()
+    self.__initialize_objects()
     run: bool = True
     while run:
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
           run = False
 
-      self.render_map()
-      self.move_entities()
-      self.handle_explosions()
+      self.__render_map()
+      self.__move_entities()
+      self.__handle_explosions()
       self.fields.update_bombs()
 
       pygame.display.update()

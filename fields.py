@@ -7,7 +7,10 @@ from powerups import Powerups, Powerup, Extra_bomb, Longer_explosion
 
 
 class Fields:
-  def __init__(self, height: int = 13, width: int = 15):
+  def __init__(self, height: int = 13, width: int = 15, block_size: int = 50):
+    self.WIDTH: int = width
+    self.HEIGHT: int = height
+    self.BLOCK_SIZE: int = block_size
     self.fields: list[list[list[pygame.Rect]]] = [[[] for _ in range(width)] for _ in range(height)]
     self.walls: list[Wall] = []
     self.bombs: list[Bomb] = []
@@ -16,6 +19,9 @@ class Fields:
 
   def get_crumbly_walls(self) -> list[Crumbly_wall]:
     return [wall for wall in self.walls if isinstance(wall, Crumbly_wall)]
+  
+  def get_objects(self, col: int, row: int) -> list[pygame.Rect]:
+    return self.fields[row][col]
 
   def get_objects_at_coords(self, x: int, y: int) -> list[pygame.Rect]:
     return self.fields[y // 50][x // 50]
@@ -58,7 +64,7 @@ class Fields:
         crumbly_wall_start_y += 50
       crumbly_wall_start_x += 50
 
-  def drop_powerup(self, x: int, y: int) -> None:
+  def __drop_powerup(self, x: int, y: int) -> None:
     powerup: (Powerup | None) = Powerups.get_powerup(x, y)
     if powerup is not None:
       self.get_objects_at_coords(x, y).append(powerup)
@@ -75,18 +81,17 @@ class Fields:
         self.get_objects_at_coords(bomb.rect.x, bomb.rect.y).remove(bomb)
         self.bombs.remove(bomb)
         bomb.owner.stats['bomb'] += 1
-        self.destroy_crumbly_walls()
+        self.__destroy_crumbly_walls()
 
   def update_explosions(self) -> None:
     for explosion in self.explosions:
       if explosion.update() == 0:
         self.explosions.remove(explosion)
 
-  def destroy_crumbly_walls(self) -> None:
+  def __destroy_crumbly_walls(self) -> None:
     for wall in self.get_crumbly_walls():
       for explosion in self.explosions:
         if pygame.Rect.colliderect(wall.rect, explosion.rect):
           self.get_objects_at_coords(wall.rect.x, wall.rect.y).remove(wall)
           self.walls.remove(wall)
-          self.drop_powerup(wall.rect.x, wall.rect.y)
-
+          self.__drop_powerup(wall.rect.x, wall.rect.y)
