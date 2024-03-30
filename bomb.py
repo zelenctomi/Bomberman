@@ -3,8 +3,8 @@ from explosion import Explosion
 
 
 class Bomb:
-  def __init__(self, x: int, y: int, player):
-    self.rect: pygame.Rect = pygame.Rect((x, y, 50, 50))
+  def __init__(self, coord, size: int, player):
+    self.rect: pygame.Rect = pygame.Rect(coord, (size, size))
     self.timer: int = 150
     self.owner = player
 

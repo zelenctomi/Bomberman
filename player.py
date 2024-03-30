@@ -60,7 +60,7 @@ class Player:
     self.stats[stat] += value
 
   def __place_bomb(self, x: int, y: int) -> None:
-    bomb: Bomb = Bomb((x + 10) - ((x + 10) % 50), (y + 10) - ((y + 10) % 50), self)
+    bomb: Bomb = Bomb((x, y), self.fields.BLOCK_SIZE, self)
     self.fields.set_bomb(x, y, bomb)
     self.stats['bomb'] -= 1
     self.bomb = bomb

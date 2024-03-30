@@ -60,8 +60,14 @@ class Game:
     for wall in self.fields.walls:
       if isinstance(wall, Crumbly_wall):
         self.screen.blit(self.crumbly_wall_surface, wall)
+        pygame.draw.rect(self.screen, (0, 255, 0), wall.rect, 3)
       else:
         self.screen.blit(self.wall_surface, wall)
+        pygame.draw.rect(self.screen, (0, 0, 255), wall.rect, 3)
+        # draw the coords on the center of each wall
+        font = pygame.font.Font(None, 16)
+        text = font.render(f'{wall.rect.left / 50, wall.rect.top / 50}', True, (255, 255, 255))
+        self.screen.blit(text, (wall.rect.left + 10, wall.rect.top + 10))
     for bomb in self.fields.bombs:
       self.screen.blit(self.bomb_surface, bomb)
     for explosion in self.fields.explosions:
@@ -83,10 +89,10 @@ class Game:
         self.screen.blit(player.dead_surface, player.rect)
 
   def __move_entities(self) -> None:
-    for player in self.players:
-      player.move(self.screen, self.elapsed)
     for monster in self.monsters:
       monster.move()
+    for player in self.players:
+      player.move(self.screen, self.elapsed)
 
   def __handle_explosions(self) -> None:
     self.fields.update_explosions()
@@ -105,6 +111,7 @@ class Game:
   def run(self) -> None:
     self.__load_assets()
     self.__initialize_objects()
+    # self.__move_entities() # DELETE THIS LINE
     run: bool = True
     while run:
       for event in pygame.event.get():

@@ -24,14 +24,28 @@ class Fields:
     return self.fields[row][col]
 
   def get_objects_at_coords(self, x: int, y: int) -> list[pygame.Rect]:
-    return self.fields[y // 50][x // 50]
+    return self.get_objects(x // self.BLOCK_SIZE, y // self.BLOCK_SIZE)
   
   def get_objects_at_object(self, obj: pygame.Rect) -> list[pygame.Rect]:
     potential_collisons: list[pygame.Rect] = []
-    for corner in [obj.rect.topleft, obj.rect.topright, obj.rect.bottomleft, obj.rect.bottomright]:
-      for object in self.get_objects_at_coords(corner[0], corner[1]):
-        if object not in potential_collisons:
-          potential_collisons.append(object)
+    topleft: tuple[int, int] = obj.rect.topleft
+    bottomright: tuple[int, int] = obj.rect.bottomright
+    bottomright = (bottomright[0] - 1, bottomright[1] - 1) # NOTE bottomright coords are out of bounds so -1 is necessary
+    objects: list[pygame.Rect] = self.get_objects_at_coords(topleft[0], topleft[1])
+    objects.extend(self.get_objects_at_coords(bottomright[0], bottomright[1]))
+    for o in objects:
+      if o not in potential_collisons:
+        potential_collisons.append(o) 
+    return potential_collisons
+  
+  def get_objects_around_object(self, obj: pygame.Rect) -> list[pygame.Rect]:
+    potential_collisons: list[pygame.Rect] = []
+    for row in range(-1, 2):
+      for col in range(-1, 2):
+        objects: list[pygame.Rect] = self.get_objects(obj.rect.x // self.BLOCK_SIZE + row, obj.rect.y // self.BLOCK_SIZE + col)
+        for o in objects:
+          if o not in potential_collisons:
+            potential_collisons.append(o)
     return potential_collisons
   
   def field_has_bomb(self, x: int, y: int) -> bool: # TODO: Remove if not necessary
@@ -64,10 +78,10 @@ class Fields:
         crumbly_wall_start_y += 50
       crumbly_wall_start_x += 50
 
-  def __drop_powerup(self, x: int, y: int) -> None:
-    powerup: (Powerup | None) = Powerups.get_powerup(x, y)
+  def __drop_powerup(self, coord: tuple[int, int]) -> None:
+    powerup: (Powerup | None) = Powerups.get_powerup(coord, self.BLOCK_SIZE)
     if powerup is not None:
-      self.get_objects_at_coords(x, y).append(powerup)
+      self.get_objects_at_coords(coord[0], coord[1]).append(powerup)
       self.powerups.append(powerup)
 
   def set_bomb(self, x: int, y: int, bomb: Bomb) -> None:
@@ -94,4 +108,5 @@ class Fields:
         if pygame.Rect.colliderect(wall.rect, explosion.rect):
           self.get_objects_at_coords(wall.rect.x, wall.rect.y).remove(wall)
           self.walls.remove(wall)
-          self.__drop_powerup(wall.rect.x, wall.rect.y)
+          coord: tuple[int, int] = (wall.rect.x, wall.rect.y)
+          self.__drop_powerup(coord)

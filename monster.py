@@ -29,7 +29,6 @@ class Monster:
     if pygame.Rect.colliderect(obj.rect, dummy):
       self.__change_direction()
       return True
-    del dummy
     return False
   
   def move(self) -> None:
@@ -37,7 +36,10 @@ class Monster:
     if rotate == 50:
       self.__change_direction()
     
-    potential_collisions: list[pygame.Rect] = self.fields.get_objects_at_object(self)
+    potential_collisions: list[pygame.Rect] = self.fields.get_objects_around_object(self)
+    # for i in range(len(potential_collisions)):
+    #   print(f'collide object type: {type(potential_collisions[i])}')
+    #   print(f'collide object matrix: {potential_collisions[i].rect.left / 50, potential_collisions[i].rect.top / 50}')
     for obj in potential_collisions:
       if self.__turn_on_collision(obj):
         return
