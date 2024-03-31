@@ -74,19 +74,19 @@ class Game:
     for monster in self.monsters:
       if monster.is_alive:
         self.screen.blit(self.monster_surface, monster.rect)
-        # show outline of monster surface
-        pygame.draw.rect(self.screen, (255, 0, 0), monster.rect, 3)
     for player in self.players:
       if player.is_alive:
         self.screen.blit(player.surface, player.rect)
+        # draw border around player
+        # pygame.draw.rect(self.screen, (0, 0, 0), player.rect, 2)
       else:
         self.screen.blit(player.dead_surface, player.rect)
 
   def __move_entities(self) -> None:
-    for player in self.players:
-      player.move(self.screen, self.elapsed)
     for monster in self.monsters:
       monster.move()
+    for player in self.players:
+      player.move()
 
   def __handle_explosions(self) -> None:
     self.fields.update_explosions()
@@ -105,6 +105,7 @@ class Game:
   def run(self) -> None:
     self.__load_assets()
     self.__initialize_objects()
+    # self.__move_entities() # DELETE THIS LINE
     run: bool = True
     while run:
       for event in pygame.event.get():
@@ -117,5 +118,5 @@ class Game:
       self.fields.update_bombs()
 
       pygame.display.update()
-      self.clock.tick(150)
+      self.clock.tick(100)
       self.elapsed: int = self.clock.get_time()

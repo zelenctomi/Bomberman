@@ -7,8 +7,8 @@ from longer_explosion import Longer_explosion
 class Powerups:
     
   @staticmethod
-  def get_powerup(x: int, y: int) -> (Powerup | None):
-    POWERUPS: list[Powerup] = [Extra_bomb(x, y), Longer_explosion(x, y)]
+  def get_powerup(coord: tuple[int, int], size: int) -> (Powerup | None):
+    POWERUPS: list[Powerup] = [Extra_bomb(coord, size), Longer_explosion(coord, size)]
     PROBABILITY: int = 3
     r: int = random.randint(0, PROBABILITY * len(POWERUPS) - PROBABILITY)
     if r > len(POWERUPS) - 1:

@@ -29,17 +29,21 @@ class Monster:
     if pygame.Rect.colliderect(obj.rect, dummy):
       self.__change_direction()
       return True
-    del dummy
     return False
   
   def move(self) -> None:
-    rotate = random.randint(0, 100)
-    if rotate == 50:
-      self.__change_direction()
-    
-    potential_collisions: list[pygame.Rect] = self.fields.get_objects_at_object(self)
+    self.__randomize_direction()
+    potential_collisions = self.fields.get_objects_around_object(self)
     for obj in potential_collisions:
       if self.__turn_on_collision(obj):
         return
-    self.rect.x += self.x_direction
-    self.rect.y += self.y_direction
+    self.__update_position(self.x_direction, self.y_direction)
+
+  def __randomize_direction(self) -> None:
+    rotate = random.randint(0, 100)
+    if rotate == 50:
+      self.__change_direction()
+
+  def __update_position(self, x: int, y: int) -> None:
+    self.rect.x += x
+    self.rect.y += y
