@@ -5,7 +5,7 @@ from explosion import Explosion
 class Bomb:
   def __init__(self, coord, size: int, player):
     self.rect: pygame.Rect = pygame.Rect(coord, (size, size))
-    self.timer: int = 150
+    self.timer: int = 200
     self.owner = player
 
   def update(self, value: int = 1) -> int:
