@@ -102,6 +102,12 @@ class Game:
         if pygame.Rect.colliderect(explosion.rect, bomb.rect):
           bomb.update(0)
 
+  def __handle_death(self) -> None:
+    for monster in self.monsters:
+      for player in self.players:
+        if pygame.Rect.colliderect(player.rect, monster.rect):
+          player.die()
+
   def run(self) -> None:
     self.__load_assets()
     self.__initialize_objects()
@@ -115,6 +121,7 @@ class Game:
       self.__render_map()
       self.__move_entities()
       self.__handle_explosions()
+      self.__handle_death()
       self.fields.update_bombs()
 
       pygame.display.update()
