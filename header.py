@@ -1,4 +1,3 @@
-from turtle import window_width
 import pygame
 import sys
 from pygame.locals import *
@@ -8,14 +7,11 @@ BLACK = (0, 0, 0)
 
 WINDOW_WIDTH = 750
 
-# Fontok létrehozása
 header_font = pygame.font.SysFont(None, 36)
 menu_font = pygame.font.SysFont(None, 24)
 
-# A játékosok pontjainak nyilvántartása
 players_points = {'Player 1': 0, 'Player 2': 0}
 
-# Menü osztály
 class Menu:
     
     def __init__(self, window):
@@ -28,7 +24,7 @@ class Menu:
         self.running = False
 
     def draw(self):
-        self.window.fill(WHITE)  # Ablak kitöltése fehér színnel
+        self.window.fill(WHITE)
         self.draw_menu()
         self.draw_status()
 
@@ -39,11 +35,11 @@ class Menu:
             elif event.key == pygame.K_DOWN:
                 self.selected_menu_item = (self.selected_menu_item + 1) % len(self.menu_items)
             elif event.key == pygame.K_RETURN:
-                if self.selected_menu_item == 0:  # Start
+                if self.selected_menu_item == 0:
                     self.start()
-                elif self.selected_menu_item == 1:  # Stop
+                elif self.selected_menu_item == 1:
                     self.stop()
-                elif self.selected_menu_item == 2:  # Exit
+                elif self.selected_menu_item == 2:
                     pygame.quit()
                     sys.exit()
 

@@ -46,7 +46,7 @@ class Spawner:
     WIDTH: int = Fields.WIDTH
     HEIGHT: int = Fields.HEIGHT
     BLOCK_SIZE: int = Fields.BLOCK_SIZE
-    spawn_points.append((BLOCK_SIZE, BLOCK_SIZE))
+    spawn_points.append((BLOCK_SIZE, BLOCK_SIZE + 50))
     spawn_points.append((WIDTH * BLOCK_SIZE - BLOCK_SIZE * 2, HEIGHT * BLOCK_SIZE - BLOCK_SIZE * 2))
     spawn_points.append((BLOCK_SIZE, HEIGHT * BLOCK_SIZE - BLOCK_SIZE * 2))
     spawn_points.append((WIDTH * BLOCK_SIZE - BLOCK_SIZE * 2, BLOCK_SIZE))

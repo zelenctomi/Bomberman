@@ -4,7 +4,7 @@ from spawner import *
 class Game:
   BLOCK_SIZE: int = 50
   SCREEN_WIDTH: int = 750
-  SCREEN_HEIGHT: int = 650
+  SCREEN_HEIGHT: int = 700
   P1_CONTROLS: dict[str, int] = {'left': pygame.K_a, 'right': pygame.K_d, 'up': pygame.K_w, 'down': pygame.K_s, 'place': pygame.K_SPACE}
   P2_CONTROLS: dict[str, int] = {'left': pygame.K_LEFT, 'right': pygame.K_RIGHT, 'up': pygame.K_UP, 'down': pygame.K_DOWN, 'place': pygame.K_o}
 
@@ -13,6 +13,12 @@ class Game:
     pygame.display.set_caption('Bomberman')
     self.screen: pygame.Surface = pygame.display.set_mode((Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT))
     self.clock: pygame.Clock = pygame.time.Clock()
+    self.font: pygame.font.Font = pygame.font.SysFont(None, 36)  # Font for the header
+    self.elapsed: int = 0
+    self.scoreboard: str = "Player 1: 0   Player 2: 0"
+    self.timer_text: str = "Time: 0s"
+    self.scoreboard_render = self.font.render(self.scoreboard, True, (255, 255, 255))
+    self.timer_render = self.font.render(self.timer_text, True, (255, 255, 255))
 
   def __load_assets(self) -> None:
     self.player1_surface: pygame.Surface = pygame.image.load(
@@ -82,6 +88,12 @@ class Game:
       else:
         self.screen.blit(player.dead_surface, player.rect)
 
+  def __render_header(self) -> None:
+        header_rect = pygame.Rect(0, 0, Game.SCREEN_WIDTH, 50)
+        pygame.draw.rect(self.screen, (0, 0, 0), header_rect)
+        self.screen.blit(self.scoreboard_render, (20, 10))
+        self.screen.blit(self.timer_render, (Game.SCREEN_WIDTH - 200, 10))
+
   def __move_entities(self) -> None:
     for monster in self.monsters:
       monster.move()
@@ -113,11 +125,16 @@ class Game:
     self.__initialize_objects()
     # self.__move_entities() # DELETE THIS LINE
     run: bool = True
+    start_time = pygame.time.get_ticks() // 1000
     while run:
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
           run = False
 
+      self.__render_header()
+      self.elapsed = (pygame.time.get_ticks() // 1000) - start_time
+      self.timer_text = f"Time: {self.elapsed}s"
+      self.timer_render = self.font.render(self.timer_text, True, (255, 255, 255))
       self.__render_map()
       self.__move_entities()
       self.__handle_explosions()
