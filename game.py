@@ -2,14 +2,18 @@ from fields import *
 from spawner import *
 from scoreboard import *
 
+
 class Game:
   BACKGROUND: tuple[int, int, int] = (222, 172, 245)
   BLOCK_SIZE: int = 50
   SCREEN_WIDTH: int = 750
   SCREEN_HEIGHT: int = 700
-  P1_CONTROLS: dict[str, int] = {'left': pygame.K_a, 'right': pygame.K_d, 'up': pygame.K_w, 'down': pygame.K_s, 'place': pygame.K_SPACE}
-  P2_CONTROLS: dict[str, int] = {'left': pygame.K_LEFT, 'right': pygame.K_RIGHT, 'up': pygame.K_UP, 'down': pygame.K_DOWN, 'place': pygame.K_RETURN}
-  P3_CONTROLS: dict[str, int] = {'left': pygame.K_j, 'right': pygame.K_l, 'up': pygame.K_i, 'down': pygame.K_k, 'place': pygame.K_o}
+  P1_CONTROLS: dict[str, int] = {'left': pygame.K_a, 'right': pygame.K_d,
+                                 'up': pygame.K_w, 'down': pygame.K_s, 'place': pygame.K_SPACE}
+  P2_CONTROLS: dict[str, int] = {'left': pygame.K_LEFT, 'right': pygame.K_RIGHT,
+                                 'up': pygame.K_UP, 'down': pygame.K_DOWN, 'place': pygame.K_RETURN}
+  P3_CONTROLS: dict[str, int] = {'left': pygame.K_j, 'right': pygame.K_l,
+                                 'up': pygame.K_i, 'down': pygame.K_k, 'place': pygame.K_o}
 
   def __init__(self):
     pygame.init()
@@ -111,7 +115,7 @@ class Game:
       for monster in self.monsters:
         if pygame.Rect.colliderect(monster.rect, explosion.rect):
           monster.die()
-          self.monsters.remove(monster) # So the monster doesn't get drawn after death
+          self.monsters.remove(monster)  # So the monster doesn't get drawn after death
       for bomb in self.fields.bombs:
         if pygame.Rect.colliderect(explosion.rect, bomb.rect):
           bomb.update(0)

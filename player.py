@@ -2,10 +2,10 @@ from fields import *
 
 
 class Player:
-  def __init__(self, spawn: tuple[int, int], fields: Fields, controls: dict[str, pygame.key.key_code]):
+  def __init__(self, spawn: tuple[int, int], fields: Fields, controls: dict[str, int]):
     self.rect: pygame.Rect = pygame.Rect(
       spawn, (fields.BLOCK_SIZE, fields.BLOCK_SIZE))
-    self.controls: dict[str, pygame.key.key_code] = controls
+    self.controls: dict[str, int] = controls
     self.fields: Fields = fields
     self.bomb: (Bomb | None) = None
     self.is_alive: bool = True
@@ -25,7 +25,7 @@ class Player:
 
   def move(self) -> None:
     if self.is_alive:
-      key: list[bool] = pygame.key.get_pressed()
+      key: tuple[bool, ...] = pygame.key.get_pressed()
       x: int = 0
       y: int = 0
       if key[self.controls['place']]:
