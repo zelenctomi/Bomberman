@@ -1,11 +1,12 @@
 from fields import *
 from spawner import *
+from score_board import *
 
 class Game:
   BACKGROUND: tuple[int, int, int] = (222, 172, 245)
   BLOCK_SIZE: int = 50
   SCREEN_WIDTH: int = 750
-  SCREEN_HEIGHT: int = 650
+  SCREEN_HEIGHT: int = 700
   P1_CONTROLS: dict[str, int] = {'left': pygame.K_a, 'right': pygame.K_d, 'up': pygame.K_w, 'down': pygame.K_s, 'place': pygame.K_SPACE}
   P2_CONTROLS: dict[str, int] = {'left': pygame.K_LEFT, 'right': pygame.K_RIGHT, 'up': pygame.K_UP, 'down': pygame.K_DOWN, 'place': pygame.K_RETURN}
   P3_CONTROLS: dict[str, int] = {'left': pygame.K_j, 'right': pygame.K_l, 'up': pygame.K_i, 'down': pygame.K_k, 'place': pygame.K_o}
@@ -44,8 +45,11 @@ class Game:
     self.monster_surface: pygame.Surface = pygame.image.load(
       'Assets/monster.png').convert_alpha()
     # self.monster_surface.set_colorkey((0, 200, 0))
+    self.scoreboard_surface: pygame.Surface = pygame.image.load(
+      'Assets/Menu/Status_Bar.png').convert_alpha()
 
   def __initialize_objects(self) -> None:
+    self.score_bar: Score_board = Score_board(self.screen)
     self.fields: Fields = Fields()
     self.fields.load_walls()
     self.fields.load_crumbly_walls()
@@ -62,7 +66,7 @@ class Game:
 
     for wall in self.fields.walls:
       if isinstance(wall, Crumbly_wall):
-        self.screen.blit(self.crumbly_wall_surface, wall)
+        self.screen.blit(self.crumbly_wall_surface, wall.rect)
       else:
         self.screen.blit(self.wall_surface, wall)
     for bomb in self.fields.bombs:
@@ -83,6 +87,7 @@ class Game:
         # pygame.draw.rect(self.screen, (0, 0, 0), player.rect, 2)
       else:
         self.screen.blit(player.dead_surface, player.rect)
+    self.screen.blit(self.scoreboard_surface, (0, 635))
 
   def __move_entities(self) -> None:
     for monster in self.monsters:
@@ -104,6 +109,12 @@ class Game:
         if pygame.Rect.colliderect(explosion.rect, bomb.rect):
           bomb.update(0)
 
+  def __handle_death(self):
+    for monster in self.monsters:
+      for player in self.players:
+        if pygame.Rect.colliderect(player.rect, monster.rect):
+          player.die()
+
   def run(self) -> None:
     self.__load_assets()
     self.__initialize_objects()
@@ -117,6 +128,7 @@ class Game:
       self.__render_map()
       self.__move_entities()
       self.__handle_explosions()
+      self.__handle_death()
       self.fields.update_bombs()
 
       pygame.display.update()
