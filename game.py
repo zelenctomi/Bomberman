@@ -1,6 +1,6 @@
 from fields import *
 from spawner import *
-from score_board import *
+from scoreboard import *
 
 class Game:
   BACKGROUND: tuple[int, int, int] = (222, 172, 245)
@@ -56,7 +56,7 @@ class Game:
       'Assets/Menu/Status_Bar.png').convert_alpha()
 
   def __initialize_objects(self) -> None:
-    self.score_bar: Score_board = Score_board(self.screen)
+    self.score_bar: Scoreboard = Scoreboard(self.screen)
     self.fields: Fields = Fields()
     self.fields.load_walls()
     self.fields.load_crumbly_walls()

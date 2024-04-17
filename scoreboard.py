@@ -1,6 +1,6 @@
 import pygame
 
-class Score_board:
+class Scoreboard:
 
     SCREEN_WIDTH: int = 750
     SCREEN_HEIGHT: int = 700
