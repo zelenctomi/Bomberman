@@ -10,7 +10,7 @@ class Fields:
   WIDTH: int
   HEIGHT: int
   BLOCK_SIZE: int
-  def __init__(self, height: int = 14, width: int = 15, block_size: int = 50):
+  def __init__(self, height: int = 13, width: int = 15, block_size: int = 50):
     Fields.WIDTH = width
     Fields.HEIGHT = height
     Fields.BLOCK_SIZE = block_size
@@ -44,7 +44,7 @@ class Fields:
         potential_collisons.append(o) 
     return potential_collisons
   
-  def get_objects_around_object(self, obj) -> list[pygame.Rect]:
+  def get_objects_around_object(self, obj):
     potential_collisons: list[pygame.Rect] = []
     for row in range(-1, 2):
       for col in range(-1, 2):
@@ -68,10 +68,10 @@ class Fields:
   def load_walls(self) -> None:
     wall_start_x: int = 0
     for x in range(15):
-      wall_start_y: int = 50
-      for y in range(14):
-        if wall_start_x in [0, 700] or wall_start_y in [50, 650] or \
-          (wall_start_x in [100, 200, 300, 400, 500, 600] and wall_start_y in [150, 250, 350, 450, 550]):
+      wall_start_y: int = 0
+      for y in range(13):
+        if wall_start_x in [0, 700] or wall_start_y in [0, 600] or \
+          (wall_start_x in [100, 200, 300, 400, 500, 600] and wall_start_y in [100, 200, 300, 400, 500]):
           wall: Wall = Wall(wall_start_x, wall_start_y)
           self.walls.append(wall)
           self.fields[y][x].append(wall)
@@ -79,12 +79,12 @@ class Fields:
       wall_start_x += 50
 
   def load_crumbly_walls(self) -> None:
-    forbidden_spots: list[list[int]] = [[50, 100], [50, 150], [100, 100], [650, 600], [600, 600], [650, 550]]#y += 50
+    forbidden_spots: list[list[int]] = [[50, 50], [50, 100], [100, 50], [650, 550], [600, 550], [650, 500]]
     crumbly_wall_start_x: int = 50
     for x in range(13):
-      crumbly_wall_start_y: int = 100
+      crumbly_wall_start_y: int = 50
       for y in range(11):
-        if (crumbly_wall_start_x in [100, 200, 300, 400, 500, 600] and crumbly_wall_start_y not in [150, 250, 350, 450, 550]) and \
+        if (crumbly_wall_start_x in [100, 200, 300, 400, 500, 600] and crumbly_wall_start_y not in [100, 200, 300, 400, 500]) and \
                 [crumbly_wall_start_x, crumbly_wall_start_y] not in forbidden_spots and random.randint(0, 9) > 7:
           crumbly_wall: Crumbly_wall = Crumbly_wall(crumbly_wall_start_x, crumbly_wall_start_y)
           self.walls.append(crumbly_wall)

@@ -7,7 +7,6 @@ class Game:
   BLOCK_SIZE: int = 50
   SCREEN_WIDTH: int = 750
   SCREEN_HEIGHT: int = 700
-  SCREEN_HEIGHT: int = 700
   P1_CONTROLS: dict[str, int] = {'left': pygame.K_a, 'right': pygame.K_d, 'up': pygame.K_w, 'down': pygame.K_s, 'place': pygame.K_SPACE}
   P2_CONTROLS: dict[str, int] = {'left': pygame.K_LEFT, 'right': pygame.K_RIGHT, 'up': pygame.K_UP, 'down': pygame.K_DOWN, 'place': pygame.K_RETURN}
   P3_CONTROLS: dict[str, int] = {'left': pygame.K_j, 'right': pygame.K_l, 'up': pygame.K_i, 'down': pygame.K_k, 'place': pygame.K_o}
@@ -95,12 +94,7 @@ class Game:
         # pygame.draw.rect(self.screen, (0, 0, 0), player.rect, 2)
       else:
         self.screen.blit(player.dead_surface, player.rect)
-
-  def __render_header(self) -> None:
-        header_rect = pygame.Rect(0, 0, Game.SCREEN_WIDTH, 50)
-        pygame.draw.rect(self.screen, (0, 0, 0), header_rect)
-        self.screen.blit(self.scoreboard_render, (20, 10))
-        self.screen.blit(self.timer_render, (Game.SCREEN_WIDTH - 200, 10))
+    self.screen.blit(self.scoreboard_surface, (0, 635))
 
   def __move_entities(self) -> None:
     for monster in self.monsters:
@@ -139,7 +133,6 @@ class Game:
         if event.type == pygame.QUIT:
           run = False
 
-      self.__render_header()
       self.elapsed = (pygame.time.get_ticks() // 1000) - start_time
       self.timer_text = f"Time: {self.elapsed}s"
       self.timer_render = self.font.render(self.timer_text, True, (255, 255, 255))

@@ -97,7 +97,7 @@ class Player:
     slideY: int = 0
     current: pygame.Rect = self.fields.snap_to_grid(self.rect)
     target: pygame.Rect = pygame.Rect((current.x // Fields.BLOCK_SIZE + x) * Fields.BLOCK_SIZE,
-                                      (current.y // Fields.BLOCK_SIZE + y) * Fields.BLOCK_SIZE + 50,
+                                      (current.y // Fields.BLOCK_SIZE + y) * Fields.BLOCK_SIZE,
                                       Fields.BLOCK_SIZE, 
                                       Fields.BLOCK_SIZE)
     # If the target block is not a collision, then the player will slide towards the target block
