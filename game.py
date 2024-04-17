@@ -12,8 +12,8 @@ class Game:
     pygame.init()
     pygame.display.set_caption('Bomberman')
     self.screen: pygame.Surface = pygame.display.set_mode((Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT))
-    self.clock: pygame.Clock = pygame.time.Clock()
-    self.font: pygame.font.Font = pygame.font.SysFont(None, 36)  # Font for the header
+    self.clock: pygame.time.Clock = pygame.time.Clock()
+    self.font: pygame.font.Font = pygame.font.Font('PixelifySansFont/PixelifySans-VariableFont_wght.ttf', 36)
     self.elapsed: int = 0
     self.scoreboard: str = "Player 1: 0   Player 2: 0"
     self.timer_text: str = "Time: 0s"
@@ -65,18 +65,18 @@ class Game:
 
     for wall in self.fields.walls:
       if isinstance(wall, Crumbly_wall):
-        self.screen.blit(self.crumbly_wall_surface, wall)
+        self.screen.blit(self.crumbly_wall_surface, wall.rect)
       else:
-        self.screen.blit(self.wall_surface, wall)
+        self.screen.blit(self.wall_surface, wall.rect)
     for bomb in self.fields.bombs:
-      self.screen.blit(self.bomb_surface, bomb)
+      self.screen.blit(self.bomb_surface, bomb.rect)
     for explosion in self.fields.explosions:
-      self.screen.blit(self.explosion_surface, explosion)
+      self.screen.blit(self.explosion_surface, explosion.rect)
     for powerup in self.fields.powerups:
       if isinstance(powerup, Extra_bomb):
-        self.screen.blit(self.extra_bomb_surface, powerup)
+        self.screen.blit(self.extra_bomb_surface, powerup.rect)
       elif isinstance(powerup, Longer_explosion):
-        self.screen.blit(self.longer_explosion_surface, powerup)
+        self.screen.blit(self.longer_explosion_surface, powerup.rect)
     for monster in self.monsters:
       if monster.is_alive:
         self.screen.blit(self.monster_surface, monster.rect)

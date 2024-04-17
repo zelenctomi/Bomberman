@@ -29,7 +29,7 @@ class Fields:
   def get_objects_at_coords(self, x: int, y: int):
     return self.get_objects(x // Fields.BLOCK_SIZE, y // Fields.BLOCK_SIZE)
   
-  def get_objects_at_object(self, obj: pygame.Rect):
+  def get_objects_at_object(self, obj):
     potential_collisons = []
     objects = []
     # NOTE rect.bottom and rect.right coordinates always lie one pixel outside of their actual border
@@ -44,7 +44,7 @@ class Fields:
         potential_collisons.append(o) 
     return potential_collisons
   
-  def get_objects_around_object(self, obj: pygame.Rect) -> list[pygame.Rect]:
+  def get_objects_around_object(self, obj) -> list[pygame.Rect]:
     potential_collisons: list[pygame.Rect] = []
     for row in range(-1, 2):
       for col in range(-1, 2):
