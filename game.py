@@ -2,11 +2,13 @@ from fields import *
 from spawner import *
 
 class Game:
+  BACKGROUND: tuple[int, int, int] = (222, 172, 245)
   BLOCK_SIZE: int = 50
   SCREEN_WIDTH: int = 750
   SCREEN_HEIGHT: int = 700
   P1_CONTROLS: dict[str, int] = {'left': pygame.K_a, 'right': pygame.K_d, 'up': pygame.K_w, 'down': pygame.K_s, 'place': pygame.K_SPACE}
-  P2_CONTROLS: dict[str, int] = {'left': pygame.K_LEFT, 'right': pygame.K_RIGHT, 'up': pygame.K_UP, 'down': pygame.K_DOWN, 'place': pygame.K_o}
+  P2_CONTROLS: dict[str, int] = {'left': pygame.K_LEFT, 'right': pygame.K_RIGHT, 'up': pygame.K_UP, 'down': pygame.K_DOWN, 'place': pygame.K_RETURN}
+  P3_CONTROLS: dict[str, int] = {'left': pygame.K_j, 'right': pygame.K_l, 'up': pygame.K_i, 'down': pygame.K_k, 'place': pygame.K_o}
 
   def __init__(self):
     pygame.init()
@@ -21,47 +23,48 @@ class Game:
     self.timer_render = self.font.render(self.timer_text, True, (255, 255, 255))
 
   def __load_assets(self) -> None:
-    self.player1_surface: pygame.Surface = pygame.image.load(
-      'assets/player1.png').convert()
-    self.player2_surface: pygame.Surface = pygame.image.load(
-      'assets/player2.png').convert()
+    self.player1_surface: pygame.Surface = pygame.transform.scale(pygame.image.load(
+      'Assets/Players/p1/idle/right/r1.png').convert_alpha(), (Game.BLOCK_SIZE, Game.BLOCK_SIZE))
+    self.player2_surface: pygame.Surface = pygame.transform.scale(pygame.image.load(
+      'Assets/Players/p1/idle/left/l1.png').convert_alpha(), (Game.BLOCK_SIZE, Game.BLOCK_SIZE))
     self.dead_surface1: pygame.Surface = pygame.image.load(
-      'assets/dead_player1.png').convert()
+      'Assets/Players/p1/idle/up/u1.png').convert_alpha()
     self.dead_surface2: pygame.Surface = pygame.image.load(
-      'assets/dead_player2.png').convert()
+      'Assets/Players/p1/idle/right/r1.png').convert_alpha()
     self.crumbly_wall_surface: pygame.Surface = pygame.image.load(
-      'assets/crumbly_wall.png').convert()
+      'Assets/Walls/Default/crumbly.png').convert_alpha()
     self.wall_surface: pygame.Surface = pygame.image.load(
-      'assets/wall.png').convert()
-    self.bomb_surface: pygame.Surface = pygame.image.load(
-      'assets/bomb.png').convert()
+      'Assets/Walls/Default/wall.png').convert_alpha()
+    self.bomb_surface: pygame.Surface = pygame.transform.scale(pygame.image.load(
+      'Assets/Bomb/bomb.png').convert_alpha(), (Game.BLOCK_SIZE, Game.BLOCK_SIZE))
     self.bomb_surface.set_colorkey((0, 200, 0))
     self.explosion_surface: pygame.Surface = pygame.image.load(
-      'assets/explosion_center.png').convert()
-    self.explosion_surface.set_colorkey((0, 200, 0))
+      'Assets/explosion_center.png').convert_alpha()
+    # self.explosion_surface.set_colorkey((0, 200, 0))
     self.extra_bomb_surface: pygame.Surface = pygame.image.load(
-      'assets/extra_bomb.png').convert()
-    self.extra_bomb_surface.set_colorkey((0, 200, 0))
+      'Assets/extra_bomb.png').convert_alpha()
+    # self.extra_bomb_surface.set_colorkey((0, 200, 0))
     self.longer_explosion_surface: pygame.Surface = pygame.image.load(
-      'assets/longer_explosion.png').convert()
-    self.longer_explosion_surface.set_colorkey((0, 200, 0))
+      'Assets/longer_explosion.png').convert_alpha()
+    # self.longer_explosion_surface.set_colorkey((0, 200, 0))
     self.monster_surface: pygame.Surface = pygame.image.load(
-      'assets/monster.png').convert()
-    self.monster_surface.set_colorkey((0, 200, 0))
+      'Assets/monster.png').convert_alpha()
+    # self.monster_surface.set_colorkey((0, 200, 0))
 
   def __initialize_objects(self) -> None:
     self.fields: Fields = Fields()
     self.fields.load_walls()
     self.fields.load_crumbly_walls()
     self.spawner: Spawner = Spawner(self.fields)
-    self.players: list[Player] = self.spawner.spawn_players([Game.P1_CONTROLS, Game.P2_CONTROLS])
+    self.players: list[Player] = self.spawner.spawn_players([Game.P1_CONTROLS, Game.P2_CONTROLS, Game.P3_CONTROLS])
     self.players[0].draw(self.player1_surface, self.dead_surface1)
     self.players[1].draw(self.player2_surface, self.dead_surface2)
+    self.players[2].draw(self.player2_surface, self.dead_surface2)
     self.monsters: list[Monster] = self.spawner.spawn_monsters(1)
     self.elapsed: int = 0
 
   def __render_map(self) -> None:
-    self.screen.fill((0, 200, 0))
+    self.screen.fill(Game.BACKGROUND)
 
     for wall in self.fields.walls:
       if isinstance(wall, Crumbly_wall):
@@ -83,7 +86,6 @@ class Game:
     for player in self.players:
       if player.is_alive:
         self.screen.blit(player.surface, player.rect)
-        # draw border around player
         # pygame.draw.rect(self.screen, (0, 0, 0), player.rect, 2)
       else:
         self.screen.blit(player.dead_surface, player.rect)
