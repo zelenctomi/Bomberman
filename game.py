@@ -21,15 +21,10 @@ class Game:
     self.screen: pygame.Surface = pygame.display.set_mode((Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT))
     self.clock: pygame.time.Clock = pygame.time.Clock()
     self.font: pygame.font.Font = pygame.font.Font('PixelifySansFont/PixelifySans-VariableFont_wght.ttf', 36)
-    self.elapsed: int = 0
-    self.scoreboard: str = "Player 1: 0   Player 2: 0"
-    self.timer_text: str = "Time: 0s"
-    self.scoreboard_render = self.font.render(self.scoreboard, True, (255, 255, 255))
-    self.timer_render = self.font.render(self.timer_text, True, (255, 255, 255))
 
   def __load_assets(self) -> None:
-    self.player1_surface: pygame.Surface = pygame.transform.scale(pygame.image.load(
-      'Assets/Players/p1/idle/right/r1.png').convert_alpha(), (Game.BLOCK_SIZE, Game.BLOCK_SIZE))
+    self.player1_surface: pygame.Surface = pygame.image.load(
+      'Assets/test_real.png').convert_alpha()
     self.player2_surface: pygame.Surface = pygame.transform.scale(pygame.image.load(
       'Assets/Players/p1/idle/left/l1.png').convert_alpha(), (Game.BLOCK_SIZE, Game.BLOCK_SIZE))
     self.dead_surface1: pygame.Surface = pygame.image.load(
@@ -69,7 +64,6 @@ class Game:
     self.players[1].draw(self.player2_surface, self.dead_surface2)
     self.players[2].draw(self.player2_surface, self.dead_surface2)
     self.monsters: list[Monster] = self.spawner.spawn_monsters(1)
-    self.elapsed: int = 0
 
   def __render_map(self) -> None:
     self.screen.fill(Game.BACKGROUND)
@@ -129,24 +123,17 @@ class Game:
   def run(self) -> None:
     self.__load_assets()
     self.__initialize_objects()
-    # self.__move_entities() # DELETE THIS LINE
     run: bool = True
-    start_time = pygame.time.get_ticks() // 1000
     while run:
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
           run = False
 
-      self.elapsed = (pygame.time.get_ticks() // 1000) - start_time
-      self.timer_text = f"Time: {self.elapsed}s"
-      self.timer_render = self.font.render(self.timer_text, True, (255, 255, 255))
       self.__render_map()
       self.__move_entities()
       self.__handle_explosions()
-      self.__handle_death()
       self.__handle_death()
       self.fields.update_bombs()
 
       pygame.display.update()
       self.clock.tick(100)
-      self.elapsed: int = self.clock.get_time()
