@@ -22,5 +22,6 @@ class Settings:
   P3_CONTROLS: dict[str, int] = {'left': pygame.K_j, 'right': pygame.K_l,
                                  'up': pygame.K_i, 'down': pygame.K_k, 'place': pygame.K_o}
 
-  P2_COLOR: tuple[int, int, int] = (50, 0, 75)  # Original - this = Light Green
-  P3_COLOR: tuple[int, int, int] = (90, 0, 0)  # Original - this = Light Blue
+  # These colors are subtracted from the original to create new ones
+  P2_COLOR: tuple[int, int, int] = (50, 0, 75)
+  P3_COLOR: tuple[int, int, int] = (90, 0, 0)
