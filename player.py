@@ -71,16 +71,16 @@ class Player:
 
   def update_frame(self) -> None:
     if self.alive:
+      self.__update_surface()
       if self.direction == self.prevDirection and self.frame < 7:
         self.frame += 1
       else:
         self.frame = 0
-      self.__update_surface()
       return
     else:
       if self.frame < 5:
-        self.frame += 1
         self.__update_surface()
+        self.frame += 1
         return
 
   def __update_surface(self) -> None:
