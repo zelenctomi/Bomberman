@@ -8,6 +8,9 @@ class Game:
   BLOCK_SIZE: int = 50
   SCREEN_WIDTH: int = 750
   SCREEN_HEIGHT: int = 700
+  FPS: int = 150
+  ANIMATION_FPS: int = 20
+  TARGET_ENTITY_FRAME: int = FPS // ANIMATION_FPS
   P1_CONTROLS: dict[str, int] = {'left': pygame.K_a, 'right': pygame.K_d,
                                  'up': pygame.K_w, 'down': pygame.K_s, 'place': pygame.K_SPACE}
   P2_CONTROLS: dict[str, int] = {'left': pygame.K_LEFT, 'right': pygame.K_RIGHT,
@@ -23,14 +26,9 @@ class Game:
     self.font: pygame.font.Font = pygame.font.Font('PixelifySansFont/PixelifySans-VariableFont_wght.ttf', 36)
 
   def __load_assets(self) -> None:
-    self.player1_surface: pygame.Surface = pygame.image.load(
-      'Assets/test_real.png').convert_alpha()
-    self.player2_surface: pygame.Surface = pygame.transform.scale(pygame.image.load(
-      'Assets/Players/p1/idle/left/l1.png').convert_alpha(), (Game.BLOCK_SIZE, Game.BLOCK_SIZE))
-    self.dead_surface1: pygame.Surface = pygame.image.load(
-      'Assets/Players/p1/idle/up/u1.png').convert_alpha()
-    self.dead_surface2: pygame.Surface = pygame.image.load(
-      'Assets/Players/p1/idle/right/r1.png').convert_alpha()
+    for player in self.players:
+      player.load_assets(self.players.index(player) + 1)
+
     self.crumbly_wall_surface: pygame.Surface = pygame.image.load(
       'Assets/Walls/Default/crumbly.png').convert_alpha()
     self.wall_surface: pygame.Surface = pygame.image.load(
@@ -54,15 +52,14 @@ class Game:
       'Assets/Menu/Status_Bar.png').convert_alpha()
 
   def __initialize_objects(self) -> None:
-    self.score_bar: Scoreboard = Scoreboard(self.screen)
+    self.scoreboard: Scoreboard = Scoreboard(self.screen)
+    self.entity_frame_trigger: int = 0
     self.fields: Fields = Fields()
     self.fields.load_walls()
     self.fields.load_crumbly_walls()
     self.spawner: Spawner = Spawner(self.fields)
-    self.players: list[Player] = self.spawner.spawn_players([Game.P1_CONTROLS, Game.P2_CONTROLS, Game.P3_CONTROLS])
-    self.players[0].draw(self.player1_surface, self.dead_surface1)
-    self.players[1].draw(self.player2_surface, self.dead_surface2)
-    self.players[2].draw(self.player2_surface, self.dead_surface2)
+    # self.players: list[Player] = self.spawner.spawn_players([Game.P1_CONTROLS, Game.P2_CONTROLS, Game.P3_CONTROLS])
+    self.players: list[Player] = self.spawner.spawn_players([Game.P1_CONTROLS])
     self.monsters: list[Monster] = self.spawner.spawn_monsters(1)
 
   def __render_map(self) -> None:
@@ -89,9 +86,7 @@ class Game:
     for player in self.players:
       if player.is_alive:
         self.screen.blit(player.surface, player.rect)
-        # pygame.draw.rect(self.screen, (0, 0, 0), player.rect, 2)
-      else:
-        self.screen.blit(player.dead_surface, player.rect)
+      
     self.screen.blit(self.scoreboard_surface, (0, 635))
 
   def __move_entities(self) -> None:
@@ -99,6 +94,18 @@ class Game:
       monster.move()
     for player in self.players:
       player.move()
+
+  def __update_frames(self) -> None:
+    '''
+    This method updates entity frames.
+    Animation FPS is set by Game.ANIMATION_FPS.
+    The animation FPS is independent of the Game.FPS.
+    '''
+    self.entity_frame_trigger += 1
+    if self.entity_frame_trigger == Game.TARGET_ENTITY_FRAME:
+      for player in self.players:
+        player.update_frame()
+      self.entity_frame_trigger = 0
 
   def __handle_explosions(self) -> None:
     self.fields.update_explosions()
@@ -121,8 +128,8 @@ class Game:
           player.die()
 
   def run(self) -> None:
-    self.__load_assets()
     self.__initialize_objects()
+    self.__load_assets()
     run: bool = True
     while run:
       for event in pygame.event.get():
@@ -131,9 +138,10 @@ class Game:
 
       self.__render_map()
       self.__move_entities()
+      self.__update_frames()
       self.__handle_explosions()
       self.__handle_death()
       self.fields.update_bombs()
 
       pygame.display.update()
-      self.clock.tick(100)
+      self.clock.tick(Game.FPS)

@@ -22,7 +22,7 @@ class Monster:
     directions.remove((self.x_direction, self.y_direction))
     self.x_direction, self.y_direction = directions[random.randint(0, 2)]
 
-  def __turn_on_collision(self, obj: pygame.Rect) -> bool:
+  def __turn_on_collision(self, obj) -> bool:
     dummy = self.rect.copy()
     dummy.x += self.x_direction
     dummy.y += self.y_direction

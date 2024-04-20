@@ -2,6 +2,7 @@ from fields import *
 
 
 class Player:
+  DIRECTIONS: dict[tuple[int, int], str] = {(0, -1): 'up', (0, 1): 'down', (-1, 0): 'left', (1, 0): 'right'}
   def __init__(self, spawn: tuple[int, int], fields: Fields, controls: dict[str, int]):
     self.rect: pygame.Rect = pygame.Rect(
       spawn, (fields.BLOCK_SIZE, fields.BLOCK_SIZE))
@@ -15,14 +16,60 @@ class Player:
       'bomb': 1,
       'explosion': 2
     }
+    # Animation #
+    self.frame: int = 0
+    self.idle: bool = True
+    self.direction: str = 'down'
+    self.prevDirection: str = 'down'
+    # Assets #
+    self.surface: pygame.Surface
+    self.idleLeft: list[pygame.Surface]
+    self.idleRight: list[pygame.Surface]
+    self.idleUp: list[pygame.Surface]
+    self.idleDown: list[pygame.Surface]
+    self.walkLeft: list[pygame.Surface]
+    self.walkRight: list[pygame.Surface]
+    self.walkUp: list[pygame.Surface]
+    self.walkDown: list[pygame.Surface]
 
-  def draw(self, surface: pygame.Surface, dead_surface: pygame.Surface) -> None:
-    self.surface: pygame.Surface = surface
-    self.dead_surface: pygame.Surface = dead_surface
+  def load_assets(self, playerNum: int) -> None:
+    '''
+    This method loads the player's assets.
+    The idle animation consists of 8 frames for each direction, with the first 4 frames and the last 4 frames being the same.
+    The walk animation consists of 8 frames for each direction.
+    '''
+    # Idle Frames #
+    self.idleLeft = [pygame.image.load(f'Assets/Players/p{playerNum}/idle/left/l1.png').convert_alpha() for _ in range(1, 5)]
+    self.idleRight = [pygame.image.load(f'Assets/Players/p{playerNum}/idle/right/r1.png').convert_alpha() for _ in range(1, 5)]
+    self.idleUp = [pygame.image.load(f'Assets/Players/p{playerNum}/idle/up/u1.png').convert_alpha() for _ in range(1, 5)]
+    self.idleDown = [pygame.image.load(f'Assets/Players/p{playerNum}/idle/down/d1.png').convert_alpha() for _ in range(1, 5)]
+    self.idleLeft.extend([pygame.image.load(f'Assets/Players/p{playerNum}/idle/left/l2.png').convert_alpha() for _ in range(1, 5)])
+    self.idleRight.extend([pygame.image.load(f'Assets/Players/p{playerNum}/idle/right/r2.png').convert_alpha() for _ in range(1, 5)])
+    self.idleUp.extend([pygame.image.load(f'Assets/Players/p{playerNum}/idle/up/u2.png').convert_alpha() for _ in range(1, 5)])
+    self.idleDown.extend([pygame.image.load(f'Assets/Players/p{playerNum}/idle/down/d2.png').convert_alpha() for _ in range(1, 5)])
+    # Walk Frames #
+    self.walkLeft = [pygame.image.load(f'Assets/Players/p{playerNum}/walk/left/l{i}.png').convert_alpha() for i in range(1, 9)]
+    self.walkRight = [pygame.image.load(f'Assets/Players/p{playerNum}/walk/right/r{i}.png').convert_alpha() for i in range(1, 9)]
+    self.walkUp = [pygame.image.load(f'Assets/Players/p{playerNum}/walk/up/u{i}.png').convert_alpha() for i in range(1, 9)]
+    self.walkDown = [pygame.image.load(f'Assets/Players/p{playerNum}/walk/down/d{i}.png').convert_alpha() for i in range(1, 9)]
+    # Default Surface #
+    self.surface = self.idleDown[0]
 
   def die(self) -> None:
     self.is_alive = False
 
+  def update_frame(self) -> None:
+    if self.direction == self.prevDirection and self.frame < 7:
+      self.frame += 1
+    else:
+      self.frame = 0
+    self.__update_surface()
+
+  def __update_surface(self) -> None:
+    event: str = 'walk' if not self.idle else 'idle'
+    direction: str = self.direction
+    self.surface = getattr(self, f'{event}{direction.capitalize()}')[self.frame]
+    
   def move(self) -> None:
     if self.is_alive:
       key: tuple[bool, ...] = pygame.key.get_pressed()
@@ -31,27 +78,38 @@ class Player:
       if key[self.controls['place']]:
         self.__place_bomb()
       if key[self.controls['left']]:
-        x = -1
+        x += -1
       if key[self.controls['right']]:
-        x = 1
+        x += 1
       if key[self.controls['up']]:
-        y = -1
+        y += -1
       if key[self.controls['down']]:
-        y = 1
-      self.__move_or_collide(x, y)
+        y += 1
 
-  def __move_or_collide(self, x: int, y: int) -> None:
+      x, y = self.__move_or_collide(x, y)
+
+      if x != 0 or y != 0:
+        self.prevDirection = self.direction
+        self.direction = Player.DIRECTIONS[(x, y)]
+        self.idle = False
+      else:
+        self.idle = True
+
+      # self.__update_frame()
+      # self.__update_surface()
+
+  def __move_or_collide(self, x: int, y: int) -> tuple[int, int]:
     potential_collisions = self.fields.get_objects_around_object(self)
     self.__update_bomb_collision()
-    diagonal: bool = True if x != 0 and y != 0 else False
     for obj in potential_collisions:
-      x, y = self.__check_collision(x, y, diagonal, obj)
+      x, y = self.__check_collision(x, y, obj)
       if x == 0 and y == 0:
-        return
+        return x, y
     if x != 0 and y != 0: # The player is at an intersection while moving diagonally
       x *= abs(self.diagonal_move[1])
       y *= abs(self.diagonal_move[0])
     self.__update_position(x, y)
+    return x, y
   
   def __update_position(self, x: int, y: int) -> None:
     self.rect.x += x
@@ -65,8 +123,9 @@ class Player:
       return True
     return False
   
-  def __check_collision(self, x: int, y: int, diagonal: bool, obj) -> tuple[int, int]: # TODO: Refactor
+  def __check_collision(self, x: int, y: int, obj) -> tuple[int, int]: # TODO: Refactor
     collided = False
+    diagonal: bool = True if x != 0 and y != 0 else False
     if self.__collides(x, 0, obj):
       if not diagonal:
         x, y = self.__slide(x, y)
