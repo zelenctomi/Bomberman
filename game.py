@@ -1,27 +1,16 @@
 from fields import *
 from spawner import *
 from scoreboard import *
+from settings import Settings
 
 
 class Game:
-  BACKGROUND: tuple[int, int, int] = (222, 172, 245)
-  BLOCK_SIZE: int = 50
-  SCREEN_WIDTH: int = 750
-  SCREEN_HEIGHT: int = 700
-  FPS: int = 150
-  ANIMATION_FPS: int = 20
-  TARGET_ENTITY_FRAME: int = FPS // ANIMATION_FPS
-  P1_CONTROLS: dict[str, int] = {'left': pygame.K_a, 'right': pygame.K_d,
-                                 'up': pygame.K_w, 'down': pygame.K_s, 'place': pygame.K_SPACE}
-  P2_CONTROLS: dict[str, int] = {'left': pygame.K_LEFT, 'right': pygame.K_RIGHT,
-                                 'up': pygame.K_UP, 'down': pygame.K_DOWN, 'place': pygame.K_RETURN}
-  P3_CONTROLS: dict[str, int] = {'left': pygame.K_j, 'right': pygame.K_l,
-                                 'up': pygame.K_i, 'down': pygame.K_k, 'place': pygame.K_o}
+  TARGET_ENTITY_FRAME: int = Settings.FPS // Settings.ANIMATION_FPS
 
   def __init__(self):
     pygame.init()
     pygame.display.set_caption('Bomberman')
-    self.screen: pygame.Surface = pygame.display.set_mode((Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT))
+    self.screen: pygame.Surface = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
     self.clock: pygame.time.Clock = pygame.time.Clock()
     self.font: pygame.font.Font = pygame.font.Font('PixelifySansFont/PixelifySans-VariableFont_wght.ttf', 36)
 
@@ -34,20 +23,16 @@ class Game:
     self.wall_surface: pygame.Surface = pygame.image.load(
       'Assets/Walls/Default/wall.png').convert_alpha()
     self.bomb_surface: pygame.Surface = pygame.transform.scale(pygame.image.load(
-      'Assets/Bomb/bomb.png').convert_alpha(), (Game.BLOCK_SIZE, Game.BLOCK_SIZE))
+      'Assets/Bomb/bomb.png').convert_alpha(), (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.bomb_surface.set_colorkey((0, 200, 0))
     self.explosion_surface: pygame.Surface = pygame.image.load(
       'Assets/explosion_center.png').convert_alpha()
-    # self.explosion_surface.set_colorkey((0, 200, 0))
     self.extra_bomb_surface: pygame.Surface = pygame.image.load(
       'Assets/extra_bomb.png').convert_alpha()
-    # self.extra_bomb_surface.set_colorkey((0, 200, 0))
     self.longer_explosion_surface: pygame.Surface = pygame.image.load(
       'Assets/longer_explosion.png').convert_alpha()
-    # self.longer_explosion_surface.set_colorkey((0, 200, 0))
     self.monster_surface: pygame.Surface = pygame.image.load(
       'Assets/monster.png').convert_alpha()
-    # self.monster_surface.set_colorkey((0, 200, 0))
     self.scoreboard_surface: pygame.Surface = pygame.image.load(
       'Assets/Menu/Status_Bar.png').convert_alpha()
 
@@ -58,12 +43,12 @@ class Game:
     self.fields.load_walls()
     self.fields.load_crumbly_walls()
     self.spawner: Spawner = Spawner(self.fields)
-    # self.players: list[Player] = self.spawner.spawn_players([Game.P1_CONTROLS, Game.P2_CONTROLS, Game.P3_CONTROLS])
-    self.players: list[Player] = self.spawner.spawn_players([Game.P1_CONTROLS])
+    self.players: list[Player] = self.spawner.spawn_players([Settings.P1_CONTROLS, Settings.P2_CONTROLS, Settings.P3_CONTROLS])
+    # self.players: list[Player] = self.spawner.spawn_players([Settings.P1_CONTROLS])
     self.monsters: list[Monster] = self.spawner.spawn_monsters(1)
 
   def __render_map(self) -> None:
-    self.screen.fill(Game.BACKGROUND)
+    self.screen.fill(Settings.BACKGROUND)
 
     for wall in self.fields.walls:
       if isinstance(wall, Crumbly_wall):
@@ -97,8 +82,8 @@ class Game:
   def __update_frames(self) -> None:
     '''
     This method updates entity frames.
-    Animation FPS is set by Game.ANIMATION_FPS.
-    The animation FPS is independent of the Game.FPS.
+    Animation FPS is set by Settings.ANIMATION_FPS.
+    The animation FPS is independent of the Settings.FPS.
     '''
     self.entity_frame_trigger += 1
     if self.entity_frame_trigger == Game.TARGET_ENTITY_FRAME:
@@ -143,4 +128,4 @@ class Game:
       self.fields.update_bombs()
 
       pygame.display.update()
-      self.clock.tick(Game.FPS)
+      self.clock.tick(Settings.FPS)

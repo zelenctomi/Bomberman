@@ -3,9 +3,9 @@ from fields import *
 
 class Player:
   DIRECTIONS: dict[tuple[int, int], str] = {(0, -1): 'up', (0, 1): 'down', (-1, 0): 'left', (1, 0): 'right'}
+
   def __init__(self, spawn: tuple[int, int], fields: Fields, controls: dict[str, int]):
-    self.rect: pygame.Rect = pygame.Rect(
-      spawn, (fields.BLOCK_SIZE, fields.BLOCK_SIZE))
+    self.rect: pygame.Rect = pygame.Rect(spawn, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.controls: dict[str, int] = controls
     self.fields: Fields = fields
     self.bomb: (Bomb | None) = None
@@ -43,24 +43,54 @@ class Player:
     The walk animation consists of 8 frames for each direction.
     '''
     # Idle Frames #
-    self.idleLeft = [pygame.image.load(f'Assets/Players/p{playerNum}/idle/left/l1.png').convert_alpha() for _ in range(1, 5)]
-    self.idleRight = [pygame.image.load(f'Assets/Players/p{playerNum}/idle/right/r1.png').convert_alpha() for _ in range(1, 5)]
-    self.idleUp = [pygame.image.load(f'Assets/Players/p{playerNum}/idle/up/u1.png').convert_alpha() for _ in range(1, 5)]
-    self.idleDown = [pygame.image.load(f'Assets/Players/p{playerNum}/idle/down/d1.png').convert_alpha() for _ in range(1, 5)]
-    self.idleLeft.extend([pygame.image.load(f'Assets/Players/p{playerNum}/idle/left/l2.png').convert_alpha() for _ in range(1, 5)])
-    self.idleRight.extend([pygame.image.load(f'Assets/Players/p{playerNum}/idle/right/r2.png').convert_alpha() for _ in range(1, 5)])
-    self.idleUp.extend([pygame.image.load(f'Assets/Players/p{playerNum}/idle/up/u2.png').convert_alpha() for _ in range(1, 5)])
-    self.idleDown.extend([pygame.image.load(f'Assets/Players/p{playerNum}/idle/down/d2.png').convert_alpha() for _ in range(1, 5)])
+    self.idleLeft = [pygame.image.load(f'Assets/Player/idle/left/l1.png').convert_alpha() for _ in range(1, 5)]
+    self.idleRight = [pygame.image.load(f'Assets/Player/idle/right/r1.png').convert_alpha() for _ in range(1, 5)]
+    self.idleUp = [pygame.image.load(f'Assets/Player/idle/up/u1.png').convert_alpha() for _ in range(1, 5)]
+    self.idleDown = [pygame.image.load(f'Assets/Player/idle/down/d1.png').convert_alpha() for _ in range(1, 5)]
+    self.idleLeft.extend([pygame.image.load(f'Assets/Player/idle/left/l2.png').convert_alpha() for _ in range(1, 5)])
+    self.idleRight.extend([pygame.image.load(f'Assets/Player/idle/right/r2.png').convert_alpha() for _ in range(1, 5)])
+    self.idleUp.extend([pygame.image.load(f'Assets/Player/idle/up/u2.png').convert_alpha() for _ in range(1, 5)])
+    self.idleDown.extend([pygame.image.load(f'Assets/Player/idle/down/d2.png').convert_alpha() for _ in range(1, 5)])
     # Walk Frames #
-    self.walkLeft = [pygame.image.load(f'Assets/Players/p{playerNum}/walk/left/l{i}.png').convert_alpha() for i in range(1, 9)]
-    self.walkRight = [pygame.image.load(f'Assets/Players/p{playerNum}/walk/right/r{i}.png').convert_alpha() for i in range(1, 9)]
-    self.walkUp = [pygame.image.load(f'Assets/Players/p{playerNum}/walk/up/u{i}.png').convert_alpha() for i in range(1, 9)]
-    self.walkDown = [pygame.image.load(f'Assets/Players/p{playerNum}/walk/down/d{i}.png').convert_alpha() for i in range(1, 9)]
+    self.walkLeft = [pygame.image.load(f'Assets/Player/walk/left/l{i}.png').convert_alpha() for i in range(1, 9)]
+    self.walkRight = [pygame.image.load(f'Assets/Player/walk/right/r{i}.png').convert_alpha() for i in range(1, 9)]
+    self.walkUp = [pygame.image.load(f'Assets/Player/walk/up/u{i}.png').convert_alpha() for i in range(1, 9)]
+    self.walkDown = [pygame.image.load(f'Assets/Player/walk/down/d{i}.png').convert_alpha() for i in range(1, 9)]
     # Death Frames #
-    self.deathLeft = [pygame.image.load(f'Assets/Players/p{playerNum}/death/left/l{i}.png').convert_alpha() for i in range(1, 7)]
-    self.deathRight = [pygame.image.load(f'Assets/Players/p{playerNum}/death/right/r{i}.png').convert_alpha() for i in range(1, 7)]
-    self.deathUp = [pygame.image.load(f'Assets/Players/p{playerNum}/death/up/u{i}.png').convert_alpha() for i in range(1, 7)]
-    self.deathDown = [pygame.image.load(f'Assets/Players/p{playerNum}/death/down/d{i}.png').convert_alpha() for i in range(1, 7)]
+    self.deathLeft = [pygame.image.load(f'Assets/Player/death/left/l{i}.png').convert_alpha() for i in range(1, 7)]
+    self.deathRight = [pygame.image.load(f'Assets/Player/death/right/r{i}.png').convert_alpha() for i in range(1, 7)]
+    self.deathUp = [pygame.image.load(f'Assets/Player/death/up/u{i}.png').convert_alpha() for i in range(1, 7)]
+    self.deathDown = [pygame.image.load(f'Assets/Player/death/down/d{i}.png').convert_alpha() for i in range(1, 7)]
+
+    # Set different colors for extra players #
+    if playerNum > 1:
+      colors: list[tuple[int, int, int]] = [Settings.P2_COLOR, Settings.P3_COLOR]
+      i: int = playerNum - 2
+      for frame in self.idleLeft:
+        frame.fill(colors[i], special_flags=pygame.BLEND_SUB)
+      for frame in self.idleRight:
+        frame.fill(colors[i], special_flags=pygame.BLEND_SUB)
+      for frame in self.idleUp:
+        frame.fill(colors[i], special_flags=pygame.BLEND_SUB)
+      for frame in self.idleDown:
+        frame.fill(colors[i], special_flags=pygame.BLEND_SUB)
+      for frame in self.walkLeft:
+        frame.fill(colors[i], special_flags=pygame.BLEND_SUB)
+      for frame in self.walkRight:
+        frame.fill(colors[i], special_flags=pygame.BLEND_SUB)
+      for frame in self.walkUp:
+        frame.fill(colors[i], special_flags=pygame.BLEND_SUB)
+      for frame in self.walkDown:
+        frame.fill(colors[i], special_flags=pygame.BLEND_SUB)
+      for frame in self.deathLeft:
+        frame.fill(colors[i], special_flags=pygame.BLEND_SUB)
+      for frame in self.deathRight:
+        frame.fill(colors[i], special_flags=pygame.BLEND_SUB)
+      for frame in self.deathUp:
+        frame.fill(colors[i], special_flags=pygame.BLEND_SUB)
+      for frame in self.deathDown:
+        frame.fill(colors[i], special_flags=pygame.BLEND_SUB)
+        
     # Default Surface #
     self.surface = self.idleDown[0]
 
@@ -88,7 +118,7 @@ class Player:
     event = 'death' if not self.alive else event
     direction: str = self.direction
     self.surface = getattr(self, f'{event}{direction.capitalize()}')[self.frame]
-    
+
   def move(self) -> None:
     if self.alive:
       key: tuple[bool, ...] = pygame.key.get_pressed()
@@ -114,9 +144,6 @@ class Player:
       else:
         self.idle = True
 
-      # self.__update_frame()
-      # self.__update_surface()
-
   def __move_or_collide(self, x: int, y: int) -> tuple[int, int]:
     potential_collisions = self.fields.get_objects_around_object(self)
     self.__update_bomb_collision()
@@ -124,12 +151,12 @@ class Player:
       x, y = self.__check_collision(x, y, obj)
       if x == 0 and y == 0:
         return x, y
-    if x != 0 and y != 0: # The player is at an intersection while moving diagonally
+    if x != 0 and y != 0:  # The player is at an intersection while moving diagonally
       x *= abs(self.diagonal_move[1])
       y *= abs(self.diagonal_move[0])
     self.__update_position(x, y)
     return x, y
-  
+
   def __update_position(self, x: int, y: int) -> None:
     self.rect.x += x
     self.rect.y += y
@@ -141,8 +168,8 @@ class Player:
     if pygame.Rect.colliderect(obj.rect, dummy) and obj != self.bomb:
       return True
     return False
-  
-  def __check_collision(self, x: int, y: int, obj) -> tuple[int, int]: # TODO: Refactor
+
+  def __check_collision(self, x: int, y: int, obj) -> tuple[int, int]:  # TODO: Refactor
     collided = False
     diagonal: bool = True if x != 0 and y != 0 else False
     if self.__collides(x, 0, obj):
@@ -158,7 +185,7 @@ class Player:
         y = 0
       collided = True
     if collided:
-      self.__check_powerup(obj) # FIXME: The player picks up the powerup with diagonal movement
+      self.__check_powerup(obj)  # FIXME: The player picks up the powerup with diagonal movement
       if abs(x + y) == 1:
         self.diagonal_move = (x, y)
     return x, y
@@ -174,10 +201,10 @@ class Player:
     slideX: int = 0
     slideY: int = 0
     current: pygame.Rect = self.fields.snap_to_grid(self.rect)
-    target: pygame.Rect = pygame.Rect((current.x // Fields.BLOCK_SIZE + x) * Fields.BLOCK_SIZE,
-                                      (current.y // Fields.BLOCK_SIZE + y) * Fields.BLOCK_SIZE,
-                                      Fields.BLOCK_SIZE, 
-                                      Fields.BLOCK_SIZE)
+    target: pygame.Rect = pygame.Rect((current.x // Settings.BLOCK_SIZE + x) * Settings.BLOCK_SIZE,
+                                      (current.y // Settings.BLOCK_SIZE + y) * Settings.BLOCK_SIZE,
+                                      Settings.BLOCK_SIZE,
+                                      Settings.BLOCK_SIZE)
     # If the target block is not a collision, then the player will slide towards the target block
     potential_collisions = self.fields.get_objects_at_coords(target.x, target.y)
     if potential_collisions == [] or isinstance(potential_collisions[0], Powerup):
@@ -194,7 +221,7 @@ class Player:
       self.fields.powerups.remove(obj)
 
   def __update_bomb_collision(self) -> None:
-    potential_collisions= self.fields.get_objects_at_object(self)
+    potential_collisions = self.fields.get_objects_at_object(self)
     if self.bomb != None and self.bomb not in potential_collisions:
       self.bomb = None
 
@@ -207,7 +234,7 @@ class Player:
   def __place_bomb(self) -> None:
     if self.stats['bomb'] > 0 and not self.fields.field_has_bomb(self.rect.x, self.rect.y):
       target: pygame.Rect = self.fields.snap_to_grid(self.rect)
-      bomb: Bomb = Bomb((target.x, target.y), Fields.BLOCK_SIZE, self)
+      bomb: Bomb = Bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
       self.fields.set_bomb(target.x, target.y, bomb)
       self.stats['bomb'] -= 1
       self.bomb = bomb

@@ -2,6 +2,7 @@ import random
 from player import Player
 from monster import Monster
 from fields import Fields
+from settings import Settings
 
 
 class Spawner:
@@ -26,11 +27,11 @@ class Spawner:
     '''
     OFFSET: int = 3 # Forbidden outer layers
     spawn_points: list[tuple[int, int]] = []
-    for row in range(Fields.HEIGHT - (OFFSET * 2)):
-      for col in range(Fields.WIDTH - (OFFSET * 2)):
+    for row in range(Settings.HEIGHT - (OFFSET * 2)):
+      for col in range(Settings.WIDTH - (OFFSET * 2)):
         if self.fields.get_objects(col + OFFSET, row + OFFSET) == []:
-          x: int = (col + OFFSET) * Fields.BLOCK_SIZE
-          y: int = (row + OFFSET) * Fields.BLOCK_SIZE
+          x: int = (col + OFFSET) * Settings.BLOCK_SIZE
+          y: int = (row + OFFSET) * Settings.BLOCK_SIZE
           spawn_points.append((x, y))
     for _ in range(count):
       spawn: tuple[int, int] = spawn_points[random.randint(0, len(spawn_points) - 1)]
@@ -43,10 +44,10 @@ class Spawner:
     > Returns the 4 corners of the map
     '''
     spawn_points: list[tuple[int, int]] = []
-    WIDTH: int = Fields.WIDTH
-    HEIGHT: int = Fields.HEIGHT
-    BLOCK_SIZE: int = Fields.BLOCK_SIZE
-    spawn_points.append((BLOCK_SIZE, BLOCK_SIZE + 50))
+    WIDTH: int = Settings.WIDTH
+    HEIGHT: int = Settings.HEIGHT
+    BLOCK_SIZE: int = Settings.BLOCK_SIZE
+    spawn_points.append((BLOCK_SIZE, BLOCK_SIZE))
     spawn_points.append((WIDTH * BLOCK_SIZE - BLOCK_SIZE * 2, HEIGHT * BLOCK_SIZE - BLOCK_SIZE * 2))
     spawn_points.append((BLOCK_SIZE, HEIGHT * BLOCK_SIZE - BLOCK_SIZE * 2))
     spawn_points.append((WIDTH * BLOCK_SIZE - BLOCK_SIZE * 2, BLOCK_SIZE))
