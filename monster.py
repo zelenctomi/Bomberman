@@ -1,12 +1,13 @@
 import pygame, random
 from fields import Fields
+from settings import Settings
 
 
 class Monster:
   DIRECTIONS: list[tuple[int, int]] = [(0, -1), (0, 1), (-1, 0), (1, 0)]
 
   def __init__(self, spawn: tuple[int, int], fields: Fields):
-    self.rect: pygame.Rect = pygame.Rect(spawn, (fields.BLOCK_SIZE, fields.BLOCK_SIZE))
+    self.rect: pygame.Rect = pygame.Rect(spawn, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.fields: Fields = fields
     self.x_direction: int
     self.y_direction: int
@@ -22,7 +23,7 @@ class Monster:
     directions.remove((self.x_direction, self.y_direction))
     self.x_direction, self.y_direction = directions[random.randint(0, 2)]
 
-  def __turn_on_collision(self, obj: pygame.Rect) -> bool:
+  def __turn_on_collision(self, obj) -> bool:
     dummy = self.rect.copy()
     dummy.x += self.x_direction
     dummy.y += self.y_direction

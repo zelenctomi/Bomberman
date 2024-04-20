@@ -1,20 +1,15 @@
 import pygame
 import random
 from wall import Wall
+from settings import Settings
 from crumbly_wall import Crumbly_wall
 from bomb import Bomb, Explosion
 from powerups import Powerups, Powerup, Extra_bomb, Longer_explosion
 
 
 class Fields:
-  WIDTH: int
-  HEIGHT: int
-  BLOCK_SIZE: int
-  def __init__(self, height: int = 13, width: int = 15, block_size: int = 50):
-    Fields.WIDTH = width
-    Fields.HEIGHT = height
-    Fields.BLOCK_SIZE = block_size
-    self.fields = [[[] for _ in range(width)] for _ in range(height)]
+  def __init__(self):
+    self.fields = [[[] for _ in range(Settings.WIDTH)] for _ in range(Settings.HEIGHT)]
     self.walls: list[Wall] = []
     self.bombs: list[Bomb] = []
     self.powerups: list[Powerup] = []
@@ -27,7 +22,7 @@ class Fields:
     return self.fields[row][col]
 
   def get_objects_at_coords(self, x: int, y: int):
-    return self.get_objects(x // Fields.BLOCK_SIZE, y // Fields.BLOCK_SIZE)
+    return self.get_objects(x // Settings.BLOCK_SIZE, y // Settings.BLOCK_SIZE)
   
   def get_objects_at_object(self, obj):
     potential_collisons = []
@@ -48,7 +43,7 @@ class Fields:
     potential_collisons: list[pygame.Rect] = []
     for row in range(-1, 2):
       for col in range(-1, 2):
-        objects: list[pygame.Rect] = self.get_objects(obj.rect.x // Fields.BLOCK_SIZE + row, obj.rect.y // Fields.BLOCK_SIZE + col)
+        objects: list[pygame.Rect] = self.get_objects(obj.rect.x // Settings.BLOCK_SIZE + row, obj.rect.y // Settings.BLOCK_SIZE + col)
         for o in objects:
           if o not in potential_collisons:
             potential_collisons.append(o)
@@ -58,9 +53,9 @@ class Fields:
     '''
     Returns a mew rectamgle that is snapped to the closest grid.
     '''
-    return pygame.Rect(rect.centerx // Fields.BLOCK_SIZE * Fields.BLOCK_SIZE, 
-                       rect.centery // Fields.BLOCK_SIZE * Fields.BLOCK_SIZE, 
-                       Fields.BLOCK_SIZE, Fields.BLOCK_SIZE)
+    return pygame.Rect(rect.centerx // Settings.BLOCK_SIZE * Settings.BLOCK_SIZE, 
+                       rect.centery // Settings.BLOCK_SIZE * Settings.BLOCK_SIZE, 
+                       Settings.BLOCK_SIZE, Settings.BLOCK_SIZE)
   
   def field_has_bomb(self, x: int, y: int) -> bool: # TODO: Remove method if not necessary
     return any(isinstance(obj, Bomb) for obj in self.get_objects_at_coords(x, y))
@@ -93,7 +88,7 @@ class Fields:
       crumbly_wall_start_x += 50
 
   def __drop_powerup(self, coord: tuple[int, int]) -> None:
-    powerup: (Powerup | None) = Powerups.get_powerup(coord, Fields.BLOCK_SIZE)
+    powerup: (Powerup | None) = Powerups.get_powerup(coord, Settings.BLOCK_SIZE)
     if powerup is not None:
       self.get_objects_at_coords(coord[0], coord[1]).append(powerup)
       self.powerups.append(powerup)

@@ -1,9 +1,10 @@
 import pygame
+from settings import Settings
 
 
 class Explosion:
   def __init__(self, x: int, y: int, walls: list[pygame.Rect]):
-    self.rect: pygame.Rect = pygame.Rect((x, y, 50, 50))
+    self.rect: pygame.Rect = pygame.Rect((x, y, Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.lifetime: int = 100
     self.walls: list[pygame.Rect] = walls
 
