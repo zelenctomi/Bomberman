@@ -6,6 +6,7 @@ from settings import Settings
 
 class Game:
   TARGET_ENTITY_FRAME: int = Settings.FPS // Settings.ANIMATION_FPS
+  TARGET_BOMB_FRAME: int = Settings.FPS // Settings.BOMB_FRAMES * Settings.BOMB_TIMER
 
   def __init__(self):
     pygame.init()
@@ -17,16 +18,19 @@ class Game:
   def __load_assets(self) -> None:
     for player in self.players:
       player.load_assets(self.players.index(player) + 1)
+    for monster in self.monsters:
+      monster.load_assets()
 
-    self.crumbly_wall_surface: pygame.Surface = pygame.image.load(
-      'Assets/Walls/Default/crumbly.png').convert_alpha()
-    self.wall_surface: pygame.Surface = pygame.image.load(
-      'Assets/Walls/Default/wall.png').convert_alpha()
-    self.bomb_surface: pygame.Surface = pygame.transform.scale(pygame.image.load(
-      'Assets/Bomb/bomb.png').convert_alpha(), (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
-    self.bomb_surface.set_colorkey((0, 200, 0))
-    self.explosion_surface: pygame.Surface = pygame.image.load(
-      'Assets/explosion_center.png').convert_alpha()
+    self.bomb_assets: list[pygame.Surface] = [pygame.image.load(f'Assets/Bomb/b{i}.png').convert_alpha() for i in range(1, 13)]
+    self.explosion_assets: list[pygame.Surface] = [pygame.image.load(f'Assets/Bomb/e{i}.png').convert_alpha() for i in range(1, 13)]
+    self.wall_asset: pygame.Surface = pygame.image.load('Assets/Walls/Default/wall.png').convert_alpha()
+    self.crumbly_asset: pygame.Surface = pygame.image.load('Assets/Walls/Default/crumbly.png').convert_alpha()
+
+    # self.bomb_surface: pygame.Surface = pygame.transform.scale(pygame.image.load(
+    #   'Assets/Bomb/bomb.png').convert_alpha(), (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
+    # self.bomb_surface.set_colorkey((0, 200, 0))
+    # self.explosion_surface: pygame.Surface = pygame.image.load(
+    #   'Assets/explosion_center.png').convert_alpha()
     self.extra_bomb_surface: pygame.Surface = pygame.image.load(
       'Assets/extra_bomb.png').convert_alpha()
     self.longer_explosion_surface: pygame.Surface = pygame.image.load(
@@ -39,35 +43,39 @@ class Game:
   def __initialize_objects(self) -> None:
     self.scoreboard: Scoreboard = Scoreboard(self.screen)
     self.entity_frame_trigger: int = 0
+    self.bomb_frame_trigger: int = 0
     self.fields: Fields = Fields()
     self.fields.load_walls()
     self.fields.load_crumbly_walls()
     self.spawner: Spawner = Spawner(self.fields)
     self.players: list[Player] = self.spawner.spawn_players([Settings.P1_CONTROLS, Settings.P2_CONTROLS, Settings.P3_CONTROLS])
-    # self.players: list[Player] = self.spawner.spawn_players([Settings.P1_CONTROLS])
-    self.monsters: list[Monster] = self.spawner.spawn_monsters(1)
+    self.monsters: list[Monster] = self.spawner.spawn_monsters(3)
 
   def __render_map(self) -> None:
     self.screen.fill(Settings.BACKGROUND)
 
     for wall in self.fields.walls:
       if isinstance(wall, Crumbly_wall):
-        self.screen.blit(self.crumbly_wall_surface, wall.rect)
-        self.screen.blit(self.crumbly_wall_surface, wall.rect)
+        self.screen.blit(self.crumbly_asset, wall.rect)
       else:
-        self.screen.blit(self.wall_surface, wall.rect)
+        self.screen.blit(self.wall_asset, wall.rect)
+
     for bomb in self.fields.bombs:
-      self.screen.blit(self.bomb_surface, bomb.rect)
+      self.screen.blit(bomb.surface, bomb.rect)
+
     for explosion in self.fields.explosions:
-      self.screen.blit(self.explosion_surface, explosion.rect)
+      self.screen.blit(self.explosion_assets[2], explosion.rect)
+
     for powerup in self.fields.powerups:
       if isinstance(powerup, Extra_bomb):
         self.screen.blit(self.extra_bomb_surface, powerup.rect)
       elif isinstance(powerup, Longer_explosion):
         self.screen.blit(self.longer_explosion_surface, powerup.rect)
+
     for monster in self.monsters:
       if monster.is_alive:
-        self.screen.blit(self.monster_surface, monster.rect)
+        self.screen.blit(monster.surface, monster.rect)
+
     for player in self.players:
         self.screen.blit(player.surface, player.rect)
       
@@ -86,10 +94,18 @@ class Game:
     The animation FPS is independent of the Settings.FPS.
     '''
     self.entity_frame_trigger += 1
+    self.bomb_frame_trigger += 1
     if self.entity_frame_trigger == Game.TARGET_ENTITY_FRAME:
       for player in self.players:
         player.update_frame()
+      for monster in self.monsters:
+        monster.update_frame()
       self.entity_frame_trigger = 0
+    if self.bomb_frame_trigger == Game.TARGET_BOMB_FRAME:
+      for bomb in self.fields.bombs:
+        bomb.update_frame()
+        bomb.update_surface(self.bomb_assets[bomb.frame])
+      self.bomb_frame_trigger = 0
 
   def __handle_explosions(self) -> None:
     self.fields.update_explosions()
