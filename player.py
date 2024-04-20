@@ -9,7 +9,7 @@ class Player:
     self.controls: dict[str, int] = controls
     self.fields: Fields = fields
     self.bomb: (Bomb | None) = None
-    self.is_alive: bool = True
+    self.alive: bool = True
     self.diagonal_move: tuple[int, int] = (1, 0)
     # Stats #
     self.stats: dict[str, int] = {
@@ -31,6 +31,10 @@ class Player:
     self.walkRight: list[pygame.Surface]
     self.walkUp: list[pygame.Surface]
     self.walkDown: list[pygame.Surface]
+    self.deathLeft: list[pygame.Surface]
+    self.deathRight: list[pygame.Surface]
+    self.deathUp: list[pygame.Surface]
+    self.deathDown: list[pygame.Surface]
 
   def load_assets(self, playerNum: int) -> None:
     '''
@@ -52,26 +56,41 @@ class Player:
     self.walkRight = [pygame.image.load(f'Assets/Players/p{playerNum}/walk/right/r{i}.png').convert_alpha() for i in range(1, 9)]
     self.walkUp = [pygame.image.load(f'Assets/Players/p{playerNum}/walk/up/u{i}.png').convert_alpha() for i in range(1, 9)]
     self.walkDown = [pygame.image.load(f'Assets/Players/p{playerNum}/walk/down/d{i}.png').convert_alpha() for i in range(1, 9)]
+    # Death Frames #
+    self.deathLeft = [pygame.image.load(f'Assets/Players/p{playerNum}/death/left/l{i}.png').convert_alpha() for i in range(1, 7)]
+    self.deathRight = [pygame.image.load(f'Assets/Players/p{playerNum}/death/right/r{i}.png').convert_alpha() for i in range(1, 7)]
+    self.deathUp = [pygame.image.load(f'Assets/Players/p{playerNum}/death/up/u{i}.png').convert_alpha() for i in range(1, 7)]
+    self.deathDown = [pygame.image.load(f'Assets/Players/p{playerNum}/death/down/d{i}.png').convert_alpha() for i in range(1, 7)]
     # Default Surface #
     self.surface = self.idleDown[0]
 
   def die(self) -> None:
-    self.is_alive = False
+    if self.alive:
+      self.alive = False
+      self.frame = 0
 
   def update_frame(self) -> None:
-    if self.direction == self.prevDirection and self.frame < 7:
-      self.frame += 1
+    if self.alive:
+      if self.direction == self.prevDirection and self.frame < 7:
+        self.frame += 1
+      else:
+        self.frame = 0
+      self.__update_surface()
+      return
     else:
-      self.frame = 0
-    self.__update_surface()
+      if self.frame < 5:
+        self.frame += 1
+        self.__update_surface()
+        return
 
   def __update_surface(self) -> None:
     event: str = 'walk' if not self.idle else 'idle'
+    event = 'death' if not self.alive else event
     direction: str = self.direction
     self.surface = getattr(self, f'{event}{direction.capitalize()}')[self.frame]
     
   def move(self) -> None:
-    if self.is_alive:
+    if self.alive:
       key: tuple[bool, ...] = pygame.key.get_pressed()
       x: int = 0
       y: int = 0

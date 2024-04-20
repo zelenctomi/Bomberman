@@ -84,7 +84,6 @@ class Game:
       if monster.is_alive:
         self.screen.blit(self.monster_surface, monster.rect)
     for player in self.players:
-      if player.is_alive:
         self.screen.blit(player.surface, player.rect)
       
     self.screen.blit(self.scoreboard_surface, (0, 635))
