@@ -25,20 +25,10 @@ class Game:
     self.explosion_assets: list[pygame.Surface] = [pygame.image.load(f'Assets/Bomb/e{i}.png').convert_alpha() for i in range(1, 13)]
     self.wall_asset: pygame.Surface = pygame.image.load('Assets/Walls/Default/wall.png').convert_alpha()
     self.crumbly_asset: pygame.Surface = pygame.image.load('Assets/Walls/Default/crumbly.png').convert_alpha()
-
-    # self.bomb_surface: pygame.Surface = pygame.transform.scale(pygame.image.load(
-    #   'Assets/Bomb/bomb.png').convert_alpha(), (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
-    # self.bomb_surface.set_colorkey((0, 200, 0))
-    # self.explosion_surface: pygame.Surface = pygame.image.load(
-    #   'Assets/explosion_center.png').convert_alpha()
-    self.extra_bomb_surface: pygame.Surface = pygame.image.load(
-      'Assets/extra_bomb.png').convert_alpha()
-    self.longer_explosion_surface: pygame.Surface = pygame.image.load(
-      'Assets/longer_explosion.png').convert_alpha()
-    self.monster_surface: pygame.Surface = pygame.image.load(
-      'Assets/monster.png').convert_alpha()
-    self.scoreboard_surface: pygame.Surface = pygame.image.load(
-      'Assets/Menu/Status_Bar.png').convert_alpha()
+    self.scoreboard_surface: pygame.Surface = pygame.image.load('Assets/Menu/Status_Bar.png').convert_alpha()
+    # Powerups #
+    self.extra_bomb_surface: pygame.Surface = pygame.image.load('Assets/Powerups/extra_bomb.png').convert_alpha()
+    self.longer_explosion_surface: pygame.Surface = pygame.image.load('Assets/Powerups/longer_explosion.png').convert_alpha()
 
   def __initialize_objects(self) -> None:
     self.scoreboard: Scoreboard = Scoreboard(self.screen)

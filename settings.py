@@ -9,6 +9,8 @@ class Settings:
   WIDTH: int = 15 # Map width in blocks
   HEIGHT: int = 13 # Map height in blocks
   BLOCK_SIZE: int = 50
+  POWERUP_SIZE: int = 30
+  POWERUP_OFFSET: int = (BLOCK_SIZE - POWERUP_SIZE) // 2
 
   # Framerate #
   FPS: int = 60
