@@ -14,7 +14,8 @@ class Player:
     # Stats #
     self.stats: dict[str, int] = {
       'bomb': 1,
-      'explosion': 2
+      'explosion': 2,
+      'detonator': 0
     }
     # Animation #
     self.frame: int = 0
