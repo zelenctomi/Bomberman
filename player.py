@@ -242,3 +242,4 @@ class Player:
       self.fields.set_bomb(target.x, target.y, bomb)
       self.stats['bomb'] -= 1
       self.bomb = bomb
+      

@@ -35,8 +35,6 @@ class Game:
     self.entity_frame_trigger: int = 0
     self.bomb_frame_trigger: int = 0
     self.fields: Fields = Fields()
-    # self.fields.load_walls()
-    # self.fields.load_crumbly_walls()
     self.fields.load_map(1)
     self.spawner: Spawner = Spawner(self.fields)
     self.players: list[Player] = self.spawner.spawn_players([Settings.P1_CONTROLS, Settings.P2_CONTROLS, Settings.P3_CONTROLS])

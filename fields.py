@@ -23,7 +23,9 @@ class Fields:
     return self.fields[row][col]
 
   def get_objects_at_coords(self, x: int, y: int):
-    return self.get_objects(x // Settings.BLOCK_SIZE, y // Settings.BLOCK_SIZE)
+    target: pygame.Rect = self.snap_to_grid(pygame.Rect(x, y, Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
+    # return self.get_objects(x // Settings.BLOCK_SIZE, y // Settings.BLOCK_SIZE)
+    return self.get_objects(target.x // Settings.BLOCK_SIZE, target.y // Settings.BLOCK_SIZE)
 
   def get_objects_at_object(self, obj):
     potential_collisons = []
