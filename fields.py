@@ -55,7 +55,7 @@ class Fields:
 
   def snap_to_grid(self, rect: pygame.Rect) -> pygame.Rect:
     '''
-    Returns a new rectamgle that is snapped to the closest grid.
+    Returns a new rectangle that is snapped to the closest grid.
     '''
     return pygame.Rect(rect.centerx // Settings.BLOCK_SIZE * Settings.BLOCK_SIZE,
                        rect.centery // Settings.BLOCK_SIZE * Settings.BLOCK_SIZE,
