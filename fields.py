@@ -1,3 +1,4 @@
+import json
 import pygame
 import random
 from wall import Wall
@@ -61,32 +62,23 @@ class Fields:
   def field_has_bomb(self, x: int, y: int) -> bool:  # TODO: Remove method if not necessary
     return any(isinstance(obj, Bomb) for obj in self.get_objects_at_coords(x, y))
 
-  def load_walls(self) -> None:
-    wall_start_x: int = 0
-    for x in range(15):
-      wall_start_y: int = 0
-      for y in range(13):
-        if wall_start_x in [0, 700] or wall_start_y in [0, 600] or \
-          (wall_start_x in [100, 200, 300, 400, 500, 600] and wall_start_y in [100, 200, 300, 400, 500]):
-          wall: Wall = Wall(wall_start_x, wall_start_y)
-          self.walls.append(wall)
-          self.fields[y][x].append(wall)
-        wall_start_y += 50
-      wall_start_x += 50
-
-  def load_crumbly_walls(self) -> None:
-    forbidden_spots: list[list[int]] = [[50, 50], [50, 100], [100, 50], [650, 550], [600, 550], [650, 500]]
-    crumbly_wall_start_x: int = 50
-    for x in range(13):
-      crumbly_wall_start_y: int = 50
-      for y in range(11):
-        if (crumbly_wall_start_x in [100, 200, 300, 400, 500, 600] and crumbly_wall_start_y not in [100, 200, 300, 400, 500]) and \
-                [crumbly_wall_start_x, crumbly_wall_start_y] not in forbidden_spots and random.randint(0, 9) > 7:
-          crumbly_wall: Crumbly_wall = Crumbly_wall(crumbly_wall_start_x, crumbly_wall_start_y)
-          self.walls.append(crumbly_wall)
-          self.fields[y + 1][x + 1].append(crumbly_wall)
-        crumbly_wall_start_y += 50
-      crumbly_wall_start_x += 50
+  def load_map(self, lvl: int) -> None:
+    WALL: int = 1
+    CRUMBLY: int = 2
+    with open(f'map.json', 'r') as file:
+      maps = json.load(file)
+      map = maps[f'lvl{lvl}']
+      for y in range(len(map)):
+        for x in range(len(map[y])):
+          wall: Wall | Crumbly_wall
+          if map[y][x] == WALL:
+            wall = Wall(x * Settings.BLOCK_SIZE, y * Settings.BLOCK_SIZE)
+            self.walls.append(wall)
+            self.fields[y][x].append(wall)
+          elif map[y][x] == CRUMBLY:
+            wall = Crumbly_wall(x * Settings.BLOCK_SIZE, y * Settings.BLOCK_SIZE)
+            self.walls.append(wall)
+            self.fields[y][x].append(wall)
 
   def __drop_powerup(self, coord: tuple[int, int]) -> None:
     powerup: (Powerup | None) = Powerups.get_powerup(
