@@ -7,3 +7,5 @@ def main() -> None:
 
 if __name__ == '__main__':
   main()
+
+#CI teszt commit miatt ide kommentelek
