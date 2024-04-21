@@ -9,10 +9,12 @@ class Settings:
   WIDTH: int = 15 # Map width in blocks
   HEIGHT: int = 13 # Map height in blocks
   BLOCK_SIZE: int = 50
+  POWERUP_SIZE: int = 30
+  POWERUP_OFFSET: int = (BLOCK_SIZE - POWERUP_SIZE) // 2
 
   # Framerate #
-  FPS: int = 150
-  ANIMATION_FPS: int = 20
+  FPS: int = 60
+  ANIMATION_FPS: int = 15
 
   # Player Settings #
   P1_CONTROLS: dict[str, int] = {'left': pygame.K_a, 'right': pygame.K_d,
@@ -25,3 +27,7 @@ class Settings:
   # These colors are subtracted from the original to create new ones
   P2_COLOR: tuple[int, int, int] = (50, 0, 75)
   P3_COLOR: tuple[int, int, int] = (90, 0, 0)
+
+  # Bomb Settings #
+  BOMB_TIMER: int = 3 # Seconds
+  BOMB_FRAMES: int = 12

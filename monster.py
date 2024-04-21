@@ -4,24 +4,60 @@ from settings import Settings
 
 
 class Monster:
-  DIRECTIONS: list[tuple[int, int]] = [(0, -1), (0, 1), (-1, 0), (1, 0)]
+  DIRECTIONS: list[tuple[int, int, str]] = [(0, -1, 'up'), (0, 1, 'down'), (-1, 0, 'left'), (1, 0, 'right')]
+  # DIRECTIONS: dict[tuple[int, int], str] = {(0, -1): 'up', (0, 1): 'down', (-1, 0): 'left', (1, 0): 'right'}
 
   def __init__(self, spawn: tuple[int, int], fields: Fields):
     self.rect: pygame.Rect = pygame.Rect(spawn, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.fields: Fields = fields
     self.x_direction: int
     self.y_direction: int
-    self.x_direction, self.y_direction = Monster.DIRECTIONS[random.randint(0, 3)]
+    # Animation #
+    self.frame: int = 0
+    self.direction: str = 'down'
+    self.prevDirection: str = 'down'
+
+    self.x_direction, self.y_direction, self.direction = Monster.DIRECTIONS[random.randint(0, 3)]
     self.is_alive: bool = True
     self.__change_direction()
+    # Assets #
+    self.surface: pygame.Surface
+    self.hopLeft: list[pygame.Surface]
+    self.hopRight: list[pygame.Surface]
+    self.hopUp: list[pygame.Surface]
+    self.hopDown: list[pygame.Surface]
+
+  def load_assets(self) -> None:
+    '''
+    This method loads the monster's assets.
+    The hop animation consists of 6 frames for each direction.
+    '''
+    self.hopLeft = [pygame.image.load(f'assets/Monster/hop/left/l{i}.png') for i in range(1, 7)]
+    self.hopRight = [pygame.image.load(f'assets/Monster/hop/right/r{i}.png') for i in range(1, 7)]
+    self.hopUp = [pygame.image.load(f'assets/Monster/hop/up/u{i}.png') for i in range(1, 7)]
+    self.hopDown = [pygame.image.load(f'assets/Monster/hop/down/d{i}.png') for i in range(1, 7)]
+    # Default Surface #
+    self.surface = self.hopDown[0]
+
+  def update_frame(self) -> None:
+    self.__update_surface()
+    if self.direction == self.prevDirection and self.frame < 5:
+      self.frame += 1
+    else:
+      self.frame = 0
+
+  def __update_surface(self) -> None:
+    event: str = 'hop'
+    direction: str = self.direction
+    self.surface = getattr(self, f'{event}{direction.capitalize()}')[self.frame]
 
   def die(self) -> None:
     self.is_alive = False
 
   def __change_direction(self) -> None:
-    directions: list[tuple[int, int]] = Monster.DIRECTIONS.copy()
-    directions.remove((self.x_direction, self.y_direction))
-    self.x_direction, self.y_direction = directions[random.randint(0, 2)]
+    directions: list[tuple[int, int, str]] = Monster.DIRECTIONS.copy()
+    directions.remove((self.x_direction, self.y_direction, self.direction))
+    self.x_direction, self.y_direction, self.direction = directions[random.randint(0, 2)]
 
   def __turn_on_collision(self, obj) -> bool:
     dummy = self.rect.copy()
@@ -33,6 +69,7 @@ class Monster:
     return False
   
   def move(self) -> None:
+    self.prevDirection = self.direction
     self.__randomize_direction()
     potential_collisions = self.fields.get_objects_around_object(self)
     for obj in potential_collisions:

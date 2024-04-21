@@ -1,3 +1,4 @@
+import json
 import pygame
 import random
 from wall import Wall
@@ -17,13 +18,15 @@ class Fields:
 
   def get_crumbly_walls(self) -> list[Crumbly_wall]:
     return [wall for wall in self.walls if isinstance(wall, Crumbly_wall)]
-  
+
   def get_objects(self, col: int, row: int):
     return self.fields[row][col]
 
   def get_objects_at_coords(self, x: int, y: int):
-    return self.get_objects(x // Settings.BLOCK_SIZE, y // Settings.BLOCK_SIZE)
-  
+    target: pygame.Rect = self.snap_to_grid(pygame.Rect(x, y, Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
+    # return self.get_objects(x // Settings.BLOCK_SIZE, y // Settings.BLOCK_SIZE)
+    return self.get_objects(target.x // Settings.BLOCK_SIZE, target.y // Settings.BLOCK_SIZE)
+
   def get_objects_at_object(self, obj):
     potential_collisons = []
     objects = []
@@ -36,59 +39,52 @@ class Fields:
       objects.extend(self.get_objects_at_coords(corner[0], corner[1]))
     for o in objects:
       if o not in potential_collisons:
-        potential_collisons.append(o) 
+        potential_collisons.append(o)
     return potential_collisons
-  
+
   def get_objects_around_object(self, obj):
     potential_collisons: list[pygame.Rect] = []
     for row in range(-1, 2):
       for col in range(-1, 2):
-        objects: list[pygame.Rect] = self.get_objects(obj.rect.x // Settings.BLOCK_SIZE + row, obj.rect.y // Settings.BLOCK_SIZE + col)
+        objects: list[pygame.Rect] = self.get_objects(
+          obj.rect.x // Settings.BLOCK_SIZE + row, obj.rect.y // Settings.BLOCK_SIZE + col)
         for o in objects:
           if o not in potential_collisons:
             potential_collisons.append(o)
     return potential_collisons
-  
+
   def snap_to_grid(self, rect: pygame.Rect) -> pygame.Rect:
     '''
     Returns a mew rectamgle that is snapped to the closest grid.
     '''
-    return pygame.Rect(rect.centerx // Settings.BLOCK_SIZE * Settings.BLOCK_SIZE, 
-                       rect.centery // Settings.BLOCK_SIZE * Settings.BLOCK_SIZE, 
+    return pygame.Rect(rect.centerx // Settings.BLOCK_SIZE * Settings.BLOCK_SIZE,
+                       rect.centery // Settings.BLOCK_SIZE * Settings.BLOCK_SIZE,
                        Settings.BLOCK_SIZE, Settings.BLOCK_SIZE)
-  
-  def field_has_bomb(self, x: int, y: int) -> bool: # TODO: Remove method if not necessary
-    return any(isinstance(obj, Bomb) for obj in self.get_objects_at_coords(x, y))
-  
-  def load_walls(self) -> None:
-    wall_start_x: int = 0
-    for x in range(15):
-      wall_start_y: int = 0
-      for y in range(13):
-        if wall_start_x in [0, 700] or wall_start_y in [0, 600] or \
-          (wall_start_x in [100, 200, 300, 400, 500, 600] and wall_start_y in [100, 200, 300, 400, 500]):
-          wall: Wall = Wall(wall_start_x, wall_start_y)
-          self.walls.append(wall)
-          self.fields[y][x].append(wall)
-        wall_start_y += 50
-      wall_start_x += 50
 
-  def load_crumbly_walls(self) -> None:
-    forbidden_spots: list[list[int]] = [[50, 50], [50, 100], [100, 50], [650, 550], [600, 550], [650, 500]]
-    crumbly_wall_start_x: int = 50
-    for x in range(13):
-      crumbly_wall_start_y: int = 50
-      for y in range(11):
-        if (crumbly_wall_start_x in [100, 200, 300, 400, 500, 600] and crumbly_wall_start_y not in [100, 200, 300, 400, 500]) and \
-                [crumbly_wall_start_x, crumbly_wall_start_y] not in forbidden_spots and random.randint(0, 9) > 7:
-          crumbly_wall: Crumbly_wall = Crumbly_wall(crumbly_wall_start_x, crumbly_wall_start_y)
-          self.walls.append(crumbly_wall)
-          self.fields[y + 1][x + 1].append(crumbly_wall)
-        crumbly_wall_start_y += 50
-      crumbly_wall_start_x += 50
+  def field_has_bomb(self, x: int, y: int) -> bool:  # TODO: Remove method if not necessary
+    return any(isinstance(obj, Bomb) for obj in self.get_objects_at_coords(x, y))
+
+  def load_map(self, lvl: int) -> None:
+    WALL: int = 1
+    CRUMBLY: int = 2
+    with open(f'map.json', 'r') as file:
+      maps = json.load(file)
+      map = maps[f'lvl{lvl}']
+      for y in range(len(map)):
+        for x in range(len(map[y])):
+          wall: Wall | Crumbly_wall
+          if map[y][x] == WALL:
+            wall = Wall(x * Settings.BLOCK_SIZE, y * Settings.BLOCK_SIZE)
+            self.walls.append(wall)
+            self.fields[y][x].append(wall)
+          elif map[y][x] == CRUMBLY:
+            wall = Crumbly_wall(x * Settings.BLOCK_SIZE, y * Settings.BLOCK_SIZE)
+            self.walls.append(wall)
+            self.fields[y][x].append(wall)
 
   def __drop_powerup(self, coord: tuple[int, int]) -> None:
-    powerup: (Powerup | None) = Powerups.get_powerup(coord, Settings.BLOCK_SIZE)
+    powerup: (Powerup | None) = Powerups.get_powerup(
+      (coord[0] + Settings.POWERUP_OFFSET, coord[1] + Settings.POWERUP_OFFSET), Settings.POWERUP_SIZE)
     if powerup is not None:
       self.get_objects_at_coords(coord[0], coord[1]).append(powerup)
       self.powerups.append(powerup)

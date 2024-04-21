@@ -36,6 +36,8 @@ class Player:
     self.deathUp: list[pygame.Surface]
     self.deathDown: list[pygame.Surface]
 
+    self.bomb_assets: list[pygame.Surface]
+
   def load_assets(self, playerNum: int) -> None:
     '''
     This method loads the player's assets.
@@ -61,6 +63,8 @@ class Player:
     self.deathRight = [pygame.image.load(f'Assets/Player/death/right/r{i}.png').convert_alpha() for i in range(1, 7)]
     self.deathUp = [pygame.image.load(f'Assets/Player/death/up/u{i}.png').convert_alpha() for i in range(1, 7)]
     self.deathDown = [pygame.image.load(f'Assets/Player/death/down/d{i}.png').convert_alpha() for i in range(1, 7)]
+    # Bomb Frames #
+    self.bomb_frame = pygame.image.load('Assets/Bomb/b1.png').convert_alpha()
 
     # Set different colors for extra players #
     if playerNum > 1:
@@ -238,3 +242,4 @@ class Player:
       self.fields.set_bomb(target.x, target.y, bomb)
       self.stats['bomb'] -= 1
       self.bomb = bomb
+      
