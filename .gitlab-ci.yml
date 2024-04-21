@@ -20,7 +20,7 @@ unit-test-job:
   script:
     - apt-get update -qy
     - apt-get install -y xvfb  # Install xvfb for pygame
-    - xvfb-run -a python -m test/tests.py  # Run your unit tests
+    - python3 test/tests.py  # Run your unit tests
 
 lint-test-job:
   stage: test
