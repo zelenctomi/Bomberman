@@ -11,7 +11,6 @@ from player import *
 
 class TestBombClass(unittest.TestCase):
 
-
     pygame.init()
     pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
 
@@ -34,7 +33,7 @@ class TestBombClass(unittest.TestCase):
         test_fields: Fields = Fields()
         test_player: Player = Player((0, 0), test_fields, Settings.P1_CONTROLS)
         test_bomb: Bomb = Bomb([0, 0], 50, test_player)
-        wall_instance =Wall(0,0)
+        wall_instance = Wall(0,0)
         self.assertEqual(len(test_bomb.explode([wall_instance])), 9)
 
     def test_update_frame_1(self):
