@@ -20,7 +20,7 @@ class Explosion: # Typehint -> list[Explosion] doesn't work on recursive methods
       elif direction == "RIGHT":
         explosions.append(Explosion(self.rect.x + offset, self.rect.y, self.walls))
       for wall in self.walls:
-        if pygame.Rect.colliderect(wall, explosions[-1].rect):
+        if pygame.Rect.colliderect(wall.rect, explosions[-1].rect):
           explosions.pop()
           return explosions
       return explosions + self.spread(direction, offset + 50, times - 1)
