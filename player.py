@@ -24,6 +24,7 @@ class Player:
     self.prevDirection: str = 'down'
     # Assets #
     self.surface: pygame.Surface
+    self.bomb_frame: pygame.Surface
     self.idleLeft: list[pygame.Surface]
     self.idleRight: list[pygame.Surface]
     self.idleUp: list[pygame.Surface]
@@ -36,7 +37,6 @@ class Player:
     self.deathRight: list[pygame.Surface]
     self.deathUp: list[pygame.Surface]
     self.deathDown: list[pygame.Surface]
-    self.bomb_frame = pygame.image.load('assets/Bomb/b1.png').convert_alpha()
     self.bomb_assets: list[pygame.Surface]
 
   def load_assets(self, playerNum: int) -> None:
