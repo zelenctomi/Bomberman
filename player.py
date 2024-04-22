@@ -9,13 +9,15 @@ class Player:
     self.controls: dict[str, int] = controls
     self.fields: Fields = fields
     self.bomb: (Bomb | None) = None
+    self.planted_bombs: int = 0
     self.alive: bool = True
     self.diagonal_move: tuple[int, int] = (1, 0)
     # Stats #
     self.stats: dict[str, int] = {
       'bomb': 1,
       'explosion': 2,
-      'detonator': 0
+      'detonator': 0,
+      'invulnerability': 0
     }
     # Animation #
     self.frame: int = 0
@@ -130,7 +132,10 @@ class Player:
       x: int = 0
       y: int = 0
       if key[self.controls['place']]:
-        self.__place_bomb()
+        if self.stats['bomb'] == 0 and self.stats['detonator'] == 1 and self.planted_bombs > 0:
+          self.__use_bombs()
+        else:
+          self.__place_bomb()
       if key[self.controls['left']]:
         x += -1
       if key[self.controls['right']]:
@@ -238,8 +243,15 @@ class Player:
 
   def __place_bomb(self) -> None:
     if self.stats['bomb'] > 0 and not self.fields.field_has_bomb(self.rect.x, self.rect.y):
+      self.planted_bombs += 1
       target: pygame.Rect = self.fields.snap_to_grid(self.rect)
       bomb: Bomb = Bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
       self.fields.set_bomb(target.x, target.y, bomb)
       self.stats['bomb'] -= 1
+      self.planted_bombs += 1
       self.bomb = bomb
+
+  def __use_bombs(self):
+    self.fields.detonator_explosion()
+    self.stats['detonator'] = 0
+    self.planted_bombs = 0

@@ -83,12 +83,21 @@ class Fields:
 
   def update_bombs(self) -> None:
     for bomb in self.bombs:
-      if bomb.update() < 0:
-        self.explosions.extend(bomb.explode([wall.rect for wall in self.walls if not isinstance(wall, Crumbly_wall)]))
-        self.get_at_coord(bomb.rect.x, bomb.rect.y).remove(bomb)
-        self.bombs.remove(bomb)
-        bomb.owner.stats['bomb'] += 1
-        self.__destroy_crumbly_walls()
+      if bomb.owner.stats['detonator'] == 0:
+        if bomb.update() < 0:
+          self.explosions.extend(bomb.explode([wall.rect for wall in self.walls if not isinstance(wall, Crumbly_wall)]))
+          self.get_at_coord(bomb.rect.x, bomb.rect.y).remove(bomb)
+          self.bombs.remove(bomb)
+          ##bomb.owner.stats['bomb'] += 1
+          self.__destroy_crumbly_walls()
+
+  def detonator_explosion(self):
+    for bomb in self.bombs:
+      self.explosions.extend(bomb.explode([wall.rect for wall in self.walls if not isinstance(wall, Crumbly_wall)]))
+      self.get_at_coord(bomb.rect.x, bomb.rect.y).remove(bomb)
+      self.bombs.remove(bomb)
+      self.__destroy_crumbly_walls()
+
 
   def update_explosions(self) -> None:
     for explosion in self.explosions:
