@@ -149,7 +149,7 @@ class Player:
         self.idle = True
 
   def __move_or_collide(self, x: int, y: int) -> tuple[int, int]:
-    potential_collisions = self.fields.get_objects_around_object(self)
+    potential_collisions: list[GameObject] = self.fields.get_objects_around_object(self)
     self.__update_bomb_collision()
     for obj in potential_collisions:
       x, y = self.__check_collision(x, y, obj)
@@ -210,7 +210,7 @@ class Player:
                                       Settings.BLOCK_SIZE,
                                       Settings.BLOCK_SIZE)
     # If the target block is not a collision, then the player will slide towards the target block
-    potential_collisions = self.fields.get_objects_at_coords(target.x, target.y)
+    potential_collisions: list[GameObject] = self.fields.get_at_coord(target.x, target.y)
     if potential_collisions == [] or isinstance(potential_collisions[0], Powerup):
       offsetX: int = self.rect.x - current.x
       offsetY: int = self.rect.y - current.y
@@ -221,11 +221,11 @@ class Player:
   def __check_powerup(self, obj) -> None:
     if isinstance(obj, Powerup):
       self.__apply_powerup(obj)
-      self.fields.get_objects_at_coords(obj.rect.x, obj.rect.y).remove(obj)
+      self.fields.get_at_coord(obj.rect.x, obj.rect.y).remove(obj)
       self.fields.powerups.remove(obj)
 
   def __update_bomb_collision(self) -> None:
-    potential_collisions = self.fields.get_objects_at_object(self)
+    potential_collisions: list[GameObject] = self.fields.get_at_coord(self.rect.x, self.rect.y)
     if self.bomb != None and self.bomb not in potential_collisions:
       self.bomb = None
 

@@ -8,12 +8,14 @@ class Game:
   TARGET_ENTITY_FRAME: int = Settings.FPS // Settings.ANIMATION_FPS
   TARGET_BOMB_FRAME: int = Settings.FPS // Settings.BOMB_FRAMES * Settings.BOMB_TIMER
 
-  def __init__(self):
+  def __init__(self, player_count: int, level: int):
+    self.player_count: int = player_count
+    self.level: int = level
     pygame.init()
-    # pygame.display.set_caption('Bomberman')
+    pygame.display.set_caption('Bomberman')
     self.screen: pygame.Surface = pygame.display.set_mode((Settings.WIDTH, Settings.HEIGHT))
     self.clock: pygame.time.Clock = pygame.time.Clock()
-    self.font: pygame.font.Font = pygame.font.Font(Settings.FONT, 36)
+    self.font: pygame.font.Font = pygame.font.Font(Settings.FONT, 16)
 
   def __load_assets(self) -> None:
     for player in self.players:
@@ -35,9 +37,9 @@ class Game:
     self.entity_frame_trigger: int = 0
     self.bomb_frame_trigger: int = 0
     self.fields: Fields = Fields()
-    self.fields.load_map(1)
+    self.fields.load_map(self.level)
     self.spawner: Spawner = Spawner(self.fields)
-    self.players: list[Player] = self.spawner.spawn_players([Settings.P1_CONTROLS, Settings.P2_CONTROLS, Settings.P3_CONTROLS])
+    self.players: list[Player] = self.spawner.spawn_players(self.player_count)
     self.monsters: list[Monster] = self.spawner.spawn_monsters(3)
 
   def __render_map(self) -> None:

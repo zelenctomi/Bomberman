@@ -1,4 +1,5 @@
 import pygame
+from typing import NewType
 
 
 class Settings:
@@ -24,10 +25,11 @@ class Settings:
                                  'up': pygame.K_UP, 'down': pygame.K_DOWN, 'place': pygame.K_RETURN}
   P3_CONTROLS: dict[str, int] = {'left': pygame.K_j, 'right': pygame.K_l,
                                  'up': pygame.K_i, 'down': pygame.K_k, 'place': pygame.K_o}
+  CONTROLS: list[dict[str, int]] = [P1_CONTROLS, P2_CONTROLS, P3_CONTROLS]
   # These colors are subtracted from the original to create new ones
   P2_COLOR: tuple[int, int, int] = (50, 0, 75)
   P3_COLOR: tuple[int, int, int] = (90, 0, 0)
 
   # Bomb #
-  BOMB_TIMER: int = 3 # Seconds
+  BOMB_TIMER: int = 3  # Seconds
   BOMB_FRAMES: int = 12
