@@ -10,7 +10,8 @@ from powerups import Powerups, Powerup, Extra_bomb, Longer_explosion
 
 class Fields:
   def __init__(self):
-    self.fields = [[[] for _ in range(Settings.WIDTH)] for _ in range(Settings.HEIGHT)]
+    self.fields = [[[] for _ in range(Settings.WIDTH // Settings.BLOCK_SIZE)]
+                       for _ in range((Settings.HEIGHT // Settings.BLOCK_SIZE) - 1)]
     self.walls: list[Wall] = []
     self.bombs: list[Bomb] = []
     self.powerups: list[Powerup] = []
@@ -24,7 +25,6 @@ class Fields:
 
   def get_objects_at_coords(self, x: int, y: int):
     target: pygame.Rect = self.snap_to_grid(pygame.Rect(x, y, Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
-    # return self.get_objects(x // Settings.BLOCK_SIZE, y // Settings.BLOCK_SIZE)
     return self.get_objects(target.x // Settings.BLOCK_SIZE, target.y // Settings.BLOCK_SIZE)
 
   def get_objects_at_object(self, obj):
@@ -73,12 +73,13 @@ class Fields:
       for y in range(len(map)):
         for x in range(len(map[y])):
           wall: Wall | Crumbly_wall
+          coord: tuple[int, int] = (x * Settings.BLOCK_SIZE, y * Settings.BLOCK_SIZE)
           if map[y][x] == WALL:
-            wall = Wall(x * Settings.BLOCK_SIZE, y * Settings.BLOCK_SIZE)
+            wall = Wall(coord, Settings.BLOCK_SIZE)
             self.walls.append(wall)
             self.fields[y][x].append(wall)
           elif map[y][x] == CRUMBLY:
-            wall = Crumbly_wall(x * Settings.BLOCK_SIZE, y * Settings.BLOCK_SIZE)
+            wall = Crumbly_wall(coord, Settings.BLOCK_SIZE)
             self.walls.append(wall)
             self.fields[y][x].append(wall)
 

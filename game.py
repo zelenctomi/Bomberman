@@ -10,10 +10,10 @@ class Game:
 
   def __init__(self):
     pygame.init()
-    pygame.display.set_caption('Bomberman')
-    self.screen: pygame.Surface = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
+    # pygame.display.set_caption('Bomberman')
+    self.screen: pygame.Surface = pygame.display.set_mode((Settings.WIDTH, Settings.HEIGHT))
     self.clock: pygame.time.Clock = pygame.time.Clock()
-    self.font: pygame.font.Font = pygame.font.Font('PixelifySansFont/PixelifySans-VariableFont_wght.ttf', 36)
+    self.font: pygame.font.Font = pygame.font.Font(Settings.FONT, 36)
 
   def __load_assets(self) -> None:
     for player in self.players:
