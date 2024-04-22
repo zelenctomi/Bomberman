@@ -18,7 +18,8 @@ class Player:
       'bomb': 1,
       'explosion': 2,
       'detonator': 0,
-      'invulnerability': 0
+      'invulnerability': 0,
+      'speed': 0
     }
     # Animation #
     self.frame: int = 0
@@ -147,6 +148,8 @@ class Player:
         y += 1
 
       x, y = self.__move_or_collide(x, y)
+      if self.stats['speed'] > 0:
+        x, y = self.__move_or_collide(x, y)
 
       if x != 0 or y != 0:
         self.prevDirection = self.direction
@@ -241,11 +244,9 @@ class Player:
     value: int
     stat, value = powerup.get_bonus()
     self.stats[stat] += value
-    self.__check_stats()
-    
-  def __check_stats(self):
-    if self.stats['invulnerability'] > 0:
-      self.__start_unvulnerability_timer()
+    if stat == 'invulnerability':
+      self.__start_unvulnerability_timer
+    ##elif stat == 'speed'
 
   def __start_unvulnerability_timer(self):
     timer = threading.Timer(20, self.__countdown, [20])

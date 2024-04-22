@@ -33,6 +33,7 @@ class Game:
     self.longer_explosion_surface: pygame.Surface = pygame.image.load('Assets/Powerups/longer_explosion.png').convert_alpha()
     self.detonator_surface: pygame.Surface = pygame.image.load('Assets/Powerups/detonator.png').convert_alpha()
     self.invulnerability_surface: pygame.Surface = pygame.image.load('Assets/Powerups/invulnerability.png').convert_alpha()
+    self.speed_surface: pygame.Surface = pygame.image.load('Assets/Powerups/speed.png').convert_alpha()
 
 
   def __initialize_objects(self) -> None:
@@ -69,6 +70,8 @@ class Game:
         self.screen.blit(self.detonator_surface, powerup.rect)
       elif isinstance(powerup, Invulnerability):
         self.screen.blit(self.invulnerability_surface, powerup.rect)
+      elif isinstance(powerup, Speed):
+        self.screen.blit(self.speed_surface, powerup.rect)
 
     for monster in self.monsters:
       if monster.is_alive:
