@@ -1,9 +1,11 @@
 from game import Game
-from start_menu import Start_menu
+from menu import Menu
+
 
 def main() -> None:
-  start: Start_menu = Start_menu()
+  start: Menu = Menu()
   start.run()
+
 
 if __name__ == '__main__':
   main()

@@ -2,13 +2,13 @@ import pygame
 from settings import Settings
 
 
-class Explosion:
+class Explosion: # Typehint -> list[Explosion] doesn't work on recursive methods
   def __init__(self, x: int, y: int, walls: list[pygame.Rect]):
     self.rect: pygame.Rect = pygame.Rect((x, y, Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.lifetime: int = 100
     self.walls: list[pygame.Rect] = walls
 
-  def spread(self, direction: str, offset: int, times: int): # Typehint -> list[Explosion] doesn't work due to recursion
+  def spread(self, direction: str, offset: int, times: int): 
     explosions: list[Explosion] = []
     if times > 0:
       if direction == "UP":
@@ -26,7 +26,7 @@ class Explosion:
       return explosions + self.spread(direction, offset + 50, times - 1)
     return []
 
-  def initiate(self, times: int): # Typehint -> list[Explosion] doesn't work due to recursion
+  def initiate(self, times: int):
     return [Explosion(self.rect.x, self.rect.y, self.walls)]  \
             + self.spread("UP", 50, times)                    \
             + self.spread("DOWN", 50, times)                  \

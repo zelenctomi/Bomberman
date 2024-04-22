@@ -8,12 +8,14 @@ class Game:
   TARGET_ENTITY_FRAME: int = Settings.FPS // Settings.ANIMATION_FPS
   TARGET_BOMB_FRAME: int = Settings.FPS // Settings.BOMB_FRAMES * Settings.BOMB_TIMER
 
-  def __init__(self):
+  def __init__(self, player_count: int, level: int):
+    self.player_count: int = player_count
+    self.level: int = level
     pygame.init()
     pygame.display.set_caption('Bomberman')
-    self.screen: pygame.Surface = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
+    self.screen: pygame.Surface = pygame.display.set_mode((Settings.WIDTH, Settings.HEIGHT))
     self.clock: pygame.time.Clock = pygame.time.Clock()
-    self.font: pygame.font.Font = pygame.font.Font('PixelifySansFont/PixelifySans-VariableFont_wght.ttf', 36)
+    self.font: pygame.font.Font = pygame.font.Font(Settings.FONT, 16)
 
   def __load_assets(self) -> None:
     for player in self.players:
@@ -29,15 +31,16 @@ class Game:
     # Powerups #
     self.extra_bomb_surface: pygame.Surface = pygame.image.load('Assets/Powerups/extra_bomb.png').convert_alpha()
     self.longer_explosion_surface: pygame.Surface = pygame.image.load('Assets/Powerups/longer_explosion.png').convert_alpha()
+    self.detonator_surface: pygame.Surface = pygame.image.load('Assets/Powerups/detonator.png').convert_alpha()
 
   def __initialize_objects(self) -> None:
-    self.scoreboard: Scoreboard = Scoreboard(self.screen)
     self.entity_frame_trigger: int = 0
     self.bomb_frame_trigger: int = 0
+    self.scoreboard: Scoreboard = Scoreboard(self.screen)
     self.fields: Fields = Fields()
-    self.fields.load_map(1)
+    self.fields.load_map(self.level)
     self.spawner: Spawner = Spawner(self.fields)
-    self.players: list[Player] = self.spawner.spawn_players([Settings.P1_CONTROLS, Settings.P2_CONTROLS, Settings.P3_CONTROLS])
+    self.players: list[Player] = self.spawner.spawn_players(self.player_count)
     self.monsters: list[Monster] = self.spawner.spawn_monsters(3)
 
   def __render_map(self) -> None:
@@ -60,6 +63,8 @@ class Game:
         self.screen.blit(self.extra_bomb_surface, powerup.rect)
       elif isinstance(powerup, Longer_explosion):
         self.screen.blit(self.longer_explosion_surface, powerup.rect)
+      elif isinstance(powerup, Detonator):
+        self.screen.blit(self.detonator_surface, powerup.rect)
 
     for monster in self.monsters:
       if monster.is_alive:
@@ -68,7 +73,7 @@ class Game:
     for player in self.players:
         self.screen.blit(player.surface, player.rect)
       
-    self.screen.blit(self.scoreboard_surface, (0, 635))
+    self.screen.blit(self.scoreboard_surface, (0, 635)) # TODO: Create a constant in Settings
 
   def __move_entities(self) -> None:
     for monster in self.monsters:

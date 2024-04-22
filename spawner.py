@@ -11,11 +11,11 @@ class Spawner:
     self.monsters: list[Monster] = []
     self.fields: Fields = fields
 
-  def spawn_players(self, controls: list[dict[str, int]]) -> list[Player]:
+  def spawn_players(self, count: int) -> list[Player]:
     spawn_points: list[tuple[int, int]] = self.__get_player_spawn_points()
-    for i in range(len(controls)):
+    for i in range(count):
       spawn: tuple[int, int] = spawn_points[i]
-      player: Player = Player(spawn, self.fields, controls[i])
+      player: Player = Player(spawn, self.fields, Settings.CONTROLS[i])
       self.players.append(player)
     return self.players
   
@@ -26,10 +26,12 @@ class Spawner:
     > The 3 most outer layers of the map are forbidden
     '''
     OFFSET: int = 3 # Forbidden outer layers
+    HEIGHT: int = (Settings.HEIGHT // Settings.BLOCK_SIZE) - 1
+    WIDTH: int = Settings.WIDTH // Settings.BLOCK_SIZE
     spawn_points: list[tuple[int, int]] = []
-    for row in range(Settings.HEIGHT - (OFFSET * 2)):
-      for col in range(Settings.WIDTH - (OFFSET * 2)):
-        if self.fields.get_objects(col + OFFSET, row + OFFSET) == []:
+    for row in range(HEIGHT - (OFFSET * 2)):
+      for col in range(WIDTH - (OFFSET * 2)):
+        if self.fields.get(col + OFFSET, row + OFFSET) == []:
           x: int = (col + OFFSET) * Settings.BLOCK_SIZE
           y: int = (row + OFFSET) * Settings.BLOCK_SIZE
           spawn_points.append((x, y))
@@ -44,8 +46,8 @@ class Spawner:
     > Returns the 4 corners of the map
     '''
     spawn_points: list[tuple[int, int]] = []
-    WIDTH: int = Settings.WIDTH
-    HEIGHT: int = Settings.HEIGHT
+    WIDTH: int = Settings.WIDTH // Settings.BLOCK_SIZE
+    HEIGHT: int = (Settings.HEIGHT // Settings.BLOCK_SIZE) - 1
     BLOCK_SIZE: int = Settings.BLOCK_SIZE
     spawn_points.append((BLOCK_SIZE, BLOCK_SIZE))
     spawn_points.append((WIDTH * BLOCK_SIZE - BLOCK_SIZE * 2, HEIGHT * BLOCK_SIZE - BLOCK_SIZE * 2))

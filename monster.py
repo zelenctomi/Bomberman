@@ -1,11 +1,11 @@
-import pygame, random
-from fields import Fields
+import pygame
+import random
+from fields import *
 from settings import Settings
 
 
 class Monster:
   DIRECTIONS: list[tuple[int, int, str]] = [(0, -1, 'up'), (0, 1, 'down'), (-1, 0, 'left'), (1, 0, 'right')]
-  # DIRECTIONS: dict[tuple[int, int], str] = {(0, -1): 'up', (0, 1): 'down', (-1, 0): 'left', (1, 0): 'right'}
 
   def __init__(self, spawn: tuple[int, int], fields: Fields):
     self.rect: pygame.Rect = pygame.Rect(spawn, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
@@ -59,26 +59,26 @@ class Monster:
     directions.remove((self.x_direction, self.y_direction, self.direction))
     self.x_direction, self.y_direction, self.direction = directions[random.randint(0, 2)]
 
-  def __turn_on_collision(self, obj) -> bool:
-    dummy = self.rect.copy()
+  def __turn_on_collision(self, obj: GameObject) -> bool:
+    dummy: pygame.Rect = self.rect.copy()
     dummy.x += self.x_direction
     dummy.y += self.y_direction
     if pygame.Rect.colliderect(obj.rect, dummy):
       self.__change_direction()
       return True
     return False
-  
+
   def move(self) -> None:
     self.prevDirection = self.direction
     self.__randomize_direction()
-    potential_collisions = self.fields.get_objects_around_object(self)
+    potential_collisions: list[GameObject] = self.fields.get_objects_around_object(self)
     for obj in potential_collisions:
       if self.__turn_on_collision(obj):
         return
     self.__update_position(self.x_direction, self.y_direction)
 
   def __randomize_direction(self) -> None:
-    rotate = random.randint(0, 100)
+    rotate: int = random.randint(0, 100)
     if rotate == 50:
       self.__change_direction()
 
