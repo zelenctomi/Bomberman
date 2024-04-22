@@ -46,26 +46,26 @@ class Player:
     The walk animation consists of 8 frames for each direction.
     '''
     # Idle Frames #
-    self.idleLeft = [pygame.image.load(f'Assets/Player/idle/left/l1.png').convert_alpha() for _ in range(1, 5)]
-    self.idleRight = [pygame.image.load(f'Assets/Player/idle/right/r1.png').convert_alpha() for _ in range(1, 5)]
-    self.idleUp = [pygame.image.load(f'Assets/Player/idle/up/u1.png').convert_alpha() for _ in range(1, 5)]
-    self.idleDown = [pygame.image.load(f'Assets/Player/idle/down/d1.png').convert_alpha() for _ in range(1, 5)]
-    self.idleLeft.extend([pygame.image.load(f'Assets/Player/idle/left/l2.png').convert_alpha() for _ in range(1, 5)])
-    self.idleRight.extend([pygame.image.load(f'Assets/Player/idle/right/r2.png').convert_alpha() for _ in range(1, 5)])
-    self.idleUp.extend([pygame.image.load(f'Assets/Player/idle/up/u2.png').convert_alpha() for _ in range(1, 5)])
-    self.idleDown.extend([pygame.image.load(f'Assets/Player/idle/down/d2.png').convert_alpha() for _ in range(1, 5)])
+    self.idleLeft = [pygame.image.load(f'assets/Player/idle/left/l1.png').convert_alpha() for _ in range(1, 5)]
+    self.idleRight = [pygame.image.load(f'assets/Player/idle/right/r1.png').convert_alpha() for _ in range(1, 5)]
+    self.idleUp = [pygame.image.load(f'assets/Player/idle/up/u1.png').convert_alpha() for _ in range(1, 5)]
+    self.idleDown = [pygame.image.load(f'assets/Player/idle/down/d1.png').convert_alpha() for _ in range(1, 5)]
+    self.idleLeft.extend([pygame.image.load(f'assets/Player/idle/left/l2.png').convert_alpha() for _ in range(1, 5)])
+    self.idleRight.extend([pygame.image.load(f'assets/Player/idle/right/r2.png').convert_alpha() for _ in range(1, 5)])
+    self.idleUp.extend([pygame.image.load(f'assets/Player/idle/up/u2.png').convert_alpha() for _ in range(1, 5)])
+    self.idleDown.extend([pygame.image.load(f'assets/Player/idle/down/d2.png').convert_alpha() for _ in range(1, 5)])
     # Walk Frames #
-    self.walkLeft = [pygame.image.load(f'Assets/Player/walk/left/l{i}.png').convert_alpha() for i in range(1, 9)]
-    self.walkRight = [pygame.image.load(f'Assets/Player/walk/right/r{i}.png').convert_alpha() for i in range(1, 9)]
-    self.walkUp = [pygame.image.load(f'Assets/Player/walk/up/u{i}.png').convert_alpha() for i in range(1, 9)]
-    self.walkDown = [pygame.image.load(f'Assets/Player/walk/down/d{i}.png').convert_alpha() for i in range(1, 9)]
+    self.walkLeft = [pygame.image.load(f'assets/Player/walk/left/l{i}.png').convert_alpha() for i in range(1, 9)]
+    self.walkRight = [pygame.image.load(f'assets/Player/walk/right/r{i}.png').convert_alpha() for i in range(1, 9)]
+    self.walkUp = [pygame.image.load(f'assets/Player/walk/up/u{i}.png').convert_alpha() for i in range(1, 9)]
+    self.walkDown = [pygame.image.load(f'assets/Player/walk/down/d{i}.png').convert_alpha() for i in range(1, 9)]
     # Death Frames #
-    self.deathLeft = [pygame.image.load(f'Assets/Player/death/left/l{i}.png').convert_alpha() for i in range(1, 7)]
-    self.deathRight = [pygame.image.load(f'Assets/Player/death/right/r{i}.png').convert_alpha() for i in range(1, 7)]
-    self.deathUp = [pygame.image.load(f'Assets/Player/death/up/u{i}.png').convert_alpha() for i in range(1, 7)]
-    self.deathDown = [pygame.image.load(f'Assets/Player/death/down/d{i}.png').convert_alpha() for i in range(1, 7)]
+    self.deathLeft = [pygame.image.load(f'assets/Player/death/left/l{i}.png').convert_alpha() for i in range(1, 7)]
+    self.deathRight = [pygame.image.load(f'assets/Player/death/right/r{i}.png').convert_alpha() for i in range(1, 7)]
+    self.deathUp = [pygame.image.load(f'assets/Player/death/up/u{i}.png').convert_alpha() for i in range(1, 7)]
+    self.deathDown = [pygame.image.load(f'assets/Player/death/down/d{i}.png').convert_alpha() for i in range(1, 7)]
     # Bomb Frames #
-    self.bomb_frame = pygame.image.load('Assets/Bomb/b1.png').convert_alpha()
+    self.bomb_frame = pygame.image.load('assets/Bomb/b1.png').convert_alpha()
 
     # Set different colors for extra players #
     if playerNum > 1:
