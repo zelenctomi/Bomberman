@@ -3,9 +3,6 @@ import pygame
 
 class Scoreboard:
 
-  SCREEN_WIDTH: int = 750
-  SCREEN_HEIGHT: int = 700
-
   def __init__(self, screen_param):
     self.screen_param = screen_param
     pygame.init()

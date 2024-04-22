@@ -33,9 +33,9 @@ class Game:
     self.longer_explosion_surface: pygame.Surface = pygame.image.load('Assets/Powerups/longer_explosion.png').convert_alpha()
 
   def __initialize_objects(self) -> None:
-    self.scoreboard: Scoreboard = Scoreboard(self.screen)
     self.entity_frame_trigger: int = 0
     self.bomb_frame_trigger: int = 0
+    self.scoreboard: Scoreboard = Scoreboard(self.screen)
     self.fields: Fields = Fields()
     self.fields.load_map(self.level)
     self.spawner: Spawner = Spawner(self.fields)
@@ -70,7 +70,7 @@ class Game:
     for player in self.players:
         self.screen.blit(player.surface, player.rect)
       
-    self.screen.blit(self.scoreboard_surface, (0, 635))
+    self.screen.blit(self.scoreboard_surface, (0, 635)) # TODO: Create a constant in Settings
 
   def __move_entities(self) -> None:
     for monster in self.monsters:
