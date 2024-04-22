@@ -95,7 +95,7 @@ class Player:
         frame.fill(colors[i], special_flags=pygame.BLEND_SUB)
       for frame in self.deathDown:
         frame.fill(colors[i], special_flags=pygame.BLEND_SUB)
-        
+
     # Default Surface #
     self.surface = self.idleDown[0]
 
@@ -150,7 +150,7 @@ class Player:
         self.idle = True
 
   def __move_or_collide(self, x: int, y: int) -> tuple[int, int]:
-    potential_collisions = self.fields.get_objects_around_object(self)
+    potential_collisions: list[GameObject] = self.fields.get_objects_around_object(self)
     self.__update_bomb_collision()
     for obj in potential_collisions:
       x, y = self.__check_collision(x, y, obj)
@@ -166,8 +166,8 @@ class Player:
     self.rect.x += x
     self.rect.y += y
 
-  def __collides(self, x: int, y: int, obj) -> bool:
-    dummy = self.rect.copy()
+  def __collides(self, x: int, y: int, obj: GameObject) -> bool:
+    dummy: pygame.Rect = self.rect.copy()
     dummy.x += x
     dummy.y += y
     if pygame.Rect.colliderect(obj.rect, dummy) and obj != self.bomb:
@@ -175,7 +175,7 @@ class Player:
     return False
 
   def __check_collision(self, x: int, y: int, obj) -> tuple[int, int]:  # TODO: Refactor
-    collided = False
+    collided: bool = False
     diagonal: bool = True if x != 0 and y != 0 else False
     if self.__collides(x, 0, obj):
       if not diagonal:
@@ -190,7 +190,7 @@ class Player:
         y = 0
       collided = True
     if collided:
-      self.__check_powerup(obj)  # FIXME: The player picks up the powerup with diagonal movement
+      self.__check_powerup(obj)
       if abs(x + y) == 1:
         self.diagonal_move = (x, y)
     return x, y
@@ -211,7 +211,7 @@ class Player:
                                       Settings.BLOCK_SIZE,
                                       Settings.BLOCK_SIZE)
     # If the target block is not a collision, then the player will slide towards the target block
-    potential_collisions = self.fields.get_objects_at_coords(target.x, target.y)
+    potential_collisions: list[GameObject] = self.fields.get_at_coord(target.x, target.y)
     if potential_collisions == [] or isinstance(potential_collisions[0], Powerup):
       offsetX: int = self.rect.x - current.x
       offsetY: int = self.rect.y - current.y
@@ -219,14 +219,14 @@ class Player:
       slideY = 0 if offsetY == 0 else abs(offsetY) // offsetY * -1
     return slideX, slideY
 
-  def __check_powerup(self, obj) -> None:
+  def __check_powerup(self, obj: GameObject) -> None:
     if isinstance(obj, Powerup):
       self.__apply_powerup(obj)
-      self.fields.get_objects_at_coords(obj.rect.x, obj.rect.y).remove(obj)
+      self.fields.get_at_coord(obj.rect.x, obj.rect.y).remove(obj)
       self.fields.powerups.remove(obj)
 
   def __update_bomb_collision(self) -> None:
-    potential_collisions = self.fields.get_objects_at_object(self)
+    potential_collisions: list[GameObject] = self.fields.get_at_coord(self.rect.x, self.rect.y)
     if self.bomb != None and self.bomb not in potential_collisions:
       self.bomb = None
 
@@ -243,4 +243,3 @@ class Player:
       self.fields.set_bomb(target.x, target.y, bomb)
       self.stats['bomb'] -= 1
       self.bomb = bomb
-      
