@@ -21,6 +21,9 @@ unit-test-job:
     - apt-get update -qy
     - apt-get install -y xvfb
     - python3 test/test_fields.py
+    - python3 test/test_bomb.py
+    - python3 test/test_explosion.py
+    - python3 test/test_powerups.py
 
 lint-test-job:
   stage: test
