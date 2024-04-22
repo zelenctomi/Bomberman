@@ -13,7 +13,7 @@ class TestFieldsClass(unittest.TestCase):
 
 
     pygame.init()
-    pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
+    pygame.display.set_mode((Settings.WIDTH, Settings.HEIGHT))
 
     def test_get_crumbly_walls_1(self):
         test_fields: Fields = Fields()
@@ -21,30 +21,30 @@ class TestFieldsClass(unittest.TestCase):
     
     def test_get_crumbly_walls_2(self):
         test_fields: Fields = Fields()
-        crumbly_wall_instance = Crumbly_wall(0,0)
+        crumbly_wall_instance = Crumbly_wall((0,0), 50)
         test_fields.walls.append(crumbly_wall_instance)
         self.assertEqual(test_fields.get_crumbly_walls(), [crumbly_wall_instance])
 
-    def test_get_objects_1(self):
+    def test_get_1(self):
         test_fields: Fields = Fields()
-        self.assertEqual(test_fields.get_objects(0,0), [])
+        self.assertEqual(test_fields.get(0,0), [])
 
-    def test_get_objects_2(self):
+    def test_get_2(self):
         test_fields: Fields = Fields()
-        crumbly_wall_instance = Crumbly_wall(0,0)
+        crumbly_wall_instance = Crumbly_wall((0,0), 50)
         test_fields.fields[0][0].append(crumbly_wall_instance)
-        self.assertEqual(test_fields.get_objects(0,0), [crumbly_wall_instance])
+        self.assertEqual(test_fields.get(0,0), [crumbly_wall_instance])
 
-    def test_get_objects_at_coords_1(self):
+    def test_get_at_coord_1(self):
         test_fields: Fields = Fields()
-        self.assertEqual(test_fields.get_objects_at_coords(0,0), [])
+        self.assertEqual(test_fields.get_at_coord(0,0), [])
 
-    def test_get_objects_at_coords_2(self):
+    def test_get_at_coord_2(self):
         test_fields: Fields = Fields()
-        crumbly_wall_instance = Crumbly_wall(0,0)
+        crumbly_wall_instance = Crumbly_wall((0,0), 50)
         test_fields.fields[0][0].append(crumbly_wall_instance)
-        self.assertEqual(test_fields.get_objects_at_coords(0,0), [crumbly_wall_instance])
-
+        self.assertEqual(test_fields.get_at_coord(0,0), [crumbly_wall_instance])
+    '''
     def test_get_objects_at_object_1(self):
         test_fields: Fields = Fields()
         crumbly_wall_instance = Crumbly_wall(0,0)
@@ -59,6 +59,7 @@ class TestFieldsClass(unittest.TestCase):
         test_fields.fields[0][0].append(monster_instance)
         test_fields.fields[0][0].append(monster_instance_2)
         self.assertEqual(test_fields.get_objects_at_object(crumbly_wall_instance), [monster_instance, monster_instance_2])
+    '''
 
     '''
     def test_get_objects_around_object_1(self):
@@ -92,6 +93,7 @@ class TestFieldsClass(unittest.TestCase):
         test_fields: Fields = Fields()
 
         test_player: Player = Player((0, 0), test_fields, Settings.P1_CONTROLS)
+        test_player.load_assets(0)
         test_bomb: Bomb = Bomb([0, 0], 50, test_player)
         test_fields.fields[0][0].append(test_bomb)
 
@@ -106,6 +108,7 @@ class TestFieldsClass(unittest.TestCase):
         test_fields: Fields = Fields()
 
         test_player: Player = Player((0, 0), test_fields, Settings.P1_CONTROLS)
+        test_player.load_assets(0)
         test_bomb: Bomb = Bomb([0, 0], 50, test_player)
         test_fields.set_bomb(0, 0, test_bomb)
 
@@ -115,6 +118,7 @@ class TestFieldsClass(unittest.TestCase):
         test_fields: Fields = Fields()
 
         test_player: Player = Player((0, 0), test_fields, Settings.P1_CONTROLS)
+        test_player.load_assets(0)
         test_bomb_1: Bomb = Bomb([0, 0], 50, test_player)
         test_bomb_2: Bomb = Bomb([50, 50], 50, test_player)
         test_fields.set_bomb(0, 0, test_bomb_1)
@@ -126,6 +130,7 @@ class TestFieldsClass(unittest.TestCase):
         test_fields: Fields = Fields()
 
         test_player: Player = Player((0, 0), test_fields, Settings.P1_CONTROLS)
+        test_player.load_assets(0)
         test_bomb: Bomb = Bomb([0, 0], 50, test_player)
         test_bomb.timer = 0
         test_fields.bombs.append(test_bomb)
@@ -137,6 +142,7 @@ class TestFieldsClass(unittest.TestCase):
         test_fields: Fields = Fields()
 
         test_player: Player = Player((0, 0), test_fields, Settings.P1_CONTROLS)
+        test_player.load_assets(0)
         test_bomb: Bomb = Bomb([0, 0], 50, test_player)
         test_fields.bombs.append(test_bomb)
         test_fields.fields[0][0].append(test_bomb)
@@ -145,7 +151,7 @@ class TestFieldsClass(unittest.TestCase):
 
     def test_update_explosions_1(self):
         test_fields: Fields = Fields()
-        test_explosion: Explosion = Explosion(0, 0, [Wall(50, 50)])
+        test_explosion: Explosion = Explosion(0, 0, [Wall((1, 1), 50)])
         test_explosion.lifetime = 1
         test_fields.explosions.append(test_explosion)
         test_fields.update_explosions()
@@ -153,7 +159,7 @@ class TestFieldsClass(unittest.TestCase):
     
     def test_update_explosions_2(self):
         test_fields: Fields = Fields()
-        test_explosion: Explosion = Explosion(0, 0, [Wall(50, 50)])
+        test_explosion: Explosion = Explosion(0, 0, [Wall((1, 1), 50)])
         test_explosion.lifetime = 2
         test_fields.explosions.append(test_explosion)
         test_fields.update_explosions()

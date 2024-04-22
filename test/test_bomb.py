@@ -12,18 +12,20 @@ from player import *
 class TestBombClass(unittest.TestCase):
 
     pygame.init()
-    pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
+    pygame.display.set_mode((Settings.WIDTH, Settings.HEIGHT))
 
     def test_update_1(self):
         test_fields: Fields = Fields()
         test_player: Player = Player((0, 0), test_fields, Settings.P1_CONTROLS)
+        test_player.load_assets(0)
         test_bomb: Bomb = Bomb([0, 0], 50, test_player)
         test_bomb.update()
         self.assertEqual(test_bomb.timer, 179)
-
+    
     def test_update_2(self):
         test_fields: Fields = Fields()
         test_player: Player = Player((0, 0), test_fields, Settings.P1_CONTROLS)
+        test_player.load_assets(0)
         test_bomb: Bomb = Bomb([0, 0], 50, test_player)
         test_bomb.update()
         test_bomb.update()
@@ -32,13 +34,15 @@ class TestBombClass(unittest.TestCase):
     def test_explode_1(self):
         test_fields: Fields = Fields()
         test_player: Player = Player((0, 0), test_fields, Settings.P1_CONTROLS)
+        test_player.load_assets(0)
         test_bomb: Bomb = Bomb([0, 0], 50, test_player)
-        wall_instance = Wall(0,0)
-        self.assertEqual(len(test_bomb.explode([wall_instance])), 9)
+        wall_instance = Wall((0,0), 50)
+        self.assertEqual(len(test_bomb.explode([wall_instance.rect])), 9)
 
     def test_update_frame_1(self):
         test_fields: Fields = Fields()
         test_player: Player = Player((0, 0), test_fields, Settings.P1_CONTROLS)
+        test_player.load_assets(0)
         test_bomb: Bomb = Bomb([0, 0], 50, test_player)
         test_bomb.update_frame()
         self.assertEqual(test_bomb.frame, 1)
@@ -46,6 +50,7 @@ class TestBombClass(unittest.TestCase):
     def test_update_frame_2(self):
         test_fields: Fields = Fields()
         test_player: Player = Player((0, 0), test_fields, Settings.P1_CONTROLS)
+        test_player.load_assets(0)
         test_bomb: Bomb = Bomb([0, 0], 50, test_player)
         test_bomb.update_frame()
         test_bomb.update_frame()
@@ -54,6 +59,7 @@ class TestBombClass(unittest.TestCase):
     def test_update_surface_1(self):
         test_fields: Fields = Fields()
         test_player: Player = Player((0, 0), test_fields, Settings.P1_CONTROLS)
+        test_player.load_assets(0)
         test_bomb: Bomb = Bomb([0, 0], 50, test_player)
         test_surface = pygame.image.load('assets/Walls/Default/wall.png').convert_alpha()
         test_bomb.update_surface(test_surface)
@@ -62,6 +68,7 @@ class TestBombClass(unittest.TestCase):
     def test_update_surface_2(self):
         test_fields: Fields = Fields()
         test_player: Player = Player((0, 0), test_fields, Settings.P1_CONTROLS)
+        test_player.load_assets(0)
         test_bomb: Bomb = Bomb([0, 0], 50, test_player)
         self.assertEqual(test_bomb.surface, test_player.bomb_frame)
 

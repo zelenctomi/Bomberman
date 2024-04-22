@@ -12,7 +12,7 @@ from player import *
 class TestPowerupsClass(unittest.TestCase):
 
     pygame.init()
-    pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
+    pygame.display.set_mode((Settings.WIDTH, Settings.HEIGHT))
 
     def test_get_powerup(self):
         drop = Powerups.get_powerup((0, 0), 50)
