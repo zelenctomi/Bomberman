@@ -11,12 +11,8 @@ class Scoreboard:
     self.pos: pygame.Rect = pygame.Rect((0, Settings.HEIGHT - Settings.SCOREBOARD_HEIGHT),
                                         (Settings.WIDTH, Settings.SCOREBOARD_HEIGHT))
     self.surface: pygame.Surface
-    # self.head_rects: list[pygame.Rect] = []
     self.heads: list[pygame.Surface] = []
-    # self.point_rects: list[pygame.Rect] = []
     self.points: list[pygame.Surface] = self.__create_points()
-    # self.powerup_rects: list[pygame.Rect] = []
-    # self.powerups: list[pygame.Surface] = []
     self.rects: tuple[pygame.Rect, pygame.Rect] = self.__create_rects()
     self.containers: list[tuple[pygame.Surface, pygame.Rect]] = self.__create_containers()
     self.__load_assets()
