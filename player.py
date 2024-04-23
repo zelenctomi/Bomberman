@@ -1,5 +1,4 @@
 from fields import *
-import threading
 
 
 class Player:
@@ -103,7 +102,7 @@ class Player:
     self.surface = self.idleDown[0]
 
   def die(self) -> None:
-    if self.alive and self.stats['invulnerability'] == 0:
+    if self.alive:
       self.alive = False
       self.frame = 0
 
@@ -241,20 +240,6 @@ class Player:
     value: int
     stat, value = powerup.get_bonus()
     self.stats[stat] += value
-    self.__check_stats()
-    
-  def __check_stats(self):
-    if self.stats['invulnerability'] > 0:
-      self.__start_unvulnerability_timer()
-
-  def __start_unvulnerability_timer(self):
-    timer = threading.Timer(20, self.__countdown, [20])
-    timer.start()
-
-  def __countdown(self, seconds):
-    while seconds > 0:
-      seconds -= 1
-    self.stats['invulnerability'] = 0
 
   def __place_bomb(self) -> None:
     if self.stats['bomb'] > 0 and not self.fields.field_has_bomb(self.rect.x, self.rect.y):
