@@ -185,7 +185,7 @@ class Player:
     dummy: pygame.Rect = self.rect.copy()
     dummy.x += x
     dummy.y += y
-    if pygame.Rect.colliderect(obj.rect, dummy) and obj != self.bomb:
+    if pygame.Rect.colliderect(obj.rect, dummy) and obj != self.bomb and self.stats['ghost'] == 0:
       return True
     return False
 
