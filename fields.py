@@ -5,9 +5,8 @@ from enum import Enum
 from wall import Wall
 from settings import Settings
 from crumbly_wall import Crumbly_wall
-from barricade_wall import Barricade_wall
 from bomb import Bomb, Explosion
-from powerups import Powerups, Powerup, Extra_bomb, Longer_explosion, Detonator, Invulnerability, Speed, Barricade
+from powerups import Powerups, Powerup, Extra_bomb, Longer_explosion, Detonator, Invulnerability, Speed
 
 GameObject = Wall | Crumbly_wall | Bomb | Powerup | Explosion
 
@@ -21,8 +20,8 @@ class Fields:
     self.powerups: list[Powerup] = []
     self.explosions: list[Explosion] = []
 
-  def get_crumbly_and_barricade_walls(self) -> list[Crumbly_wall]:
-    return [wall for wall in self.walls if isinstance(wall, Crumbly_wall) or isinstance(wall, Crumbly_wall)]
+  def get_crumbly_walls(self) -> list[Crumbly_wall]:
+    return [wall for wall in self.walls if isinstance(wall, Crumbly_wall)]
 
   def get(self, col: int, row: int) -> list[GameObject]:
     return self.fields[row][col]
@@ -82,10 +81,6 @@ class Fields:
     self.bombs.append(bomb)
     self.get_at_coord(x, y).append(bomb)
 
-  def set_barricade(self, x: int, y: int, barricade) -> None:
-    self.walls.append(barricade)
-    self.get_at_coord(x, y).append(barricade)
-
   def update_bombs(self) -> None:
     for bomb in self.bombs:
       if bomb.owner.stats['detonator'] == 0:
@@ -94,14 +89,14 @@ class Fields:
           self.get_at_coord(bomb.rect.x, bomb.rect.y).remove(bomb)
           self.bombs.remove(bomb)
           ##bomb.owner.stats['bomb'] += 1
-          self.__destroy_crumbly_and_barricade_walls()
+          self.__destroy_crumbly_walls()
 
   def detonator_explosion(self):
     for bomb in self.bombs:
       self.explosions.extend(bomb.explode([wall.rect for wall in self.walls if not isinstance(wall, Crumbly_wall)]))
       self.get_at_coord(bomb.rect.x, bomb.rect.y).remove(bomb)
       self.bombs.remove(bomb)
-      self.__destroy_crumbly_and_barricade_walls()
+      self.__destroy_crumbly_walls()
 
 
   def update_explosions(self) -> None:
@@ -109,8 +104,8 @@ class Fields:
       if explosion.update() == 0:
         self.explosions.remove(explosion)
 
-  def __destroy_crumbly_and_barricade_walls(self) -> None:
-    for wall in self.get_crumbly_and_barricade_walls():
+  def __destroy_crumbly_walls(self) -> None:
+    for wall in self.get_crumbly_walls():
       for explosion in self.explosions:
         if pygame.Rect.colliderect(wall.rect, explosion.rect):
           self.get_at_coord(wall.rect.x, wall.rect.y).remove(wall)
