@@ -15,6 +15,7 @@ class Player:
     self.diagonal_move: tuple[int, int] = (1, 0)
     self.invulnerability_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     self.speed_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
+    self.ghost_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     # Stats #
     self.stats: dict[str, int] = {
       'bomb': 1,
@@ -22,7 +23,8 @@ class Player:
       'detonator': 0,
       'invulnerability': 0,
       'speed': 0,
-      'barricade': 3
+      'barricade': 3,
+      'ghost': 1
     }
     # Animation #
     self.frame: int = 0
@@ -252,12 +254,19 @@ class Player:
       self.invulnerability_timer = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     elif stat == 'speed':
       self.speed_timer = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
+    elif stat == 'ghost':
+      self.ghost_timer = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
+    
 
   def check_extra_powerups(self):
+    print(self.stats['ghost'])
     if self.stats['invulnerability'] > 0:
       self.__update_invulnerability()
     if self.stats['speed'] > 0:
       self.__update_speed()
+    if self.stats['ghost'] > 0:
+      self.__update_ghost()
+
 
   def __update_invulnerability(self):
     self.invulnerability_timer -= 1
@@ -268,6 +277,11 @@ class Player:
     self.speed_timer -= 1
     if self.speed_timer == 0:
       self.stats['speed'] = 0
+
+  def __update_ghost(self):
+    self.ghost_timer -= 1
+    if self.ghost_timer == 0:
+      self.stats['ghost'] = 0
 
   def __place_bomb(self) -> None:
     if self.stats['bomb'] > 0 and not self.fields.field_has_bomb(self.rect.x, self.rect.y):

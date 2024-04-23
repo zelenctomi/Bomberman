@@ -6,6 +6,7 @@ from detonator import Detonator
 from invulnerability import Invulnerability
 from speed import Speed
 from barricade import Barricade
+from ghost import Ghost
 
 
 class Powerups:
@@ -17,7 +18,8 @@ class Powerups:
                                Detonator(coord, size),
                                Invulnerability(coord, size),
                                Speed(coord, size),
-                               Barricade(coord, size)]
+                               Barricade(coord, size),
+                               Ghost(coord, size)]
     PROBABILITY: int = 5
     r: int = random.randint(0, PROBABILITY * len(POWERUPS) - PROBABILITY)
     if r > len(POWERUPS) - 1:

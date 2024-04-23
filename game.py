@@ -36,6 +36,7 @@ class Game:
     self.invulnerability_surface: pygame.Surface = pygame.image.load('Assets/Powerups/invulnerability.png').convert_alpha()
     self.speed_surface: pygame.Surface = pygame.image.load('Assets/Powerups/speed.png').convert_alpha()
     self.barricade_surface: pygame.Surface = pygame.image.load('Assets/Powerups/barricade.png').convert_alpha()
+    self.ghost_surface: pygame.Surface = pygame.image.load('Assets/Powerups/ghostwalk.png').convert_alpha()
 
 
   def __initialize_objects(self) -> None:
@@ -77,6 +78,8 @@ class Game:
         self.screen.blit(self.speed_surface, powerup.rect)
       elif isinstance(powerup, Barricade):
         self.screen.blit(self.barricade_surface, powerup.rect)
+      elif isinstance(powerup, Ghost):
+        self.screen.blit(self.ghost_surface, powerup.rect)
 
     for monster in self.monsters:
       if monster.is_alive:

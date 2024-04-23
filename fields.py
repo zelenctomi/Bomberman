@@ -7,7 +7,7 @@ from settings import Settings
 from crumbly_wall import Crumbly_wall
 from barricade_wall import Barricade_wall
 from bomb import Bomb, Explosion
-from powerups import Powerups, Powerup, Extra_bomb, Longer_explosion, Detonator, Invulnerability, Speed, Barricade
+from powerups import Powerups, Powerup, Extra_bomb, Longer_explosion, Detonator, Invulnerability, Speed, Barricade, Ghost
 
 GameObject = Wall | Crumbly_wall | Bomb | Powerup | Explosion
 
