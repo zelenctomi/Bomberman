@@ -32,3 +32,6 @@ class Settings:
   # Bomb #
   BOMB_TIMER: int = 3  # Seconds
   BOMB_FRAMES: int = 12
+
+  # Extra powerups
+  EXTRA_POWERUPS_TIMER: int = 12

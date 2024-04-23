@@ -133,6 +133,10 @@ class Game:
         if pygame.Rect.colliderect(player.rect, monster.rect):
           player.die()
 
+  def __update_extra_powerups(self):
+    for player in self.players:
+      player.check_extra_powerups()
+
   def run(self) -> None:
     self.__initialize_objects()
     self.__load_assets()
@@ -145,6 +149,7 @@ class Game:
       self.__render_map()
       self.__move_entities()
       self.__update_frames()
+      self.__update_extra_powerups()
       self.__handle_explosions()
       self.__handle_death()
       self.fields.update_bombs()

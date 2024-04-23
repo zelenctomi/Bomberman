@@ -13,6 +13,7 @@ class Player:
     self.planted_bombs: int = 0
     self.alive: bool = True
     self.diagonal_move: tuple[int, int] = (1, 0)
+    self.invulnerability_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     # Stats #
     self.stats: dict[str, int] = {
       'bomb': 1,
@@ -247,17 +248,17 @@ class Player:
     stat, value = powerup.get_bonus()
     self.stats[stat] += value
     if stat == 'invulnerability':
-      self.__start_unvulnerability_timer
+      self.invulnerability_timer = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     ##elif stat == 'speed'
 
-  def __start_unvulnerability_timer(self):
-    timer = threading.Timer(20, self.__countdown, [20])
-    timer.start()
+  def check_extra_powerups(self):
+    if self.stats['invulnerability'] > 0:
+      self.__update_invulnerability()
 
-  def __countdown(self, seconds):
-    while seconds > 0:
-      seconds -= 1
-    self.stats['invulnerability'] = 0
+  def __update_invulnerability(self):
+    self.invulnerability_timer -= 1
+    if self.invulnerability_timer == 0:
+      self.stats['invulnerability'] = 0
 
   def __place_bomb(self) -> None:
     if self.stats['bomb'] > 0 and not self.fields.field_has_bomb(self.rect.x, self.rect.y):
