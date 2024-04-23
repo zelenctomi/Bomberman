@@ -4,7 +4,7 @@ import unittest
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
+# test comment
 from fields import *
 from monster import *
 from player import *
