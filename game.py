@@ -27,6 +27,7 @@ class Game:
     self.explosion_assets: list[pygame.Surface] = [pygame.image.load(f'Assets/Bomb/e{i}.png').convert_alpha() for i in range(1, 13)]
     self.wall_asset: pygame.Surface = pygame.image.load('Assets/Walls/Default/wall.png').convert_alpha()
     self.crumbly_asset: pygame.Surface = pygame.image.load('Assets/Walls/Default/crumbly.png').convert_alpha()
+    self.barricade_asset: pygame.Surface = pygame.image.load('Assets/Walls/Default/barricade.png').convert_alpha()
     self.scoreboard_surface: pygame.Surface = pygame.image.load('Assets/Menu/Status_Bar.png').convert_alpha()
     # Powerups #
     self.extra_bomb_surface: pygame.Surface = pygame.image.load('Assets/Powerups/extra_bomb.png').convert_alpha()
@@ -34,6 +35,7 @@ class Game:
     self.detonator_surface: pygame.Surface = pygame.image.load('Assets/Powerups/detonator.png').convert_alpha()
     self.invulnerability_surface: pygame.Surface = pygame.image.load('Assets/Powerups/invulnerability.png').convert_alpha()
     self.speed_surface: pygame.Surface = pygame.image.load('Assets/Powerups/speed.png').convert_alpha()
+    self.barricade_surface: pygame.Surface = pygame.image.load('Assets/Powerups/barricade.png').convert_alpha()
 
 
   def __initialize_objects(self) -> None:
@@ -52,7 +54,8 @@ class Game:
     for wall in self.fields.walls:
       if isinstance(wall, Crumbly_wall):
         self.screen.blit(self.crumbly_asset, wall.rect)
-      else:
+      ##
+      elif isinstance(wall ,Wall):
         self.screen.blit(self.wall_asset, wall.rect)
 
     for bomb in self.fields.bombs:
@@ -72,6 +75,8 @@ class Game:
         self.screen.blit(self.invulnerability_surface, powerup.rect)
       elif isinstance(powerup, Speed):
         self.screen.blit(self.speed_surface, powerup.rect)
+      elif isinstance(powerup, Barricade):
+        self.screen.blit(self.barricade_surface, powerup.rect)
 
     for monster in self.monsters:
       if monster.is_alive:

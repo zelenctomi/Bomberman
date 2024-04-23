@@ -19,7 +19,8 @@ class Player:
       'explosion': 2,
       'detonator': 0,
       'invulnerability': 0,
-      'speed': 0
+      'speed': 0,
+      'barricade': 3
     }
     # Animation #
     self.frame: int = 0
@@ -138,6 +139,7 @@ class Player:
           self.__use_bombs()
         else:
           self.__place_bomb()
+        self.__place_barricade()
       if key[self.controls['left']]:
         x += -1
       if key[self.controls['right']]:
@@ -266,6 +268,12 @@ class Player:
       self.stats['bomb'] -= 1
       self.planted_bombs += 1
       self.bomb = bomb
+
+  def __place_barricade(self):
+    if self.stats['barricade'] > 0 and not self.fields.field_has_bomb(self.rect.x, self.rect.y):
+      target: pygame.Rect = self.fields.snap_to_grid(self.rect)
+      barricade: Barricade = Barricade((target.x, target.y), Settings.BLOCK_SIZE)
+      self.fields.set_barricade(target.x, target.y, barricade)
 
   def __use_bombs(self):
     self.fields.detonator_explosion()
