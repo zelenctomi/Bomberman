@@ -14,6 +14,7 @@ class Player:
     self.alive: bool = True
     self.diagonal_move: tuple[int, int] = (1, 0)
     self.invulnerability_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
+    self.speed_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     # Stats #
     self.stats: dict[str, int] = {
       'bomb': 1,
@@ -249,16 +250,24 @@ class Player:
     self.stats[stat] += value
     if stat == 'invulnerability':
       self.invulnerability_timer = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
-    ##elif stat == 'speed'
+    elif stat == 'speed':
+      self.speed_timer = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
 
   def check_extra_powerups(self):
     if self.stats['invulnerability'] > 0:
       self.__update_invulnerability()
+    if self.stats['speed'] > 0:
+      self.__update_speed()
 
   def __update_invulnerability(self):
     self.invulnerability_timer -= 1
     if self.invulnerability_timer == 0:
       self.stats['invulnerability'] = 0
+
+  def __update_speed(self):
+    self.speed_timer -= 1
+    if self.speed_timer == 0:
+      self.stats['speed'] = 0
 
   def __place_bomb(self) -> None:
     if self.stats['bomb'] > 0 and not self.fields.field_has_bomb(self.rect.x, self.rect.y):
