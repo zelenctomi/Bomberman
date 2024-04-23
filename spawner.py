@@ -43,7 +43,7 @@ class Spawner:
   
   def __get_player_spawn_points(self) -> list[tuple[int, int]]:
     '''
-    > Returns the 4 corners of the map
+    Returns the 4 corners of the map.
     '''
     spawn_points: list[tuple[int, int]] = []
     WIDTH: int = Settings.WIDTH // Settings.BLOCK_SIZE

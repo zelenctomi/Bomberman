@@ -4,12 +4,12 @@ from fields import *
 class Player:
   DIRECTIONS: dict[tuple[int, int], str] = {(0, -1): 'up', (0, 1): 'down', (-1, 0): 'left', (1, 0): 'right'}
 
-  def __init__(self, spawn: tuple[int, int], fields: Fields, controls: dict[str, int]):
-    self.rect: pygame.Rect = pygame.Rect(spawn, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
+  def __init__(self, coord: tuple[int, int], fields: Fields, controls: dict[str, int]):
+    self.rect: pygame.Rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.controls: dict[str, int] = controls
     self.fields: Fields = fields
-    self.bomb: (Bomb | None) = None
     self.alive: bool = True
+    self.bomb: (Bomb | None) = None
     self.diagonal_move: tuple[int, int] = (1, 0)
     # Stats #
     self.stats: dict[str, int] = {

@@ -7,18 +7,18 @@ from settings import Settings
 class Monster:
   DIRECTIONS: list[tuple[int, int, str]] = [(0, -1, 'up'), (0, 1, 'down'), (-1, 0, 'left'), (1, 0, 'right')]
 
-  def __init__(self, spawn: tuple[int, int], fields: Fields):
-    self.rect: pygame.Rect = pygame.Rect(spawn, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
+  def __init__(self, coord: tuple[int, int], fields: Fields):
+    self.rect: pygame.Rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.fields: Fields = fields
-    self.x_direction: int
-    self.y_direction: int
+    self.is_alive: bool = True
     # Animation #
     self.frame: int = 0
     self.direction: str = 'down'
     self.prevDirection: str = 'down'
-
+    # Movement #
+    self.x_direction: int
+    self.y_direction: int
     self.x_direction, self.y_direction, self.direction = Monster.DIRECTIONS[random.randint(0, 3)]
-    self.is_alive: bool = True
     self.__change_direction()
     # Assets #
     self.surface: pygame.Surface
@@ -78,8 +78,8 @@ class Monster:
     self.__update_position(self.x_direction, self.y_direction)
 
   def __randomize_direction(self) -> None:
-    rotate: int = random.randint(0, 100)
-    if rotate == 50:
+    r: int = random.randint(0, 100)
+    if r == 50:
       self.__change_direction()
 
   def __update_position(self, x: int, y: int) -> None:

@@ -7,7 +7,6 @@ from game import *
 
 class Menu():
   # Colors #
-  WHITE: tuple[int, int, int] = (255, 255, 255)
   MAP_OUTLINE: tuple[int, int, int] = (222, 172, 245)
   # Map Selection #
   WIDTH: int = Settings.WIDTH // 5
@@ -23,11 +22,11 @@ class Menu():
     self.font_header: pygame.font.Font = pygame.font.Font(Settings.FONT, 50)
     self.font_main: pygame.font.Font = pygame.font.Font(Settings.FONT, 24)
     self.font_main_hover: pygame.font.Font = pygame.font.Font(Settings.FONT, 25)
-    self.title_text: pygame.Surface = self.font_header.render('BOMBERMAN', False, Menu.WHITE)
-    self.p2_normal_text: pygame.Surface = self.font_main.render('2  PLAYERS', False, Menu.WHITE)
-    self.p3_normal_text: pygame.Surface = self.font_main.render('3  PLAYERS', False, Menu.WHITE)
-    self.p2_hover_text: pygame.Surface = self.font_main_hover.render('2  PLAYERS', False, Menu.WHITE)
-    self.p3_hover_text: pygame.Surface = self.font_main_hover.render('3  PLAYERS', False, Menu.WHITE)
+    self.title_text: pygame.Surface = self.font_header.render('BOMBERMAN', False, Settings.WHITE)
+    self.p2_normal_text: pygame.Surface = self.font_main.render('2  PLAYERS', False, Settings.WHITE)
+    self.p3_normal_text: pygame.Surface = self.font_main.render('3  PLAYERS', False, Settings.WHITE)
+    self.p2_hover_text: pygame.Surface = self.font_main_hover.render('2  PLAYERS', False, Settings.WHITE)
+    self.p3_hover_text: pygame.Surface = self.font_main_hover.render('3  PLAYERS', False, Settings.WHITE)
     self.p2_text: pygame.Surface = self.p2_normal_text
     self.p3_text: pygame.Surface = self.p3_normal_text
     self.pointer: pygame.Surface = pygame.image.load('Assets/Menu/pointer.png').convert_alpha()
@@ -120,7 +119,7 @@ class Menu():
         outline.fill(Menu.MAP_OUTLINE)
         outline.set_alpha(25)
       else:
-        outline.fill(Menu.WHITE)
+        outline.fill(Settings.WHITE)
       self.screen.blit(outline, outline_pos)
       self.screen.blit(self.map_bg, pos)
       for row in map:

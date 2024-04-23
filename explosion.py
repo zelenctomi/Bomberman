@@ -3,8 +3,8 @@ from settings import Settings
 
 
 class Explosion: # Typehint -> list[Explosion] doesn't work on recursive methods
-  def __init__(self, x: int, y: int, walls: list[pygame.Rect]):
-    self.rect: pygame.Rect = pygame.Rect((x, y, Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
+  def __init__(self, coord: tuple[int, int], walls: list[pygame.Rect]):
+    self.rect: pygame.Rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.lifetime: int = 100
     self.walls: list[pygame.Rect] = walls
 
@@ -12,13 +12,13 @@ class Explosion: # Typehint -> list[Explosion] doesn't work on recursive methods
     explosions: list[Explosion] = []
     if times > 0:
       if direction == "UP":
-        explosions.append(Explosion(self.rect.x, self.rect.y - offset, self.walls))
+        explosions.append(Explosion((self.rect.x, self.rect.y - offset), self.walls))
       elif direction == "DOWN":
-        explosions.append(Explosion(self.rect.x, self.rect.y + offset, self.walls))
+        explosions.append(Explosion((self.rect.x, self.rect.y + offset), self.walls))
       elif direction == "LEFT":
-        explosions.append(Explosion(self.rect.x - offset, self.rect.y, self.walls))
+        explosions.append(Explosion((self.rect.x - offset, self.rect.y), self.walls))
       elif direction == "RIGHT":
-        explosions.append(Explosion(self.rect.x + offset, self.rect.y, self.walls))
+        explosions.append(Explosion((self.rect.x + offset, self.rect.y), self.walls))
       for wall in self.walls:
         if pygame.Rect.colliderect(wall, explosions[-1].rect):
           explosions.pop()
@@ -27,7 +27,7 @@ class Explosion: # Typehint -> list[Explosion] doesn't work on recursive methods
     return []
 
   def initiate(self, times: int):
-    return [Explosion(self.rect.x, self.rect.y, self.walls)]  \
+    return [Explosion((self.rect.x, self.rect.y), self.walls)]  \
             + self.spread("UP", 50, times)                    \
             + self.spread("DOWN", 50, times)                  \
             + self.spread("LEFT", 50, times)                  \

@@ -4,7 +4,7 @@ from settings import Settings
 
 
 class Bomb:
-  def __init__(self, coord, size: int, player):
+  def __init__(self, coord: tuple[int, int], size: int, player):
     self.rect: pygame.Rect = pygame.Rect(coord, (size, size))
     self.timer: int = Settings.BOMB_TIMER * Settings.FPS
     self.owner = player
@@ -18,7 +18,7 @@ class Bomb:
     return self.timer
 
   def explode(self, walls: list[pygame.Rect]) -> list[Explosion]:
-    return Explosion(self.rect.x, self.rect.y, walls).initiate(self.owner.stats['explosion'])
+    return Explosion((self.rect.x, self.rect.y), walls).initiate(self.owner.stats['explosion'])
   
   def update_frame(self) -> None:
     if self.frame < 11:
