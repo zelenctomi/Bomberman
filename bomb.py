@@ -17,8 +17,8 @@ class Bomb:
     self.timer = self.timer * value
     return self.timer
 
-  def explode(self, walls: list[pygame.Rect]) -> list[Explosion]:
-    return Explosion((self.rect.x, self.rect.y), walls).initiate(self.owner.stats['explosion'])
+  def explode(self, walls: list[pygame.Rect], crumbly: list[pygame.Rect]) -> list[Explosion]:
+    return Explosion((self.rect.x, self.rect.y), walls, crumbly).initiate(self.owner.stats['explosion'])
   
   def update_frame(self) -> None:
     if self.frame < 11:

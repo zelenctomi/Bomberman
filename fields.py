@@ -20,36 +20,65 @@ class Fields:
     self.powerups: list[Powerup] = []
     self.explosions: list[Explosion] = []
 
+  def get_walls(self) -> list[Wall]:
+    return [wall for wall in self.walls if not isinstance(wall, Crumbly_wall)]
+
   def get_crumbly_walls(self) -> list[Crumbly_wall]:
     return [wall for wall in self.walls if isinstance(wall, Crumbly_wall)]
 
-  def get(self, col: int, row: int) -> list[GameObject]:
-    return self.fields[row][col]
-
-  def get_at_coord(self, x: int, y: int) -> list[GameObject]:
+  def get(self, x: int, y: int) -> list[GameObject]:
+    objects: list[GameObject] = []
     target: pygame.Rect = self.snap_to_grid(pygame.Rect(x, y, Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
-    return self.get(target.x // Settings.BLOCK_SIZE, target.y // Settings.BLOCK_SIZE)
+    objects.extend(self.fields[target.y // Settings.BLOCK_SIZE][target.x // Settings.BLOCK_SIZE])
+    # NOTE: When the object is between two blocks, we need to check both
+    if x % Settings.BLOCK_SIZE != 0:
+      shift: int = target.x + Settings.BLOCK_SIZE if x % target.x < x else target.x - Settings.BLOCK_SIZE
+      objects.extend(self.fields[target.y // Settings.BLOCK_SIZE][shift // Settings.BLOCK_SIZE])
+    if y % Settings.BLOCK_SIZE != 0:
+      shift: int = target.y + Settings.BLOCK_SIZE if y % target.y < y else target.y - Settings.BLOCK_SIZE
+      objects.extend(self.fields[shift // Settings.BLOCK_SIZE][target.x // Settings.BLOCK_SIZE])
+    return objects
 
-  def get_objects_around_object(self, obj) -> list[GameObject]:
+  def get_surrounding_objects(self, obj: pygame.Rect) -> list[GameObject]:
+    target: pygame.Rect = self.snap_to_grid(obj)
     potential_collisons: list[GameObject] = []
     for row in range(-1, 2):
       for col in range(-1, 2):
-        objects: list[GameObject] = self.get(obj.rect.x // Settings.BLOCK_SIZE + row, obj.rect.y // Settings.BLOCK_SIZE + col)
+        objects: list[GameObject] = self.get(target.x + row * Settings.BLOCK_SIZE, target.y + col * Settings.BLOCK_SIZE)
         for o in objects:
           if o not in potential_collisons:
             potential_collisons.append(o)
     return potential_collisons
+  
+  def set(self, coord: tuple[int, int], obj: GameObject) -> None:
+    self.fields[coord[1] // Settings.BLOCK_SIZE][coord[0] // Settings.BLOCK_SIZE].append(obj)
+    if isinstance(obj, Wall):
+      self.walls.append(obj)
+    elif isinstance(obj, Powerup):
+      self.powerups.append(obj)
+    elif isinstance(obj, Bomb):
+      self.bombs.append(obj)
+
+  def remove(self, coord: tuple[int, int], obj: GameObject) -> None:
+    self.fields[coord[1] // Settings.BLOCK_SIZE][coord[0] // Settings.BLOCK_SIZE].remove(obj)
+    if isinstance(obj, Wall):
+      self.walls.remove(obj)
+    elif isinstance(obj, Powerup):
+      self.powerups.remove(obj)
+    elif isinstance(obj, Bomb):
+      self.bombs.remove(obj)
 
   def snap_to_grid(self, rect: pygame.Rect) -> pygame.Rect:
     '''
     Returns a new rectangle that is snapped to the closest grid.
+    The alignment bias is towards the right and bottom.
     '''
     return pygame.Rect(rect.centerx // Settings.BLOCK_SIZE * Settings.BLOCK_SIZE,
                        rect.centery // Settings.BLOCK_SIZE * Settings.BLOCK_SIZE,
                        Settings.BLOCK_SIZE, Settings.BLOCK_SIZE)
 
   def field_has_bomb(self, x: int, y: int) -> bool:
-    return any(isinstance(obj, Bomb) for obj in self.get_at_coord(x, y))
+    return any(isinstance(obj, Bomb) for obj in self.get(x, y))
 
   def load_map(self, lvl: int) -> None:
     WALL: int = 1
@@ -74,19 +103,13 @@ class Fields:
     powerup: (Powerup | None) = Powerups.get_powerup(
       (coord[0] + Settings.POWERUP_OFFSET, coord[1] + Settings.POWERUP_OFFSET), Settings.POWERUP_SIZE)
     if powerup is not None:
-      self.get_at_coord(coord[0], coord[1]).append(powerup)
-      self.powerups.append(powerup)
-
-  def set_bomb(self, x: int, y: int, bomb: Bomb) -> None:
-    self.bombs.append(bomb)
-    self.get_at_coord(x, y).append(bomb)
+      self.set(coord, powerup)
 
   def update_bombs(self) -> None:
     for bomb in self.bombs:
       if bomb.update() < 0:
-        self.explosions.extend(bomb.explode([wall.rect for wall in self.walls if not isinstance(wall, Crumbly_wall)]))
-        self.get_at_coord(bomb.rect.x, bomb.rect.y).remove(bomb)
-        self.bombs.remove(bomb)
+        self.explosions.extend(bomb.explode([wall.rect for wall in self.get_walls()], [crumbly.rect for crumbly in self.get_crumbly_walls()]))
+        self.remove((bomb.rect.x, bomb.rect.y), bomb)
         bomb.owner.stats['bomb'] += 1
         self.__destroy_crumbly_walls()
 
@@ -99,7 +122,5 @@ class Fields:
     for wall in self.get_crumbly_walls():
       for explosion in self.explosions:
         if pygame.Rect.colliderect(wall.rect, explosion.rect):
-          self.get_at_coord(wall.rect.x, wall.rect.y).remove(wall)
-          self.walls.remove(wall)
-          coord: tuple[int, int] = (wall.rect.x, wall.rect.y)
-          self.__drop_powerup(coord)
+          self.remove((wall.rect.x, wall.rect.y), wall)
+          self.__drop_powerup((wall.rect.x, wall.rect.y))

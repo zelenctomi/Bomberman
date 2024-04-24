@@ -71,7 +71,7 @@ class Monster:
   def move(self) -> None:
     self.prevDirection = self.direction
     self.__randomize_direction()
-    potential_collisions: list[GameObject] = self.fields.get_objects_around_object(self)
+    potential_collisions: list[GameObject] = self.fields.get_surrounding_objects(self.rect)
     for obj in potential_collisions:
       if self.__turn_on_collision(obj):
         return

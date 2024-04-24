@@ -31,7 +31,7 @@ class Spawner:
     spawn_points: list[tuple[int, int]] = []
     for row in range(HEIGHT - (OFFSET * 2)):
       for col in range(WIDTH - (OFFSET * 2)):
-        if self.fields.get(col + OFFSET, row + OFFSET) == []:
+        if self.fields.get((col + OFFSET) * Settings.BLOCK_SIZE, (row + OFFSET) * Settings.BLOCK_SIZE) == []:
           x: int = (col + OFFSET) * Settings.BLOCK_SIZE
           y: int = (row + OFFSET) * Settings.BLOCK_SIZE
           spawn_points.append((x, y))
