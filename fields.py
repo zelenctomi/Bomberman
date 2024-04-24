@@ -49,7 +49,7 @@ class Fields:
           if o not in potential_collisons:
             potential_collisons.append(o)
     return potential_collisons
-  
+
   def set(self, coord: tuple[int, int], obj: GameObject) -> None:
     self.fields[coord[1] // Settings.BLOCK_SIZE][coord[0] // Settings.BLOCK_SIZE].append(obj)
     if isinstance(obj, Wall):
@@ -108,7 +108,8 @@ class Fields:
   def update_bombs(self) -> None:
     for bomb in self.bombs:
       if bomb.update() < 0:
-        self.explosions.extend(bomb.explode([wall.rect for wall in self.get_walls()], [crumbly.rect for crumbly in self.get_crumbly_walls()]))
+        self.explosions.extend(bomb.explode([wall.rect for wall in self.get_walls()],
+                                            [crumbly.rect for crumbly in self.get_crumbly_walls()]))
         self.remove((bomb.rect.x, bomb.rect.y), bomb)
         bomb.owner.stats['bomb'] += 1
         self.__destroy_crumbly_walls()

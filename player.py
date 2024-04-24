@@ -156,7 +156,7 @@ class Player:
       x, y = self.__check_collision(x, y, obj)
       if x == 0 and y == 0:
         return x, y
-    if x != 0 and y != 0: # The player is at an intersection while moving diagonally
+    if x != 0 and y != 0:  # The player is at an intersection while moving diagonally
       x *= abs(self.diagonal_move[1])
       y *= abs(self.diagonal_move[0])
     self.__update_position(x, y)

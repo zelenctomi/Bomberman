@@ -18,14 +18,14 @@ class Spawner:
       player: Player = Player(spawn, self.fields, Settings.CONTROLS[i])
       self.players.append(player)
     return self.players
-  
+
   def spawn_monsters(self, count: int) -> list[Monster]:
     '''
     > Spawns monsters at random locations
-    
+
     > The 3 most outer layers of the map are forbidden
     '''
-    OFFSET: int = 3 # Forbidden outer layers
+    OFFSET: int = 3  # Forbidden outer layers
     HEIGHT: int = (Settings.HEIGHT // Settings.BLOCK_SIZE) - 1
     WIDTH: int = Settings.WIDTH // Settings.BLOCK_SIZE
     spawn_points: list[tuple[int, int]] = []
@@ -40,7 +40,7 @@ class Spawner:
       monster: Monster = Monster(spawn, self.fields)
       self.monsters.append(monster)
     return self.monsters
-  
+
   def __get_player_spawn_points(self) -> list[tuple[int, int]]:
     '''
     Returns the 4 corners of the map.

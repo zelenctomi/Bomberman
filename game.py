@@ -68,9 +68,8 @@ class Game:
         self.screen.blit(monster.surface, monster.rect)
 
     for player in self.players:
-        self.screen.blit(player.surface, player.rect)
-      
-    # self.screen.blit(self.scoreboard_surface, (0, 635)) # TODO: Create a constant in Settings
+      self.screen.blit(player.surface, player.rect)
+
     self.scoreboard.render()
 
   def __move_entities(self) -> None:

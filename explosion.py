@@ -32,9 +32,9 @@ class Explosion: # Typehint -> list[Explosion] doesn't work on recursive methods
 
   def initiate(self, times: int):
     return [Explosion((self.rect.x, self.rect.y), self.walls, self.crumbly)]  \
-            + self.spread("UP", 50, times)                    \
-            + self.spread("DOWN", 50, times)                  \
-            + self.spread("LEFT", 50, times)                  \
+            + self.spread("UP", 50, times)                                    \
+            + self.spread("DOWN", 50, times)                                  \
+            + self.spread("LEFT", 50, times)                                  \
             + self.spread("RIGHT", 50, times)
   
   def update(self) -> int:

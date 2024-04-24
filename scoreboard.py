@@ -49,7 +49,7 @@ class Scoreboard:
     if self.player_count == 3:  # Position the 3rd rect in the middle
       containers.append((pygame.Surface(size).convert_alpha(), pygame.Rect((300, centerY), size)))
     for container in containers:
-      container[0].fill((0, 0, 0, 0)) # Transparent
+      container[0].fill((0, 0, 0, 0))  # Transparent
     return containers
 
   def render(self):
