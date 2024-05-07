@@ -106,6 +106,7 @@ class Fields:
 
   def detonator_explosion(self):
     for bomb in self.bombs:
+      print("fasz")
       self.explosions.extend(bomb.explode([wall.rect for wall in self.walls if not isinstance(wall, Crumbly_wall)]))
       self.get_at_coord(bomb.rect.x, bomb.rect.y).remove(bomb)
       self.bombs.remove(bomb)

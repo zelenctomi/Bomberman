@@ -20,11 +20,11 @@ class Player:
     self.stats: dict[str, int] = {
       'bomb': 1,
       'explosion': 2,
-      'detonator': 0,
+      'detonator': 1,
       'invulnerability': 0,
-      'speed': 1,
+      'speed': 0,
       'barricade': 3,
-      'ghost': 1
+      'ghost': 0
     }
     # Animation #
     self.frame: int = 0
@@ -139,11 +139,11 @@ class Player:
       x: int = 0
       y: int = 0
       if key[self.controls['place']]:
-        """if self.stats['bomb'] == 0 and self.stats['detonator'] == 1 and self.planted_bombs > 0:
-          self.__use_bombs()
-        else:
-          self.__place_bomb()"""
-        if self.stats['bomb'] > 0:
+        if self.stats['bomb'] == 0 and self.stats['detonator'] > 0:
+          print("detonator")
+          self.__use_bombs
+        elif self.stats['bomb'] > 0:
+          print("place")
           self.__place_bomb()
       if key[self.controls['barricade']]:
         if self.stats['barricade'] > 0:
@@ -325,5 +325,5 @@ class Player:
 
   def __use_bombs(self):
     self.fields.detonator_explosion()
-    self.stats['detonator'] = 0
+    ##self.stats['detonator'] = 0
     self.planted_bombs = 0
