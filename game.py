@@ -55,7 +55,8 @@ class Game:
     for wall in self.fields.walls:
       if isinstance(wall, Crumbly_wall):
         self.screen.blit(self.crumbly_asset, wall.rect)
-      ##
+      elif isinstance(wall ,Barricade_wall):
+        self.screen.blit(self.barricade_asset, wall.rect)
       elif isinstance(wall ,Wall):
         self.screen.blit(self.wall_asset, wall.rect)
 

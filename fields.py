@@ -9,7 +9,7 @@ from barricade_wall import Barricade_wall
 from bomb import Bomb, Explosion
 from powerups import Powerups, Powerup, Extra_bomb, Longer_explosion, Detonator, Invulnerability, Speed, Barricade, Ghost
 
-GameObject = Wall | Crumbly_wall | Bomb | Powerup | Explosion
+GameObject = Wall | Crumbly_wall | Barricade_wall | Bomb | Powerup | Explosion
 
 
 class Fields:
@@ -21,8 +21,11 @@ class Fields:
     self.powerups: list[Powerup] = []
     self.explosions: list[Explosion] = []
 
-  def get_crumbly_and_barricade_walls(self) -> list[Crumbly_wall]:
-    return [wall for wall in self.walls if isinstance(wall, Crumbly_wall) or isinstance(wall, Crumbly_wall)]
+  def get_crumbly_and_barricade_walls(self) -> list[Wall]:
+    return [wall for wall in self.walls if isinstance(wall, Crumbly_wall) or isinstance(wall, Barricade_wall)]
+  
+  def get_crumbly_walls(self) -> list[Wall]:
+    return [wall for wall in self.walls if isinstance(wall, Crumbly_wall)]
 
   def get(self, col: int, row: int) -> list[GameObject]:
     return self.fields[row][col]
@@ -48,9 +51,15 @@ class Fields:
     return pygame.Rect(rect.centerx // Settings.BLOCK_SIZE * Settings.BLOCK_SIZE,
                        rect.centery // Settings.BLOCK_SIZE * Settings.BLOCK_SIZE,
                        Settings.BLOCK_SIZE, Settings.BLOCK_SIZE)
+  
+  def player_on_wall(self, rect: pygame.Rect) -> bool:
+    for wall in self.walls:
+      if rect.collidepoint(rect.centerx, rect.centery):
+        return True
+    return False
 
-  def field_has_bomb(self, x: int, y: int) -> bool:
-    return any(isinstance(obj, Bomb) for obj in self.get_at_coord(x, y))
+  def field_has_bomb_or_wall(self, x: int, y: int) -> bool:
+    return any(isinstance(obj, Bomb) for obj in self.get_at_coord(x, y)) or any(isinstance(obj, Wall) for obj in self.get_at_coord(x, y))
 
   def load_map(self, lvl: int) -> None:
     WALL: int = 1
@@ -82,7 +91,7 @@ class Fields:
     self.bombs.append(bomb)
     self.get_at_coord(x, y).append(bomb)
 
-  def set_barricade(self, x: int, y: int, barricade) -> None:
+  def set_barricade(self, x: int, y: int, barricade: Barricade_wall) -> None:
     self.walls.append(barricade)
     self.get_at_coord(x, y).append(barricade)
 
@@ -93,7 +102,6 @@ class Fields:
           self.explosions.extend(bomb.explode([wall.rect for wall in self.walls if not isinstance(wall, Crumbly_wall)]))
           self.get_at_coord(bomb.rect.x, bomb.rect.y).remove(bomb)
           self.bombs.remove(bomb)
-          ##bomb.owner.stats['bomb'] += 1
           self.__destroy_crumbly_and_barricade_walls()
 
   def detonator_explosion(self):
@@ -110,7 +118,7 @@ class Fields:
         self.explosions.remove(explosion)
 
   def __destroy_crumbly_and_barricade_walls(self) -> None:
-    for wall in self.get_crumbly_and_barricade_walls():
+    for wall in self.get_crumbly_walls():
       for explosion in self.explosions:
         if pygame.Rect.colliderect(wall.rect, explosion.rect):
           self.get_at_coord(wall.rect.x, wall.rect.y).remove(wall)
