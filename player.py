@@ -18,13 +18,13 @@ class Player:
     self.ghost_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     # Stats #
     self.stats: dict[str, int] = {
-      'bomb': 1,
+      'bomb': 3,
       'explosion': 2,
       'detonator': 0,
       'invulnerability': 0,
-      'speed': 0,
+      'speed': 1,
       'barricade': 3,
-      'ghost': 1
+      'ghost': 0
     }
     # Animation #
     self.frame: int = 0
@@ -139,11 +139,12 @@ class Player:
       x: int = 0
       y: int = 0
       if key[self.controls['place']]:
-        if self.stats['bomb'] == 0 and self.stats['detonator'] == 1 and self.planted_bombs > 0:
+        """if self.stats['bomb'] == 0 and self.stats['detonator'] == 1 and self.planted_bombs > 0:
           self.__use_bombs()
         else:
+          self.__place_bomb()"""
+        if self.stats['bomb'] > 0:
           self.__place_bomb()
-        self.__place_barricade()
       if key[self.controls['left']]:
         x += -1
       if key[self.controls['right']]:
@@ -259,7 +260,6 @@ class Player:
     
 
   def check_extra_powerups(self):
-    print(self.stats['ghost'])
     if self.stats['invulnerability'] > 0:
       self.__update_invulnerability()
     if self.stats['speed'] > 0:
