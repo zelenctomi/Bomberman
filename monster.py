@@ -85,3 +85,9 @@ class Monster:
   def __update_position(self, x: int, y: int) -> None:
     self.rect.x += x
     self.rect.y += y
+
+  def respawn(self, coord: tuple[int, int]) -> None:
+    self.rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
+    self.alive = True
+    self.frame = 0
+    self.surface = self.hopDown[0]

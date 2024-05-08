@@ -8,12 +8,14 @@ class Game:
   TARGET_ENTITY_FRAME: int = Settings.FPS // Settings.ANIMATION_FPS
   TARGET_BOMB_FRAME: int = Settings.FPS // Settings.BOMB_FRAMES * Settings.BOMB_TIMER
 
-  def __init__(self, player_count: int, level: int):
+  def __init__(self, player_count: int, level: int, rounds: int = 2):
     pygame.init()
     pygame.display.set_caption('Bomberman')
     self.screen: pygame.Surface = pygame.display.set_mode((Settings.WIDTH, Settings.HEIGHT))
     self.clock: pygame.time.Clock = pygame.time.Clock()
     self.font: pygame.font.Font = pygame.font.Font(Settings.FONT, 16)
+    self.level: int = level
+    self.rounds: int = rounds
     # Game objects #
     self.scoreboard: Scoreboard = Scoreboard(self.screen, player_count)
     self.fields: Fields = Fields()
@@ -112,11 +114,40 @@ class Game:
         if pygame.Rect.colliderect(explosion.rect, bomb.rect):
           bomb.update(0)
 
-  def __handle_death(self) -> None:
+  def __handle_entity_collision(self) -> None:
     for monster in self.monsters:
       for player in self.players:
         if pygame.Rect.colliderect(player.rect, monster.rect):
           player.die()
+
+  def __handle_game_over(self) -> None:
+    alive_players: int = 0
+    for player in self.players:
+      if player.alive:
+        alive_players += 1
+    if self.fields.no_bombs_active() and alive_players < 2:
+      self.__game_over()
+
+  def __game_over(self) -> None:
+    self.__update_winner_score()
+    if self.rounds > 0:
+      self.__start_new_round()
+    else:
+      self.__end_game()
+
+  def __start_new_round(self) -> None:
+    self.rounds -= 1
+    self.fields.reload_map(self.level)
+    self.spawner.respawn_players(self.players)
+    self.spawner.respawn_monsters(self.monsters)
+
+  def __update_winner_score(self) -> None:
+    for player in self.players:
+      if player.alive:
+        self.scoreboard.update(self.players.index(player))
+
+  def __end_game(self) -> None:
+    print('Game Over')
 
   def run(self) -> None:
     self.__load_assets()
@@ -130,8 +161,9 @@ class Game:
       self.__move_entities()
       self.__update_frames()
       self.__handle_explosions()
-      self.__handle_death()
+      self.__handle_entity_collision()
       self.fields.update_bombs()
+      self.__handle_game_over()
 
       pygame.display.update()
       self.clock.tick(Settings.FPS)

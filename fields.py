@@ -125,3 +125,15 @@ class Fields:
         if pygame.Rect.colliderect(wall.rect, explosion.rect):
           self.remove((wall.rect.x, wall.rect.y), wall)
           self.__drop_powerup((wall.rect.x, wall.rect.y))
+
+  def no_bombs_active(self) -> bool:
+    return len(self.bombs) == 0 and len(self.explosions) == 0
+  
+  def reload_map(self, lvl: int) -> None:
+    self.fields = [[[] for _ in range(Settings.WIDTH // Settings.BLOCK_SIZE)]
+                   for _ in range((Settings.HEIGHT // Settings.BLOCK_SIZE) - 1)]
+    self.walls = []
+    self.bombs = []
+    self.powerups = []
+    self.explosions = []
+    self.load_map(lvl)

@@ -242,3 +242,11 @@ class Player:
       self.fields.set((target.x, target.y), bomb)
       self.stats['bomb'] -= 1
       self.bomb = bomb
+
+  def respawn(self, coord: tuple[int, int]) -> None:
+    self.rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
+    self.alive = True
+    self.frame = 0
+    self.direction = 'down'
+    self.prevDirection = 'down'
+    self.surface = self.idleDown[0]

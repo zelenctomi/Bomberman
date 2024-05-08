@@ -7,6 +7,7 @@ class Scoreboard:
   def __init__(self, screen: pygame.Surface, player_count: int):
     self.screen = screen
     self.player_count: int = player_count
+    self.scores: list[int] = [0 for _ in range(player_count)]
     self.font: pygame.font.Font = pygame.font.Font(Settings.FONT, 24)
     self.pos: pygame.Rect = pygame.Rect((0, Settings.HEIGHT - Settings.SCOREBOARD_HEIGHT),
                                         (Settings.WIDTH, Settings.SCOREBOARD_HEIGHT))
@@ -28,7 +29,6 @@ class Scoreboard:
       self.heads.append(surface)
 
   def __create_rects(self) -> tuple[pygame.Rect, pygame.Rect]:
-    # centerY: int = Settings.SCOREBOARD_HEIGHT - Settings.BLOCK_SIZE
     size: tuple[int, int] = (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE)
     heads: pygame.Rect = pygame.Rect((0, 0), size)
     points: pygame.Rect = pygame.Rect((Settings.BLOCK_SIZE, 0), size)
@@ -37,7 +37,7 @@ class Scoreboard:
   def __create_points(self) -> list[pygame.Surface]:
     points: list[pygame.Surface] = []
     for i in range(self.player_count):
-      points.append(self.font.render('0', False, Settings.WHITE))
+      points.append(self.font.render(f'{self.scores[i]}', False, Settings.WHITE))
     return points
 
   def __create_containers(self) -> list[tuple[pygame.Surface, pygame.Rect]]:
@@ -61,3 +61,8 @@ class Scoreboard:
       self.containers[i][0].blit(self.points[i], point_pos)
       self.surface.blit(self.containers[i][0], self.containers[i][1])
     self.screen.blit(self.surface, self.pos)
+
+  def update(self, player: int):
+    self.scores[player] += 1
+    self.points[player] = self.font.render(f'{self.scores[player]}', False, Settings.WHITE)
+    self.rects = self.__create_rects()
