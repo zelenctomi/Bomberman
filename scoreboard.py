@@ -22,8 +22,8 @@ class Scoreboard:
     self.surface: pygame.Surface = pygame.image.load('Assets/Scoreboard/bar.png').convert_alpha()
     colors: list[tuple[int, int, int]] = [Settings.P2_COLOR, Settings.P3_COLOR]
     for i in range(self.player_count):
-      surface = pygame.image.load('Assets/Scoreboard/head.png').convert_alpha()
-      colors_index = i - 1
+      surface: pygame.Surface = pygame.image.load('Assets/Scoreboard/head.png').convert_alpha()
+      colors_index: int = i - 1
       if i > 0:
         surface.fill(colors[colors_index], special_flags=pygame.BLEND_SUB)
       self.heads.append(surface)
@@ -49,7 +49,8 @@ class Scoreboard:
     if self.player_count == 3:  # Position the 3rd rect in the middle
       containers.append((pygame.Surface(size).convert_alpha(), pygame.Rect((300, centerY), size)))
     for container in containers:
-      container[0].fill((0, 0, 0, 0))  # Transparent
+      container[0].fill(Settings.PURPLE)  # Transparent
+      pass
     return containers
 
   def render(self):
@@ -65,4 +66,4 @@ class Scoreboard:
   def update(self, player: int):
     self.scores[player] += 1
     self.points[player] = self.font.render(f'{self.scores[player]}', False, Settings.WHITE)
-    self.rects = self.__create_rects()
+    self.containers[player][0].fill(Settings.PURPLE) # Clear the container

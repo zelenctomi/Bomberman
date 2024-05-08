@@ -5,6 +5,7 @@ class Settings:
   # General #
   FONT: str = 'PixelifySansFont/static/PixelifySans-Regular.ttf'
   WHITE: tuple[int, int, int] = (255, 255, 255)
+  PURPLE: tuple[int, int, int] = (98, 55, 160)
   WIDTH: int = 750
   HEIGHT: int = 700
 

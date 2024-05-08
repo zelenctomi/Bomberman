@@ -1,6 +1,5 @@
 import pygame
 import json
-import sys
 from settings import *
 from game import *
 
@@ -177,3 +176,6 @@ class Menu():
     pygame.time.wait(100)
     game: Game = Game(self.player_count, self.level)
     game.run()
+    while game.running:
+      pass
+    self.run()

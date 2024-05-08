@@ -2,13 +2,14 @@ from fields import *
 from spawner import *
 from scoreboard import *
 from settings import Settings
+import sys
 
 
 class Game:
   TARGET_ENTITY_FRAME: int = Settings.FPS // Settings.ANIMATION_FPS
   TARGET_BOMB_FRAME: int = Settings.FPS // Settings.BOMB_FRAMES * Settings.BOMB_TIMER
 
-  def __init__(self, player_count: int, level: int, rounds: int = 2):
+  def __init__(self, player_count: int, level: int, rounds: int = 1):
     pygame.init()
     pygame.display.set_caption('Bomberman')
     self.screen: pygame.Surface = pygame.display.set_mode((Settings.WIDTH, Settings.HEIGHT))
@@ -16,6 +17,7 @@ class Game:
     self.font: pygame.font.Font = pygame.font.Font(Settings.FONT, 16)
     self.level: int = level
     self.rounds: int = rounds
+    self.running: bool = True
     # Game objects #
     self.scoreboard: Scoreboard = Scoreboard(self.screen, player_count)
     self.fields: Fields = Fields()
@@ -44,7 +46,6 @@ class Game:
 
   def __render_map(self) -> None:
     self.screen.fill(Settings.BACKGROUND)
-
     for wall in self.fields.walls:
       if isinstance(wall, Crumbly_wall):
         self.screen.blit(self.crumbly_asset, wall.rect)
@@ -130,13 +131,13 @@ class Game:
 
   def __game_over(self) -> None:
     self.__update_winner_score()
+    self.rounds -= 1
     if self.rounds > 0:
       self.__start_new_round()
     else:
       self.__end_game()
 
   def __start_new_round(self) -> None:
-    self.rounds -= 1
     self.fields.reload_map(self.level)
     self.spawner.respawn_players(self.players)
     self.spawner.respawn_monsters(self.monsters)
@@ -147,15 +148,16 @@ class Game:
         self.scoreboard.update(self.players.index(player))
 
   def __end_game(self) -> None:
-    print('Game Over')
+    self.running = False
 
   def run(self) -> None:
     self.__load_assets()
-    run: bool = True
-    while run:
+    while self.running:
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
-          run = False
+          self.running = False
+          pygame.quit()
+          sys.exit()
 
       self.__render_map()
       self.__move_entities()
