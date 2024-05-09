@@ -4,14 +4,20 @@ import pygame
 class Settings:
   # General #
   FONT: str = 'PixelifySansFont/static/PixelifySans-Regular.ttf'
+  BOLD_FONT: str = 'PixelifySansFont/static/PixelifySans-SemiBold.ttf'
+  WHITE: tuple[int, int, int] = (255, 255, 255)
+  PURPLE: tuple[int, int, int] = (98, 55, 160)
   WIDTH: int = 750
   HEIGHT: int = 700
 
-  # Map Settings #
+  # Map #
   BACKGROUND: tuple[int, int, int] = (222, 172, 245)
   BLOCK_SIZE: int = 50
   POWERUP_SIZE: int = 30
   POWERUP_OFFSET: int = (BLOCK_SIZE - POWERUP_SIZE) // 2
+
+  # Scoreboard #
+  SCOREBOARD_HEIGHT: int = 66
 
   # Framerate #
   FPS: int = 60
@@ -30,5 +36,5 @@ class Settings:
   P3_COLOR: tuple[int, int, int] = (90, 0, 0)
 
   # Bomb #
-  BOMB_TIMER: int = 3  # Seconds
+  BOMB_TIMER: int = 3 # Seconds
   BOMB_FRAMES: int = 12

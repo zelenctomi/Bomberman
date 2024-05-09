@@ -7,18 +7,18 @@ from settings import Settings
 class Monster:
   DIRECTIONS: list[tuple[int, int, str]] = [(0, -1, 'up'), (0, 1, 'down'), (-1, 0, 'left'), (1, 0, 'right')]
 
-  def __init__(self, spawn: tuple[int, int], fields: Fields):
-    self.rect: pygame.Rect = pygame.Rect(spawn, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
+  def __init__(self, coord: tuple[int, int], fields: Fields):
+    self.rect: pygame.Rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.fields: Fields = fields
-    self.x_direction: int
-    self.y_direction: int
+    self.is_alive: bool = True
     # Animation #
     self.frame: int = 0
     self.direction: str = 'down'
     self.prevDirection: str = 'down'
-
+    # Movement #
+    self.x_direction: int
+    self.y_direction: int
     self.x_direction, self.y_direction, self.direction = Monster.DIRECTIONS[random.randint(0, 3)]
-    self.is_alive: bool = True
     self.__change_direction()
     # Assets #
     self.surface: pygame.Surface
@@ -32,10 +32,10 @@ class Monster:
     This method loads the monster's assets.
     The hop animation consists of 6 frames for each direction.
     '''
-    self.hopLeft = [pygame.image.load(f'assets/Monster/hop/left/l{i}.png') for i in range(1, 7)]
-    self.hopRight = [pygame.image.load(f'assets/Monster/hop/right/r{i}.png') for i in range(1, 7)]
-    self.hopUp = [pygame.image.load(f'assets/Monster/hop/up/u{i}.png') for i in range(1, 7)]
-    self.hopDown = [pygame.image.load(f'assets/Monster/hop/down/d{i}.png') for i in range(1, 7)]
+    self.hopLeft = [pygame.image.load(f'assets/Monsters/Basic/hop/left/l{i}.png') for i in range(1, 7)]
+    self.hopRight = [pygame.image.load(f'assets/Monsters/Basic/hop/right/r{i}.png') for i in range(1, 7)]
+    self.hopUp = [pygame.image.load(f'assets/Monsters/Basic/hop/up/u{i}.png') for i in range(1, 7)]
+    self.hopDown = [pygame.image.load(f'assets/Monsters/Basic/hop/down/d{i}.png') for i in range(1, 7)]
     # Default Surface #
     self.surface = self.hopDown[0]
 
@@ -71,17 +71,23 @@ class Monster:
   def move(self) -> None:
     self.prevDirection = self.direction
     self.__randomize_direction()
-    potential_collisions: list[GameObject] = self.fields.get_objects_around_object(self)
+    potential_collisions: list[GameObject] = self.fields.get_surrounding_objects(self.rect)
     for obj in potential_collisions:
       if self.__turn_on_collision(obj):
         return
     self.__update_position(self.x_direction, self.y_direction)
 
   def __randomize_direction(self) -> None:
-    rotate: int = random.randint(0, 100)
-    if rotate == 50:
+    r: int = random.randint(0, 100)
+    if r == 50:
       self.__change_direction()
 
   def __update_position(self, x: int, y: int) -> None:
     self.rect.x += x
     self.rect.y += y
+
+  def respawn(self, coord: tuple[int, int]) -> None:
+    self.rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
+    self.alive = True
+    self.frame = 0
+    self.surface = self.hopDown[0]
