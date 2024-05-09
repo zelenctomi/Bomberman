@@ -4,6 +4,7 @@ import pygame
 class Settings:
   # General #
   FONT: str = 'PixelifySansFont/static/PixelifySans-Regular.ttf'
+  BOLD_FONT: str = 'PixelifySansFont/static/PixelifySans-SemiBold.ttf'
   WHITE: tuple[int, int, int] = (255, 255, 255)
   PURPLE: tuple[int, int, int] = (98, 55, 160)
   WIDTH: int = 750

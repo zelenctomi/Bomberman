@@ -32,10 +32,10 @@ class Monster:
     This method loads the monster's assets.
     The hop animation consists of 6 frames for each direction.
     '''
-    self.hopLeft = [pygame.image.load(f'assets/Monster/hop/left/l{i}.png') for i in range(1, 7)]
-    self.hopRight = [pygame.image.load(f'assets/Monster/hop/right/r{i}.png') for i in range(1, 7)]
-    self.hopUp = [pygame.image.load(f'assets/Monster/hop/up/u{i}.png') for i in range(1, 7)]
-    self.hopDown = [pygame.image.load(f'assets/Monster/hop/down/d{i}.png') for i in range(1, 7)]
+    self.hopLeft = [pygame.image.load(f'assets/Monsters/Basic/hop/left/l{i}.png') for i in range(1, 7)]
+    self.hopRight = [pygame.image.load(f'assets/Monsters/Basic/hop/right/r{i}.png') for i in range(1, 7)]
+    self.hopUp = [pygame.image.load(f'assets/Monsters/Basic/hop/up/u{i}.png') for i in range(1, 7)]
+    self.hopDown = [pygame.image.load(f'assets/Monsters/Basic/hop/down/d{i}.png') for i in range(1, 7)]
     # Default Surface #
     self.surface = self.hopDown[0]
 

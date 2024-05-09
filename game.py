@@ -1,6 +1,7 @@
 from fields import *
 from spawner import *
 from scoreboard import *
+from gameover import *
 from settings import Settings
 import sys
 
@@ -9,7 +10,7 @@ class Game:
   TARGET_ENTITY_FRAME: int = Settings.FPS // Settings.ANIMATION_FPS
   TARGET_BOMB_FRAME: int = Settings.FPS // Settings.BOMB_FRAMES * Settings.BOMB_TIMER
 
-  def __init__(self, player_count: int, level: int, rounds: int = 1):
+  def __init__(self, player_count: int, level: int, rounds: int = 2):
     pygame.init()
     pygame.display.set_caption('Bomberman')
     self.screen: pygame.Surface = pygame.display.set_mode((Settings.WIDTH, Settings.HEIGHT))
@@ -20,6 +21,7 @@ class Game:
     self.running: bool = True
     # Game objects #
     self.scoreboard: Scoreboard = Scoreboard(self.screen, player_count)
+    self.gameover: Gameover = Gameover(self.screen)
     self.fields: Fields = Fields()
     self.fields.load_map(level)
     self.spawner: Spawner = Spawner(self.fields)
@@ -75,11 +77,15 @@ class Game:
 
     self.scoreboard.render()
 
+    if self.rounds < 1:
+      self.gameover.render()
+
   def __move_entities(self) -> None:
     for monster in self.monsters:
       monster.move()
-    for player in self.players:
-      player.move()
+    if self.rounds > 0:
+      for player in self.players:
+        player.move()
 
   def __update_frames(self) -> None:
     '''
@@ -130,12 +136,14 @@ class Game:
       self.__game_over()
 
   def __game_over(self) -> None:
-    self.__update_winner_score()
-    self.rounds -= 1
+    if self.rounds > 0:
+      self.rounds -= 1
+      self.__update_winner_score()
+      
     if self.rounds > 0:
       self.__start_new_round()
     else:
-      self.__end_game()
+      self.__handle_proceed_to_menu()
 
   def __start_new_round(self) -> None:
     self.fields.reload_map(self.level)
@@ -147,8 +155,9 @@ class Game:
       if player.alive:
         self.scoreboard.update(self.players.index(player))
 
-  def __end_game(self) -> None:
-    self.running = False
+  def __handle_proceed_to_menu(self) -> None:
+    if self.gameover.proceed and any(pygame.key.get_pressed()):
+      self.running = False
 
   def run(self) -> None:
     self.__load_assets()
