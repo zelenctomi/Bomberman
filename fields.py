@@ -13,8 +13,8 @@ GameObject = Wall | Crumbly_wall | Bomb | Powerup | Explosion
 
 class Fields:
   def __init__(self):
-    self.fields: list[list[list[GameObject]]] = [[[] for _ in range(Settings.WIDTH // Settings.BLOCK_SIZE)]
-                                                 for _ in range((Settings.HEIGHT // Settings.BLOCK_SIZE) - 1)]
+    self.fields: list[list[list[GameObject]]] = [[[] for _ in range(Settings.COLS)]
+                                                     for _ in range(Settings.ROWS)]
     self.walls: list[Wall] = []
     self.bombs: list[Bomb] = []
     self.powerups: list[Powerup] = []
@@ -128,10 +128,9 @@ class Fields:
 
   def no_bombs_active(self) -> bool:
     return len(self.bombs) == 0 and len(self.explosions) == 0
-  
+
   def reload_map(self, lvl: int) -> None:
-    self.fields = [[[] for _ in range(Settings.WIDTH // Settings.BLOCK_SIZE)]
-                   for _ in range((Settings.HEIGHT // Settings.BLOCK_SIZE) - 1)]
+    self.fields = [[[] for _ in range(Settings.COLS)] for _ in range(Settings.ROWS)]
     self.walls = []
     self.bombs = []
     self.powerups = []

@@ -26,7 +26,7 @@ class Game:
     self.fields.load_map(level)
     self.spawner: Spawner = Spawner(self.fields)
     self.players: list[Player] = self.spawner.spawn_players(player_count)
-    self.monsters: list[Monster] = self.spawner.spawn_monsters(3)
+    self.monsters: list[Monster] = self.spawner.spawn_monsters(5)
     # Animation #
     self.entity_frame_trigger: int = 0
     self.bomb_frame_trigger: int = 0
@@ -69,7 +69,7 @@ class Game:
         self.screen.blit(self.detonator_surface, powerup.rect)
 
     for monster in self.monsters:
-      if monster.is_alive:
+      if monster.alive:
         self.screen.blit(monster.surface, monster.rect)
 
     for player in self.players:
@@ -116,16 +116,16 @@ class Game:
       for monster in self.monsters:
         if pygame.Rect.colliderect(monster.rect, explosion.rect):
           monster.die()
-          self.monsters.remove(monster)  # So the monster doesn't get drawn after death
       for bomb in self.fields.bombs:
         if pygame.Rect.colliderect(explosion.rect, bomb.rect):
           bomb.update(0)
 
   def __handle_entity_collision(self) -> None:
     for monster in self.monsters:
-      for player in self.players:
-        if pygame.Rect.colliderect(player.rect, monster.rect):
-          player.die()
+      if monster.alive:
+        for player in self.players:
+          if pygame.Rect.colliderect(player.rect, monster.hitbox):
+            player.die()
 
   def __handle_game_over(self) -> None:
     alive_players: int = 0

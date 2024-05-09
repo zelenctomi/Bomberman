@@ -13,6 +13,8 @@ class Settings:
   # Map #
   BACKGROUND: tuple[int, int, int] = (222, 172, 245)
   BLOCK_SIZE: int = 50
+  COLS: int = WIDTH // BLOCK_SIZE
+  ROWS: int = HEIGHT // BLOCK_SIZE - 1
   POWERUP_SIZE: int = 30
   POWERUP_OFFSET: int = (BLOCK_SIZE - POWERUP_SIZE) // 2
 
