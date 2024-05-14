@@ -1,6 +1,4 @@
 from fields import *
-import threading
-
 
 class Player:
   DIRECTIONS: dict[tuple[int, int], str] = {(0, -1): 'up', (0, 1): 'down', (-1, 0): 'left', (1, 0): 'right'}
@@ -10,7 +8,7 @@ class Player:
     self.controls: dict[str, int] = controls
     self.fields: Fields = fields
     self.bomb: (Bomb | None) = None
-    self.planted_bombs: int = 0
+    self.detonator_bomb: Detonator_bomb
     self.alive: bool = True
     self.diagonal_move: tuple[int, int] = (1, 0)
     self.invulnerability_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
@@ -18,13 +16,13 @@ class Player:
     self.ghost_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     # Stats #
     self.stats: dict[str, int] = {
-      'bomb': 1,
+      'bomb': 3,
       'explosion': 2,
       'detonator': 1,
-      'invulnerability': 0,
-      'speed': 0,
+      'invulnerability': 1,
+      'speed': 1,
       'barricade': 3,
-      'ghost': 0
+      'ghost': 1
     }
     # Animation #
     self.frame: int = 0
@@ -75,6 +73,7 @@ class Player:
     self.deathDown = [pygame.image.load(f'assets/Player/death/down/d{i}.png').convert_alpha() for i in range(1, 7)]
     # Bomb Frames #
     self.bomb_frame = pygame.image.load('assets/Bomb/b1.png').convert_alpha()
+    self.detonator_bomb = Detonator_bomb((0, 0), 0, self)
 
     # Set different colors for extra players #
     if playerNum > 1:
@@ -140,10 +139,10 @@ class Player:
       y: int = 0
       if key[self.controls['place']]:
         if self.stats['bomb'] == 0 and self.stats['detonator'] > 0:
+          self.__use_bombs()
+          self.stats['detonator'] = 0
           print("detonator")
-          self.__use_bombs
         elif self.stats['bomb'] > 0:
-          print("place")
           self.__place_bomb()
       if key[self.controls['barricade']]:
         if self.stats['barricade'] > 0:
@@ -208,7 +207,7 @@ class Player:
       else:
         y = 0
       collided = True
-    if collided:
+    if collided or (not collided and self.stats['ghost'] > 0):
       self.__check_powerup(obj)
       if abs(x + y) == 1:
         self.diagonal_move = (x, y)
@@ -248,6 +247,8 @@ class Player:
     potential_collisions: list[GameObject] = self.fields.get_at_coord(self.rect.x, self.rect.y)
     if self.bomb != None and self.bomb not in potential_collisions:
       self.bomb = None
+    if self.detonator_bomb.rect.x == 0 and self.detonator_bomb not in potential_collisions:
+      self.detonator_bomb = Detonator_bomb((0, 0), 0, self)
 
   def __apply_powerup(self, powerup: Powerup) -> None:
     stat: str
@@ -298,13 +299,19 @@ class Player:
 
   def __place_bomb(self) -> None:
     if self.stats['bomb'] > 0 and not self.fields.field_has_bomb_or_wall(self.rect.x, self.rect.y):
-      self.planted_bombs += 1
       target: pygame.Rect = self.fields.snap_to_grid(self.rect)
-      bomb: Bomb = Bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
-      self.fields.set_bomb(target.x, target.y, bomb)
-      self.stats['bomb'] -= 1
-      self.planted_bombs += 1
-      self.bomb = bomb
+      print("place")
+      if self.stats['detonator'] == 0:
+        bomb: Bomb = Bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
+        self.fields.set_bomb(target.x, target.y, bomb)
+        self.stats['bomb'] -= 1
+        self.bomb = bomb
+      else:
+        detonator_bomb: Detonator_bomb = Detonator_bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
+        self.fields.set_detonator_bomb(target.x, target.y, detonator_bomb)
+        self.stats['bomb'] -= 1
+        self.detonator_bomb = detonator_bomb
+
 
   def __place_barricade(self):
     if self.stats['barricade'] > 0:
@@ -324,6 +331,5 @@ class Player:
         self.stats['barricade'] -= 1
 
   def __use_bombs(self):
-    self.fields.detonator_explosion()
-    ##self.stats['detonator'] = 0
-    self.planted_bombs = 0
+    self.fields.detonator_explosion(self.detonator_bomb)
+    self.stats['detonator']

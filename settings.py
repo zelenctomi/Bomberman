@@ -35,3 +35,5 @@ class Settings:
 
   # Extra powerups
   EXTRA_POWERUPS_TIMER: int = 12
+  SCOREBOARD_RECT_1: tuple[int, int] = (0, 635)
+

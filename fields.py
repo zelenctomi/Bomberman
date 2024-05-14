@@ -6,10 +6,11 @@ from wall import Wall
 from settings import Settings
 from crumbly_wall import Crumbly_wall
 from barricade_wall import Barricade_wall
+from detonator_bomb import Detonator_bomb
 from bomb import Bomb, Explosion
 from powerups import Powerups, Powerup, Extra_bomb, Longer_explosion, Detonator, Invulnerability, Speed, Barricade, Ghost
 
-GameObject = Wall | Crumbly_wall | Barricade_wall | Bomb | Powerup | Explosion
+GameObject = Wall | Crumbly_wall | Barricade_wall | Bomb | Detonator_bomb | Powerup | Explosion
 
 
 class Fields:
@@ -18,6 +19,7 @@ class Fields:
                                                  for _ in range((Settings.HEIGHT // Settings.BLOCK_SIZE) - 1)]
     self.walls: list[Wall] = []
     self.bombs: list[Bomb] = []
+    self.detonator_bombs: list[Detonator_bomb] = []
     self.powerups: list[Powerup] = []
     self.explosions: list[Explosion] = []
 
@@ -59,7 +61,7 @@ class Fields:
     return False
 
   def field_has_bomb_or_wall(self, x: int, y: int) -> bool:
-    return any(isinstance(obj, Bomb) for obj in self.get_at_coord(x, y)) or any(isinstance(obj, Wall) for obj in self.get_at_coord(x, y))
+    return any(isinstance(obj, Bomb) for obj in self.get_at_coord(x, y)) or any(isinstance(obj, Detonator_bomb) for obj in self.get_at_coord(x, y)) or any(isinstance(obj, Wall) for obj in self.get_at_coord(x, y))
 
   def load_map(self, lvl: int) -> None:
     WALL: int = 1
@@ -91,6 +93,10 @@ class Fields:
     self.bombs.append(bomb)
     self.get_at_coord(x, y).append(bomb)
 
+  def set_detonator_bomb(self, x: int, y: int, detonator_bomb: Detonator_bomb) -> None:
+    self.detonator_bombs.append(detonator_bomb)
+    self.get_at_coord(x, y).append(detonator_bomb)
+
   def set_barricade(self, x: int, y: int, barricade: Barricade_wall) -> None:
     self.walls.append(barricade)
     self.get_at_coord(x, y).append(barricade)
@@ -99,18 +105,18 @@ class Fields:
     for bomb in self.bombs:
       if bomb.owner.stats['detonator'] == 0:
         if bomb.update() < 0:
-          self.explosions.extend(bomb.explode([wall.rect for wall in self.walls if not isinstance(wall, Crumbly_wall)]))
+          self.explosions.extend(bomb.explode([wall.rect for wall in self.walls if not isinstance(wall, Crumbly_wall) and not isinstance(wall, Barricade_wall)]))
           self.get_at_coord(bomb.rect.x, bomb.rect.y).remove(bomb)
           self.bombs.remove(bomb)
           self.__destroy_crumbly_and_barricade_walls()
 
-  def detonator_explosion(self):
-    for bomb in self.bombs:
-      print("fasz")
-      self.explosions.extend(bomb.explode([wall.rect for wall in self.walls if not isinstance(wall, Crumbly_wall)]))
-      self.get_at_coord(bomb.rect.x, bomb.rect.y).remove(bomb)
-      self.bombs.remove(bomb)
-      self.__destroy_crumbly_and_barricade_walls()
+  def detonator_explosion(self, detonator_bomb: Detonator_bomb):
+    for bomb in self.detonator_bombs:
+      if bomb.owner == detonator_bomb.owner:
+        self.explosions.extend(bomb.explode([wall.rect for wall in self.walls if not isinstance(wall, Crumbly_wall) and not isinstance(wall, Barricade_wall)]))
+        self.get_at_coord(bomb.rect.x, bomb.rect.y).remove(bomb)
+        self.detonator_bombs.remove(bomb)
+        self.__destroy_crumbly_and_barricade_walls()
 
 
   def update_explosions(self) -> None:
@@ -119,10 +125,11 @@ class Fields:
         self.explosions.remove(explosion)
 
   def __destroy_crumbly_and_barricade_walls(self) -> None:
-    for wall in self.get_crumbly_walls():
+    for wall in self.get_crumbly_and_barricade_walls():
       for explosion in self.explosions:
         if pygame.Rect.colliderect(wall.rect, explosion.rect):
           self.get_at_coord(wall.rect.x, wall.rect.y).remove(wall)
           self.walls.remove(wall)
           coord: tuple[int, int] = (wall.rect.x, wall.rect.y)
-          self.__drop_powerup(coord)
+          if isinstance(wall, Crumbly_wall):
+            self.__drop_powerup(coord)

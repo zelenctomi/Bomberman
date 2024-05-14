@@ -1,21 +1,28 @@
 import pygame
+from settings import Settings
 
 
 class Scoreboard:
 
-  def __init__(self, screen_param):
-    self.screen_param = screen_param
+  def __init__(self):
     pygame.init()
+    self.rect_bg1: pygame.Rect = pygame.Rect(Settings.SCOREBOARD_RECT_1, (800, 66))
+    self.rect_bg2: pygame.Rect = pygame.Rect(Settings.SCOREBOARD_RECT_1, (800, 66))
+    self.rect_bg2.right = 0
     self.__load_asset()
     self.__write_datas()
-    self.__render()
 
   def __load_asset(self):
     self.scoreboard_surface: pygame.Surface = pygame.image.load(
         'Assets/Menu/Status_Bar.png').convert_alpha()
-
-  def __render(self):
-    self.screen_param.blit(self.scoreboard_surface, (0, 650))
+    
+  def slide(self):
+    self.rect_bg1.x += 1
+    self.rect_bg2.x += 1
+    if self.rect_bg1.left == Settings.WIDTH:
+      self.rect_bg1.right = 0
+    elif self.rect_bg2.left == Settings.WIDTH:
+      self.rect_bg2.right = 0
 
   def __write_datas(self):
     font = pygame.font.Font(None, 20)
@@ -31,7 +38,3 @@ class Scoreboard:
     player_1_rect.midleft = (10, 640)
     player_2_rect.midleft = (100, 640)
     player_3_rect.midleft = (190, 640)
-
-    self.screen_param.blit(player_1, player_1_rect)
-    self.screen_param.blit(player_2, player_2_rect)
-    self.screen_param.blit(player_3, player_3_rect)

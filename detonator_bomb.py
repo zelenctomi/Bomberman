@@ -3,10 +3,10 @@ from explosion import Explosion
 from settings import Settings
 
 
-class Bomb:
+class Detonator_bomb:
   def __init__(self, coord, size: int, player):
     self.rect: pygame.Rect = pygame.Rect(coord, (size, size))
-    self.timer: int = Settings.BOMB_TIMER * Settings.FPS
+    self.detonator: int = 1
     self.owner = player
     # Animation #
     self.frame: int = 0
@@ -14,6 +14,10 @@ class Bomb:
 
   def explode(self, walls: list[pygame.Rect]) -> list[Explosion]:
     return Explosion(self.rect.x, self.rect.y, walls).initiate(self.owner.stats['explosion'])
+  
+  def update(self, value: int = 1) -> int:
+    self.detonator = 0
+    return self.detonator
   
   def update_frame(self) -> None:
     if self.frame < 11:

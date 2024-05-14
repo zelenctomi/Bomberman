@@ -42,7 +42,7 @@ class Game:
   def __initialize_objects(self) -> None:
     self.entity_frame_trigger: int = 0
     self.bomb_frame_trigger: int = 0
-    self.scoreboard: Scoreboard = Scoreboard(self.screen)
+    self.scoreboard: Scoreboard = Scoreboard()
     self.fields: Fields = Fields()
     self.fields.load_map(self.level)
     self.spawner: Spawner = Spawner(self.fields)
@@ -61,6 +61,9 @@ class Game:
         self.screen.blit(self.wall_asset, wall.rect)
 
     for bomb in self.fields.bombs:
+      self.screen.blit(bomb.surface, bomb.rect)
+
+    for bomb in self.fields.detonator_bombs:
       self.screen.blit(bomb.surface, bomb.rect)
 
     for explosion in self.fields.explosions:
@@ -89,7 +92,8 @@ class Game:
     for player in self.players:
         self.screen.blit(player.surface, player.rect)
       
-    self.screen.blit(self.scoreboard_surface, (0, 635)) # TODO: Create a constant in Settings
+    self.screen.blit(self.scoreboard_surface, self.scoreboard.rect_bg1)
+    self.screen.blit(self.scoreboard_surface, self.scoreboard.rect_bg2) # TODO: Create a constant in Settings
 
   def __move_entities(self) -> None:
     for monster in self.monsters:
@@ -103,6 +107,7 @@ class Game:
     Animation FPS is set by Settings.ANIMATION_FPS.
     The animation FPS is independent of the Settings.FPS.
     '''
+    self.scoreboard.slide()
     self.entity_frame_trigger += 1
     self.bomb_frame_trigger += 1
     if self.entity_frame_trigger == Game.TARGET_ENTITY_FRAME:
@@ -130,6 +135,9 @@ class Game:
       for bomb in self.fields.bombs:
         if pygame.Rect.colliderect(explosion.rect, bomb.rect):
           bomb.update(0)
+      for detonator_bomb in self.fields.detonator_bombs:
+        if pygame.Rect.colliderect(explosion.rect, detonator_bomb.rect):
+          detonator_bomb.update(0)
 
   def __handle_death(self) -> None:
     for monster in self.monsters:
@@ -140,6 +148,9 @@ class Game:
   def __update_extra_powerups(self):
     for player in self.players:
       player.check_extra_powerups()
+
+  def __update_scoreboard(self):
+    self.scoreboard
 
   def run(self) -> None:
     self.__initialize_objects()
