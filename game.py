@@ -26,7 +26,7 @@ class Game:
     self.fields.load_map(level)
     self.spawner: Spawner = Spawner(self.fields)
     self.players: list[Player] = self.spawner.spawn_players(player_count)
-    self.monsters: list[Monster] = self.spawner.spawn_monsters(3)
+    self.monsters: list[Monster] = self.spawner.spawn_monsters(5)
     # Animation #
     self.entity_frame_trigger: int = 0
     self.bomb_frame_trigger: int = 0
@@ -41,6 +41,7 @@ class Game:
     self.explosion_assets: list[pygame.Surface] = [pygame.image.load(f'Assets/Bomb/e{i}.png').convert_alpha() for i in range(1, 13)]
     self.wall_asset: pygame.Surface = pygame.image.load('Assets/Walls/Default/wall.png').convert_alpha()
     self.crumbly_asset: pygame.Surface = pygame.image.load('Assets/Walls/Default/crumbly.png').convert_alpha()
+    self.barricade_asset: pygame.Surface = pygame.image.load('Assets/Walls/Default/barricade.png').convert_alpha()
     # Powerups #
     self.extra_bomb_surface: pygame.Surface = pygame.image.load('Assets/Powerups/extra_bomb.png').convert_alpha()
     self.longer_explosion_surface: pygame.Surface = pygame.image.load('Assets/Powerups/longer_explosion.png').convert_alpha()
@@ -49,17 +50,6 @@ class Game:
     self.speed_surface: pygame.Surface = pygame.image.load('Assets/Powerups/speed.png').convert_alpha()
     self.barricade_surface: pygame.Surface = pygame.image.load('Assets/Powerups/barricade.png').convert_alpha()
     self.ghost_surface: pygame.Surface = pygame.image.load('Assets/Powerups/ghostwalk.png').convert_alpha()
-
-
-  def __initialize_objects(self) -> None:
-    self.entity_frame_trigger: int = 0
-    self.bomb_frame_trigger: int = 0
-    self.scoreboard: Scoreboard = Scoreboard()
-    self.fields: Fields = Fields()
-    self.fields.load_map(self.level)
-    self.spawner: Spawner = Spawner(self.fields)
-    self.players: list[Player] = self.spawner.spawn_players(self.player_count)
-    self.monsters: list[Monster] = self.spawner.spawn_monsters(3)
 
   def __render_map(self) -> None:
     self.screen.fill(Settings.BACKGROUND)
@@ -72,9 +62,6 @@ class Game:
         self.screen.blit(self.wall_asset, wall.rect)
 
     for bomb in self.fields.bombs:
-      self.screen.blit(bomb.surface, bomb.rect)
-
-    for bomb in self.fields.detonator_bombs:
       self.screen.blit(bomb.surface, bomb.rect)
 
     for explosion in self.fields.explosions:
@@ -115,13 +102,17 @@ class Game:
       for player in self.players:
         player.move()
 
+  def __update_extra_powerups(self):
+    for player in self.players:
+      player.check_extra_powerups()
+
   def __update_frames(self) -> None:
     '''
     This method updates entity frames.
     Animation FPS is set by Settings.ANIMATION_FPS.
     The animation FPS is independent of the Settings.FPS.
     '''
-    self.scoreboard.slide()
+    # self.scoreboard.slide()
     self.entity_frame_trigger += 1
     self.bomb_frame_trigger += 1
     if self.entity_frame_trigger == Game.TARGET_ENTITY_FRAME:
@@ -149,9 +140,6 @@ class Game:
       for bomb in self.fields.bombs:
         if pygame.Rect.colliderect(explosion.rect, bomb.rect):
           bomb.update(0)
-      for detonator_bomb in self.fields.detonator_bombs:
-        if pygame.Rect.colliderect(explosion.rect, detonator_bomb.rect):
-          detonator_bomb.update(0)
 
   def __handle_entity_collision(self) -> None:
     for monster in self.monsters:

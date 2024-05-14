@@ -67,3 +67,11 @@ class Scoreboard:
     self.scores[player] += 1
     self.points[player] = self.font.render(f'{self.scores[player]}', False, Settings.WHITE)
     self.containers[player][0].fill(Settings.PURPLE) # Clear the container
+
+  # def slide(self):
+  #   self.rect_bg1.x += 1
+  #   self.rect_bg2.x += 1
+  #   if self.rect_bg1.left == Settings.WIDTH:
+  #     self.rect_bg1.right = 0
+  #   elif self.rect_bg2.left == Settings.WIDTH:
+  #     self.rect_bg2.right = 0

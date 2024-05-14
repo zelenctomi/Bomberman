@@ -8,8 +8,6 @@ class Player:
     self.rect: pygame.Rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.controls: dict[str, int] = controls
     self.fields: Fields = fields
-    self.bomb: (Bomb | None) = None
-    self.detonator_bomb: Detonator_bomb
     self.alive: bool = True
     self.bomb: (Bomb | None) = None
     self.diagonal_move: tuple[int, int] = (1, 0)
@@ -18,13 +16,13 @@ class Player:
     self.ghost_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     # Stats #
     self.stats: dict[str, int] = {
-      'bomb': 3,
+      'bomb': 1,
       'explosion': 2,
-      'detonator': 1,
-      'invulnerability': 1,
-      'speed': 1,
-      'barricade': 3,
-      'ghost': 1
+      'detonator': 0,
+      'invulnerability': 0,
+      'speed': 0,
+      'barricade': 0,
+      'ghost': 0
     }
     # Animation #
     self.frame: int = 0
@@ -110,7 +108,7 @@ class Player:
     self.surface = self.idleDown[0]
 
   def die(self) -> None:
-    if self.alive:
+    if self.alive and self.stats['invulnerability'] == 0:
       self.alive = False
       self.frame = 0
 
@@ -141,7 +139,7 @@ class Player:
       y: int = 0
       if key[self.controls['place']]:
         if self.stats['bomb'] == 0 and self.stats['detonator'] > 0:
-          self.__use_bombs()
+          self.__detonate_bombs()
           self.stats['detonator'] = 0
           print("detonator")
         elif self.stats['bomb'] > 0:
@@ -241,6 +239,7 @@ class Player:
     if isinstance(obj, Powerup):
       self.__apply_powerup(obj)
       self.fields.remove((obj.rect.x, obj.rect.y), obj)
+      print('applied')
 
   def __update_bomb_collision(self) -> None:
     potential_collisions: list[GameObject] = self.fields.get(self.rect.x, self.rect.y)
@@ -261,7 +260,6 @@ class Player:
     elif stat == 'ghost':
       self.ghost_timer = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     
-
   def check_extra_powerups(self):
     if self.stats['invulnerability'] > 0:
       self.__update_invulnerability()
@@ -269,7 +267,6 @@ class Player:
       self.__update_speed()
     if self.stats['ghost'] > 0:
       self.__update_ghost()
-
 
   def __update_invulnerability(self):
     self.invulnerability_timer -= 1
@@ -302,12 +299,12 @@ class Player:
       print("place")
       if self.stats['detonator'] == 0:
         bomb: Bomb = Bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
-        self.fields.set_bomb(target.x, target.y, bomb)
+        self.fields.set((target.x, target.y), bomb)
         self.stats['bomb'] -= 1
         self.bomb = bomb
       else:
         detonator_bomb: Detonator_bomb = Detonator_bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
-        self.fields.set_detonator_bomb(target.x, target.y, detonator_bomb)
+        self.fields.set((target.x, target.y), detonator_bomb)
         self.stats['bomb'] -= 1
         self.detonator_bomb = detonator_bomb
 
@@ -325,10 +322,17 @@ class Player:
         target.y += Settings.BLOCK_SIZE
       if not self.fields.field_has_bomb_or_wall(target.x, target.y):
         barricade: Barricade_wall = Barricade_wall((target.x, target.y), Settings.BLOCK_SIZE)
-        self.fields.set_barricade(target.x, target.y, barricade)
+        self.fields.set((target.x, target.y), barricade)
         self.player_snap_to_grid()
         self.stats['barricade'] -= 1
 
-  def __use_bombs(self):
-    self.fields.detonator_explosion(self.detonator_bomb)
+  def __detonate_bombs(self):
     self.stats['detonator']
+
+  def respawn(self, coord: tuple[int, int]) -> None:
+    self.rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
+    self.alive = True
+    self.frame = 0
+    self.direction = 'down'
+    self.prevDirection = 'down'
+    self.surface = self.idleDown[0]
