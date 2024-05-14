@@ -73,7 +73,6 @@ class Player:
     self.deathDown = [pygame.image.load(f'assets/Player/death/down/d{i}.png').convert_alpha() for i in range(1, 7)]
     # Bomb Frames #
     self.bomb_frame = pygame.image.load('assets/Bomb/b1.png').convert_alpha()
-    self.detonator_bomb = Detonator_bomb((0, 0), 0, self)
 
     # Set different colors for extra players #
     if playerNum > 1:
@@ -245,8 +244,6 @@ class Player:
     potential_collisions: list[GameObject] = self.fields.get(self.rect.x, self.rect.y)
     if self.bomb != None and self.bomb not in potential_collisions:
       self.bomb = None
-    if self.detonator_bomb.rect.x == 0 and self.detonator_bomb not in potential_collisions:
-      self.detonator_bomb = Detonator_bomb((0, 0), 0, self)
 
   def __apply_powerup(self, powerup: Powerup) -> None:
     stat: str
@@ -303,10 +300,11 @@ class Player:
         self.stats['bomb'] -= 1
         self.bomb = bomb
       else:
-        detonator_bomb: Detonator_bomb = Detonator_bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
-        self.fields.set((target.x, target.y), detonator_bomb)
-        self.stats['bomb'] -= 1
-        self.detonator_bomb = detonator_bomb
+        pass
+        # detonator_bomb: Detonator_bomb = Detonator_bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
+        # self.fields.set((target.x, target.y), detonator_bomb)
+        # self.stats['bomb'] -= 1
+        # self.detonator_bomb = detonator_bomb
 
 
   def __place_barricade(self):

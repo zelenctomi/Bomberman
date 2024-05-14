@@ -6,11 +6,10 @@ from wall import Wall
 from settings import Settings
 from crumbly_wall import Crumbly_wall
 from barricade_wall import Barricade_wall
-from detonator_bomb import Detonator_bomb
 from bomb import Bomb, Explosion
 from powerups import Powerups, Powerup, Extra_bomb, Longer_explosion, Detonator, Invulnerability, Speed, Barricade, Ghost
 
-GameObject = Wall | Crumbly_wall | Barricade_wall | Bomb | Detonator_bomb | Powerup | Explosion
+GameObject = Wall | Crumbly_wall | Barricade_wall | Bomb | Powerup | Explosion
 
 
 class Fields:
@@ -83,7 +82,7 @@ class Fields:
                        Settings.BLOCK_SIZE, Settings.BLOCK_SIZE)
   
   def field_has_bomb_or_wall(self, x: int, y: int) -> bool:
-    return any(isinstance(obj, Bomb) for obj in self.get(x, y)) or any(isinstance(obj, Detonator_bomb) for obj in self.get(x, y)) or any(isinstance(obj, Wall) for obj in self.get(x, y))
+    return any(isinstance(obj, Bomb) for obj in self.get(x, y)) or any(isinstance(obj, Wall) for obj in self.get(x, y))
 
   def load_map(self, lvl: int) -> None:
     WALL: int = 1
