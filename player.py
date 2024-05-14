@@ -8,14 +8,23 @@ class Player:
     self.rect: pygame.Rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.controls: dict[str, int] = controls
     self.fields: Fields = fields
+    self.bomb: (Bomb | None) = None
+    self.detonator_bomb: Detonator_bomb
     self.alive: bool = True
     self.bomb: (Bomb | None) = None
     self.diagonal_move: tuple[int, int] = (1, 0)
+    self.invulnerability_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
+    self.speed_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
+    self.ghost_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     # Stats #
     self.stats: dict[str, int] = {
-      'bomb': 1,
+      'bomb': 3,
       'explosion': 2,
-      'detonator': 0
+      'detonator': 1,
+      'invulnerability': 1,
+      'speed': 1,
+      'barricade': 3,
+      'ghost': 1
     }
     # Animation #
     self.frame: int = 0
@@ -66,6 +75,7 @@ class Player:
     self.deathDown = [pygame.image.load(f'assets/Player/death/down/d{i}.png').convert_alpha() for i in range(1, 7)]
     # Bomb Frames #
     self.bomb_frame = pygame.image.load('assets/Bomb/b1.png').convert_alpha()
+    self.detonator_bomb = Detonator_bomb((0, 0), 0, self)
 
     # Set different colors for extra players #
     if playerNum > 1:
@@ -130,7 +140,15 @@ class Player:
       x: int = 0
       y: int = 0
       if key[self.controls['place']]:
-        self.__place_bomb()
+        if self.stats['bomb'] == 0 and self.stats['detonator'] > 0:
+          self.__use_bombs()
+          self.stats['detonator'] = 0
+          print("detonator")
+        elif self.stats['bomb'] > 0:
+          self.__place_bomb()
+      if key[self.controls['barricade']]:
+        if self.stats['barricade'] > 0:
+          self.__place_barricade()
       if key[self.controls['left']]:
         x += -1
       if key[self.controls['right']]:
@@ -170,7 +188,7 @@ class Player:
     dummy: pygame.Rect = self.rect.copy()
     dummy.x += x
     dummy.y += y
-    if pygame.Rect.colliderect(obj.rect, dummy) and obj != self.bomb:
+    if pygame.Rect.colliderect(obj.rect, dummy) and obj != self.bomb and self.stats['ghost'] == 0 or dummy.x < Settings.BLOCK_SIZE or dummy.x > 13 * Settings.BLOCK_SIZE or dummy.y < Settings.BLOCK_SIZE or dummy.y > 11 * Settings.BLOCK_SIZE:
       return True
     return False
 
@@ -189,7 +207,7 @@ class Player:
       else:
         y = 0
       collided = True
-    if collided:
+    if collided or (not collided and self.stats['ghost'] > 0):
       self.__check_powerup(obj)
       if abs(x + y) == 1:
         self.diagonal_move = (x, y)
@@ -228,25 +246,89 @@ class Player:
     potential_collisions: list[GameObject] = self.fields.get(self.rect.x, self.rect.y)
     if self.bomb != None and self.bomb not in potential_collisions:
       self.bomb = None
+    if self.detonator_bomb.rect.x == 0 and self.detonator_bomb not in potential_collisions:
+      self.detonator_bomb = Detonator_bomb((0, 0), 0, self)
 
   def __apply_powerup(self, powerup: Powerup) -> None:
     stat: str
     value: int
     stat, value = powerup.get_bonus()
     self.stats[stat] += value
+    if stat == 'invulnerability':
+      self.invulnerability_timer = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
+    elif stat == 'speed':
+      self.speed_timer = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
+    elif stat == 'ghost':
+      self.ghost_timer = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
+    
+
+  def check_extra_powerups(self):
+    if self.stats['invulnerability'] > 0:
+      self.__update_invulnerability()
+    if self.stats['speed'] > 0:
+      self.__update_speed()
+    if self.stats['ghost'] > 0:
+      self.__update_ghost()
+
+
+  def __update_invulnerability(self):
+    self.invulnerability_timer -= 1
+    if self.invulnerability_timer == 0:
+      self.stats['invulnerability'] = 0
+
+  def __update_speed(self):
+    self.speed_timer -= 1
+    if self.speed_timer == 0:
+      self.stats['speed'] = 0
+
+  def __update_ghost(self):
+    self.ghost_timer -= 1
+    if self.ghost_timer == 0:
+      self.stats['ghost'] = 0
+      for wall in self.fields.walls:
+        if self.stats['ghost'] == 0:
+          if wall.rect.collidepoint(self.rect.centerx, self.rect.centery):
+            self.die()
+          else:
+            self.player_snap_to_grid()
+
+  def player_snap_to_grid(self):
+    target: pygame.Rect = self.fields.snap_to_grid(self.rect)
+    self.rect = pygame.Rect((target.x, target.y), (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
 
   def __place_bomb(self) -> None:
-    if self.stats['bomb'] > 0 and not self.fields.field_has_bomb(self.rect.x, self.rect.y):
+    if self.stats['bomb'] > 0 and not self.fields.field_has_bomb_or_wall(self.rect.x, self.rect.y):
       target: pygame.Rect = self.fields.snap_to_grid(self.rect)
-      bomb: Bomb = Bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
-      self.fields.set((target.x, target.y), bomb)
-      self.stats['bomb'] -= 1
-      self.bomb = bomb
+      print("place")
+      if self.stats['detonator'] == 0:
+        bomb: Bomb = Bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
+        self.fields.set_bomb(target.x, target.y, bomb)
+        self.stats['bomb'] -= 1
+        self.bomb = bomb
+      else:
+        detonator_bomb: Detonator_bomb = Detonator_bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
+        self.fields.set_detonator_bomb(target.x, target.y, detonator_bomb)
+        self.stats['bomb'] -= 1
+        self.detonator_bomb = detonator_bomb
 
-  def respawn(self, coord: tuple[int, int]) -> None:
-    self.rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
-    self.alive = True
-    self.frame = 0
-    self.direction = 'down'
-    self.prevDirection = 'down'
-    self.surface = self.idleDown[0]
+
+  def __place_barricade(self):
+    if self.stats['barricade'] > 0:
+      target: pygame.Rect = self.fields.snap_to_grid(self.rect)
+      if self.direction == 'right':
+        target.x += Settings.BLOCK_SIZE
+      elif self.direction == 'left':
+        target.x -= Settings.BLOCK_SIZE
+      elif self.direction == 'up':
+        target.y -= Settings.BLOCK_SIZE
+      elif self.direction == 'down':
+        target.y += Settings.BLOCK_SIZE
+      if not self.fields.field_has_bomb_or_wall(target.x, target.y):
+        barricade: Barricade_wall = Barricade_wall((target.x, target.y), Settings.BLOCK_SIZE)
+        self.fields.set_barricade(target.x, target.y, barricade)
+        self.player_snap_to_grid()
+        self.stats['barricade'] -= 1
+
+  def __use_bombs(self):
+    self.fields.detonator_explosion(self.detonator_bomb)
+    self.stats['detonator']

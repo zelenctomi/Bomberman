@@ -45,16 +45,36 @@ class Game:
     self.extra_bomb_surface: pygame.Surface = pygame.image.load('Assets/Powerups/extra_bomb.png').convert_alpha()
     self.longer_explosion_surface: pygame.Surface = pygame.image.load('Assets/Powerups/longer_explosion.png').convert_alpha()
     self.detonator_surface: pygame.Surface = pygame.image.load('Assets/Powerups/detonator.png').convert_alpha()
+    self.invulnerability_surface: pygame.Surface = pygame.image.load('Assets/Powerups/invulnerability.png').convert_alpha()
+    self.speed_surface: pygame.Surface = pygame.image.load('Assets/Powerups/speed.png').convert_alpha()
+    self.barricade_surface: pygame.Surface = pygame.image.load('Assets/Powerups/barricade.png').convert_alpha()
+    self.ghost_surface: pygame.Surface = pygame.image.load('Assets/Powerups/ghostwalk.png').convert_alpha()
+
+
+  def __initialize_objects(self) -> None:
+    self.entity_frame_trigger: int = 0
+    self.bomb_frame_trigger: int = 0
+    self.scoreboard: Scoreboard = Scoreboard()
+    self.fields: Fields = Fields()
+    self.fields.load_map(self.level)
+    self.spawner: Spawner = Spawner(self.fields)
+    self.players: list[Player] = self.spawner.spawn_players(self.player_count)
+    self.monsters: list[Monster] = self.spawner.spawn_monsters(3)
 
   def __render_map(self) -> None:
     self.screen.fill(Settings.BACKGROUND)
     for wall in self.fields.walls:
       if isinstance(wall, Crumbly_wall):
         self.screen.blit(self.crumbly_asset, wall.rect)
-      else:
+      elif isinstance(wall ,Barricade_wall):
+        self.screen.blit(self.barricade_asset, wall.rect)
+      elif isinstance(wall ,Wall):
         self.screen.blit(self.wall_asset, wall.rect)
 
     for bomb in self.fields.bombs:
+      self.screen.blit(bomb.surface, bomb.rect)
+
+    for bomb in self.fields.detonator_bombs:
       self.screen.blit(bomb.surface, bomb.rect)
 
     for explosion in self.fields.explosions:
@@ -67,6 +87,14 @@ class Game:
         self.screen.blit(self.longer_explosion_surface, powerup.rect)
       elif isinstance(powerup, Detonator):
         self.screen.blit(self.detonator_surface, powerup.rect)
+      elif isinstance(powerup, Invulnerability):
+        self.screen.blit(self.invulnerability_surface, powerup.rect)
+      elif isinstance(powerup, Speed):
+        self.screen.blit(self.speed_surface, powerup.rect)
+      elif isinstance(powerup, Barricade):
+        self.screen.blit(self.barricade_surface, powerup.rect)
+      elif isinstance(powerup, Ghost):
+        self.screen.blit(self.ghost_surface, powerup.rect)
 
     for monster in self.monsters:
       if monster.is_alive:
@@ -93,6 +121,7 @@ class Game:
     Animation FPS is set by Settings.ANIMATION_FPS.
     The animation FPS is independent of the Settings.FPS.
     '''
+    self.scoreboard.slide()
     self.entity_frame_trigger += 1
     self.bomb_frame_trigger += 1
     if self.entity_frame_trigger == Game.TARGET_ENTITY_FRAME:
@@ -120,6 +149,9 @@ class Game:
       for bomb in self.fields.bombs:
         if pygame.Rect.colliderect(explosion.rect, bomb.rect):
           bomb.update(0)
+      for detonator_bomb in self.fields.detonator_bombs:
+        if pygame.Rect.colliderect(explosion.rect, detonator_bomb.rect):
+          detonator_bomb.update(0)
 
   def __handle_entity_collision(self) -> None:
     for monster in self.monsters:
@@ -171,6 +203,7 @@ class Game:
       self.__render_map()
       self.__move_entities()
       self.__update_frames()
+      self.__update_extra_powerups()
       self.__handle_explosions()
       self.__handle_entity_collision()
       self.fields.update_bombs()
