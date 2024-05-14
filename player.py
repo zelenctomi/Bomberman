@@ -10,6 +10,8 @@ class Player:
     self.fields: Fields = fields
     self.alive: bool = True
     self.bomb: (Bomb | None) = None
+    self.delay: int = 0 # Delay will be 1s
+    self.countdown: bool = False
     self.diagonal_move: tuple[int, int] = (1, 0)
     self.invulnerability_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     self.speed_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
@@ -18,7 +20,7 @@ class Player:
     self.stats: dict[str, int] = {
       'bomb': 1,
       'explosion': 2,
-      'detonator': 0,
+      'detonator': 1,
       'invulnerability': 0,
       'speed': 0,
       'barricade': 0,
@@ -137,11 +139,10 @@ class Player:
       x: int = 0
       y: int = 0
       if key[self.controls['place']]:
-        if self.stats['bomb'] == 0 and self.stats['detonator'] > 0:
+        if self.stats['bomb'] == 0 and self.stats['detonator'] > 0 and self.delay == 0:
           self.__detonate_bombs()
-          self.stats['detonator'] = 0
           print("detonator")
-        elif self.stats['bomb'] > 0:
+        elif self.stats['bomb'] > 0 and self.delay == 0:
           self.__place_bomb()
       if key[self.controls['barricade']]:
         if self.stats['barricade'] > 0:
@@ -163,6 +164,9 @@ class Player:
         self.idle = False
       else:
         self.idle = True
+
+      if self.countdown:
+        self.__update_delay()
 
   def __move_or_collide(self, x: int, y: int) -> tuple[int, int]:
     potential_collisions: list[GameObject] = self.fields.get_surrounding_objects(self.rect)
@@ -294,19 +298,13 @@ class Player:
     if self.stats['bomb'] > 0 and not self.fields.field_has_bomb_or_wall(self.rect.x, self.rect.y):
       target: pygame.Rect = self.fields.snap_to_grid(self.rect)
       print("place")
-      if self.stats['detonator'] == 0:
-        bomb: Bomb = Bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
-        self.fields.set((target.x, target.y), bomb)
-        self.stats['bomb'] -= 1
-        self.bomb = bomb
-      else:
-        pass
-        # detonator_bomb: Detonator_bomb = Detonator_bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
-        # self.fields.set((target.x, target.y), detonator_bomb)
-        # self.stats['bomb'] -= 1
-        # self.detonator_bomb = detonator_bomb
-
-
+      bomb: Bomb = Bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
+      self.fields.set((target.x, target.y), bomb)
+      self.stats['bomb'] -= 1
+      print('bomb owner stats:', bomb.owner.stats)
+      self.bomb = bomb
+      self.__reset_delay()
+        
   def __place_barricade(self):
     if self.stats['barricade'] > 0:
       target: pygame.Rect = self.fields.snap_to_grid(self.rect)
@@ -325,8 +323,10 @@ class Player:
         self.stats['barricade'] -= 1
 
   def __detonate_bombs(self):
-    self.stats['detonator']
-
+    self.fields.detonate_bombs(1)
+    self.stats['detonator'] -= 1
+    self.__reset_delay()
+    
   def respawn(self, coord: tuple[int, int]) -> None:
     self.rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.alive = True
@@ -334,3 +334,25 @@ class Player:
     self.direction = 'down'
     self.prevDirection = 'down'
     self.surface = self.idleDown[0]
+    self.__reset_stats()
+
+  def __update_delay(self):
+    if self.delay > 0:
+      self.delay -= 1
+    else:
+      self.countdown = False
+
+  def __reset_delay(self):
+    self.delay = Settings.FPS
+    self.countdown = True
+
+  def __reset_stats(self):
+    self.stats = {
+      'bomb': 1,
+      'explosion': 2,
+      'detonator': 0,
+      'invulnerability': 0,
+      'speed': 0,
+      'barricade': 0,
+      'ghost': 0
+    }
