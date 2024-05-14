@@ -114,6 +114,9 @@ class Player:
       self.frame = 0
 
   def update_frame(self) -> None:
+    '''
+    Updates the player frames for the movement animation
+    '''
     if self.alive:
       self.__update_surface()
       if self.direction == self.prevDirection and self.frame < 7:
@@ -128,12 +131,19 @@ class Player:
         return
 
   def __update_surface(self) -> None:
+    '''
+    Updates player texture based on animation frame
+    '''
     event: str = 'walk' if not self.idle else 'idle'
     event = 'death' if not self.alive else event
     direction: str = self.direction
     self.surface = getattr(self, f'{event}{direction.capitalize()}')[self.frame]
 
   def move(self) -> None:
+    '''
+    Moves the player based on key press of they are alive.
+    Checks if collison happens and toggles idle of so
+    '''
     if self.alive:
       key: tuple[bool, ...] = pygame.key.get_pressed()
       x: int = 0
@@ -169,6 +179,9 @@ class Player:
         self.__update_delay()
 
   def __move_or_collide(self, x: int, y: int) -> tuple[int, int]:
+    '''
+    Tries to move the player if no collision happens
+    '''
     potential_collisions: list[GameObject] = self.fields.get_surrounding_objects(self.rect)
     self.__update_bomb_collision()
     for obj in potential_collisions:
@@ -182,10 +195,16 @@ class Player:
     return x, y
 
   def __update_position(self, x: int, y: int) -> None:
+    '''
+    Updates the player coordinates
+    '''
     self.rect.x += x
     self.rect.y += y
 
   def __collides(self, x: int, y: int, obj: GameObject) -> bool:
+    '''
+    Checks if a dummy objects collides with a GameObject that is not the player's bomb
+    '''
     dummy: pygame.Rect = self.rect.copy()
     dummy.x += x
     dummy.y += y
@@ -194,6 +213,9 @@ class Player:
     return False
 
   def __check_collision(self, x: int, y: int, obj) -> tuple[int, int]:  # TODO: Refactor
+    '''
+    Checks for collisions
+    '''
     collided: bool = False
     diagonal: bool = True if x != 0 and y != 0 else False
     if self.__collides(x, 0, obj):
@@ -239,17 +261,27 @@ class Player:
     return slideX, slideY
 
   def __check_powerup(self, obj: GameObject) -> None:
+    '''
+    Checks if an object is a Powerup. If so, then applies its effects
+    and removes it from the fields matrix
+    '''
     if isinstance(obj, Powerup):
       self.__apply_powerup(obj)
       self.fields.remove((obj.rect.x, obj.rect.y), obj)
       print('applied')
 
   def __update_bomb_collision(self) -> None:
+    '''
+    Checks if the player is no longer standing on their own bomb
+    '''
     potential_collisions: list[GameObject] = self.fields.get(self.rect.x, self.rect.y)
     if self.bomb != None and self.bomb not in potential_collisions:
       self.bomb = None
 
   def __apply_powerup(self, powerup: Powerup) -> None:
+    '''
+    Applies the Powerup to the player
+    '''
     stat: str
     value: int
     stat, value = powerup.get_bonus()
@@ -328,6 +360,9 @@ class Player:
     self.__reset_delay()
     
   def respawn(self, coord: tuple[int, int]) -> None:
+    '''
+    Respawns the player
+    '''
     self.rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.alive = True
     self.frame = 0

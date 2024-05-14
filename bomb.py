@@ -20,7 +20,11 @@ class Bomb:
       self.timer = self.timer * value
     return self.timer
 
+ 
   def explode(self, walls: list[pygame.Rect], crumbly: list[pygame.Rect]) -> list[Explosion]:
+    '''
+    Detonates the bomb, spawning and explosion cascade starting from the bomb's field
+    '''
     return Explosion((self.rect.x, self.rect.y), walls, crumbly).initiate(self.owner.stats['explosion'])
 
   def update_frame(self) -> None:

@@ -13,6 +13,9 @@ class Spawner:
     self.player_spawns: list[tuple[int, int]] = self.__get_player_spawn_points()
 
   def spawn_players(self, count: int) -> list[Player]:
+    '''
+    Fills the player list with players that have set spawn locations and movement keys
+    '''
     for i in range(count):
       spawn: tuple[int, int] = self.player_spawns[i]
       player: Player = Player(spawn, self.fields, Settings.CONTROLS[i])
@@ -20,6 +23,9 @@ class Spawner:
     return self.players
 
   def spawn_monsters(self, count: int) -> list[Monster]:
+    '''
+    Fills the monster list with monsters that have random spawn locations
+    '''
     spawn_points: list[tuple[int, int]] = self.__get_monster_spawn_points()
     for _ in range(count):
       spawn: tuple[int, int] = spawn_points[random.randint(0, len(spawn_points) - 1)]
@@ -60,10 +66,16 @@ class Spawner:
     return spawn_points
   
   def respawn_players(self, players: list[Player]) -> None:
+    '''
+    Respawns all players to their default spawnpoints
+    '''
     for i in range(len(players)):
       players[i].respawn(self.player_spawns[i])
 
   def respawn_monsters(self, monsters: list[Monster]) -> None:
+    '''
+    Respawns all monsters to random spawnpoints
+    '''
     spawn_points: list[tuple[int, int]] = self.__get_monster_spawn_points()
     for i in range(len(monsters)):
       monsters[i].respawn(spawn_points[i])

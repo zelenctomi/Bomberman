@@ -22,6 +22,9 @@ class Fields:
     self.explosions: list[Explosion] = []
 
   def get_walls(self) -> list[Wall]:
+    '''
+    Returns a list of Walls
+    '''
     return [wall for wall in self.walls if not isinstance(wall, Crumbly_wall)]
 
   def get_crumbly_walls(self) -> list[Wall]:
@@ -31,6 +34,9 @@ class Fields:
     return [wall for wall in self.walls if isinstance(wall, Crumbly_wall) or isinstance(wall, Barricade_wall)]
 
   def get(self, x: int, y: int) -> list[GameObject]:
+    '''
+    Returns a list of GameObjects that can be found on a tile
+    '''
     objects: list[GameObject] = []
     target: pygame.Rect = self.snap_to_grid(pygame.Rect(x, y, Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     objects.extend(self.fields[target.y // Settings.BLOCK_SIZE][target.x // Settings.BLOCK_SIZE])
@@ -44,6 +50,9 @@ class Fields:
     return objects
 
   def get_surrounding_objects(self, obj: pygame.Rect) -> list[GameObject]:
+    '''
+    Returns a list of GameObjects that can be found around a tile
+    '''
     target: pygame.Rect = self.snap_to_grid(obj)
     potential_collisons: list[GameObject] = []
     for row in range(-1, 2):
@@ -55,6 +64,9 @@ class Fields:
     return potential_collisons
 
   def set(self, coord: tuple[int, int], obj: GameObject) -> None:
+    '''
+    Appends objects to the fields matrix and to the lists of Walls, Powerups and Bombs
+    '''
     self.fields[coord[1] // Settings.BLOCK_SIZE][coord[0] // Settings.BLOCK_SIZE].append(obj)
     if isinstance(obj, Wall):
       self.walls.append(obj)
@@ -64,6 +76,9 @@ class Fields:
       self.bombs.append(obj)
 
   def remove(self, coord: tuple[int, int], obj: GameObject) -> None:
+    '''
+    Removes specific objects from lists of Walls, Powerups and Bombs
+    '''
     self.fields[coord[1] // Settings.BLOCK_SIZE][coord[0] // Settings.BLOCK_SIZE].remove(obj)
     if isinstance(obj, Wall):
       self.walls.remove(obj)
@@ -85,6 +100,9 @@ class Fields:
     return any(isinstance(obj, Bomb) for obj in self.get(x, y)) or any(isinstance(obj, Wall) for obj in self.get(x, y))
 
   def load_map(self, lvl: int) -> None:
+    '''
+    Loads a preset map from a .json file. Updates the walls list
+    '''
     WALL: int = 1
     CRUMBLY: int = 2
     with open(f'map.json', 'r') as file:
@@ -104,12 +122,19 @@ class Fields:
             self.fields[y][x].append(wall)
 
   def __drop_powerup(self, coord: tuple[int, int]) -> None:
+    '''
+    Calls get_powerup for a random chance to generate a Powerup. If a Powerup is generated, then it is appended to the
+    fields matrix and powerups list
+    '''
     powerup: (Powerup | None) = Powerups.get_powerup(
       (coord[0] + Settings.POWERUP_OFFSET, coord[1] + Settings.POWERUP_OFFSET), Settings.POWERUP_SIZE)
     if powerup is not None:
       self.set(coord, powerup)
 
   def update_bombs(self) -> None:
+    '''
+    Detonates the bomb if the timer runs out.
+    '''
     for bomb in self.bombs:
       if bomb.owner.stats['detonator'] == 0:
         if bomb.update() < 0:
@@ -131,6 +156,9 @@ class Fields:
         self.__destroy_crumbly_and_barricade_walls()
 
   def update_explosions(self) -> None:
+    '''
+    Removes Explosions if their lifetime runs out
+    '''
     for explosion in self.explosions:
       if explosion.update() == 0:
         self.explosions.remove(explosion)
@@ -145,9 +173,15 @@ class Fields:
             self.__drop_powerup(coord)
 
   def no_bombs_active(self) -> bool:
+    '''
+    Checks if there are any Bombs or Explosions on the map
+    '''
     return len(self.bombs) == 0 and len(self.explosions) == 0
   
   def reload_map(self, lvl: int) -> None:
+    '''
+    Clears the fields and objects lists then loads a map
+    '''
     self.fields = [[[] for _ in range(Settings.WIDTH // Settings.BLOCK_SIZE)]
                    for _ in range((Settings.HEIGHT // Settings.BLOCK_SIZE) - 1)]
     self.walls = []
