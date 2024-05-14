@@ -9,7 +9,10 @@ class Explosion: # Typehint -> list[Explosion] doesn't work on recursive methods
     self.walls: list[pygame.Rect] = walls
     self.crumbly: list[pygame.Rect] = crumbly
 
-  def spread(self, direction: str, offset: int, times: int): 
+  def spread(self, direction: str, offset: int, times: int):
+    '''
+    Spreads the explosion recursively in a direction
+    ''' 
     explosions: list[Explosion] = []
     if times > 0:
       if direction == "UP":
@@ -31,6 +34,9 @@ class Explosion: # Typehint -> list[Explosion] doesn't work on recursive methods
     return []
 
   def initiate(self, times: int):
+    '''
+    Starts the explosion from a tile. The explosion spreads in four directions
+    '''
     return [Explosion((self.rect.x, self.rect.y), self.walls, self.crumbly)]  \
             + self.spread("UP", 50, times)                                    \
             + self.spread("DOWN", 50, times)                                  \
@@ -38,5 +44,8 @@ class Explosion: # Typehint -> list[Explosion] doesn't work on recursive methods
             + self.spread("RIGHT", 50, times)
   
   def update(self) -> int:
+    '''
+    Decrements the lifetime of an explosion
+    '''
     self.lifetime -= 1
     return self.lifetime
