@@ -21,13 +21,22 @@ class Gameover:
                                       Settings.HEIGHT // 2 - self.text.get_height() // 2 - 300)
 
   def __fade_in(self):
+    '''
+    Fades in the gameover screen
+    '''
     self.surface.set_alpha(self.transparency)
 
   def __text_fade_in_down(self):
+    '''
+    Moves the gameover screen during fade in
+    '''
     self.text.set_alpha(self.transparency)
     self.text_pos = (self.text_pos[0], self.text_pos[1] + 3)
 
   def __proceed_text_flash(self):
+    '''
+    Implements text fade in
+    '''
     transparency: int | None = self.proceed_text.get_alpha()
     transparency = 255 if transparency is None else transparency
     if self.proceed_text_fade_in:
@@ -40,6 +49,9 @@ class Gameover:
         self.proceed_text_fade_in = True
 
   def render(self):
+    '''
+    Renders gameover screen
+    '''
     if self.transparency < 120:
       self.__fade_in()
     if self.transparency < 253:

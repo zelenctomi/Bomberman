@@ -19,6 +19,9 @@ class Scoreboard:
     self.__load_assets()
 
   def __load_assets(self):
+    '''
+    Loads the textures for the scoreboard
+    '''
     self.surface: pygame.Surface = pygame.image.load('Assets/Scoreboard/bar.png').convert_alpha()
     colors: list[tuple[int, int, int]] = [Settings.P2_COLOR, Settings.P3_COLOR]
     for i in range(self.player_count):
@@ -29,18 +32,27 @@ class Scoreboard:
       self.heads.append(surface)
 
   def __create_rects(self) -> tuple[pygame.Rect, pygame.Rect]:
+    '''
+    Creates Rect objects for the scoreboard parts
+    '''
     size: tuple[int, int] = (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE)
     heads: pygame.Rect = pygame.Rect((0, 0), size)
     points: pygame.Rect = pygame.Rect((Settings.BLOCK_SIZE, 0), size)
     return (heads, points)
 
   def __create_points(self) -> list[pygame.Surface]:
+    '''
+    Creates the point texts
+    '''
     points: list[pygame.Surface] = []
     for i in range(self.player_count):
       points.append(self.font.render(f'{self.scores[i]}', False, Settings.WHITE))
     return points
 
   def __create_containers(self) -> list[tuple[pygame.Surface, pygame.Rect]]:
+    '''
+    Creates containers for the scoreboard items
+    '''
     ITEMS: int = 3
     centerY: int = Settings.SCOREBOARD_HEIGHT - Settings.BLOCK_SIZE
     size: tuple[int, int] = (Settings.BLOCK_SIZE * ITEMS, Settings.BLOCK_SIZE)
@@ -54,6 +66,9 @@ class Scoreboard:
     return containers
 
   def render(self):
+    '''
+    Renders the textures to the scoreboard
+    '''
     for i in range(self.player_count):
       text_size: tuple[int, int] = self.points[i].get_size()
       point_pos: tuple[int, int] = (self.rects[1].centerx - text_size[0] // 2, self.rects[1].centery - text_size[1] // 2)
@@ -64,6 +79,9 @@ class Scoreboard:
     self.screen.blit(self.surface, self.pos)
 
   def update(self, player: int):
+    '''
+    Updates the scoreboard by incrementing points
+    '''
     self.scores[player] += 1
     self.points[player] = self.font.render(f'{self.scores[player]}', False, Settings.WHITE)
     self.containers[player][0].fill(Settings.PURPLE) # Clear the container
