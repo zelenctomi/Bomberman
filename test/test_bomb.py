@@ -50,16 +50,13 @@ class TestBombClass(unittest.TestCase):
         test_bomb.update_frame()
         self.assertEqual(test_bomb.frame, 0)
 
-    def test_update_surface_1(self):
+    def test_update_surface(self):
         test_fields: Fields = Fields()
         test_player: Player = Player((0, 0), test_fields, Settings.P1_CONTROLS)
         test_player.load_assets(0)
         test_bomb: Bomb = Bomb((0, 0), 50, test_player)
-        test_surface = pygame.image.load('assets/Walls/Default/wall.png').convert_alpha()
-        test_bomb.update_surface(test_surface)
-        self.assertEqual(test_bomb.surface, test_surface)
-
-
+        self.assertEqual(test_bomb.surface, test_player.bomb_frame)
+        
 if __name__ == '__main__':
     unittest.main()
 
