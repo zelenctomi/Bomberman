@@ -16,7 +16,7 @@ class TestPowerupsClass(unittest.TestCase):
 
     def test_get_powerup(self):
         drop = Powerups.get_powerup((0, 0), 50)
-        self.assertTrue(type(drop) in [Longer_explosion, Extra_bomb, type(None)])
+        self.assertTrue(type(drop) in [Longer_explosion, Extra_bomb, Detonator, Invulnerability, Speed, Barricade, Ghost, type(None)])
     
 if __name__ == '__main__':
     unittest.main()
