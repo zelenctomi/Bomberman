@@ -13,6 +13,9 @@ class Powerups:
     
   @staticmethod
   def get_powerup(coord: tuple[int, int], size: int) -> (Powerup | None):
+    '''
+    Rolls a chance to return or return with a random Powerup
+    '''
     POWERUPS: list[Powerup] = [Extra_bomb(coord, size), 
                                Longer_explosion(coord, size), 
                                Detonator(coord, size),

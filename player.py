@@ -109,6 +109,9 @@ class Player:
     self.surface = self.idleDown[0]
 
   def die(self) -> None:
+    '''
+    Kills the player if they don't have an active invulnerability buff
+    '''
     if self.alive and self.stats['invulnerability'] == 0:
       self.alive = False
       self.frame = 0
@@ -294,6 +297,10 @@ class Player:
       self.ghost_timer = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     
   def check_extra_powerups(self):
+    '''
+    Calls the update method for invulnerability, speed and ghost,
+    decreasing their lifetime and removing them, if they expire
+    '''
     if self.stats['invulnerability'] > 0:
       self.__update_invulnerability()
     if self.stats['speed'] > 0:
@@ -302,16 +309,25 @@ class Player:
       self.__update_ghost()
 
   def __update_invulnerability(self):
+    '''
+    Decreasing the lifetime of the invulnerability buff and removes it, if it expires
+    '''
     self.invulnerability_timer -= 1
     if self.invulnerability_timer == 0:
       self.stats['invulnerability'] = 0
 
   def __update_speed(self):
+    '''
+    Decreasing the lifetime of the speed buff and removes it, if it expires
+    '''
     self.speed_timer -= 1
     if self.speed_timer == 0:
       self.stats['speed'] = 0
 
   def __update_ghost(self):
+    '''
+    Decreasing the ghost of the speed buff and removes it, if it expires
+    '''
     self.ghost_timer -= 1
     if self.ghost_timer == 0:
       self.stats['ghost'] = 0
@@ -323,10 +339,16 @@ class Player:
             self.player_snap_to_grid()
 
   def player_snap_to_grid(self):
+    '''
+    Places the player to a valid field if they wander off using ghost and it expires
+    '''
     target: pygame.Rect = self.fields.snap_to_grid(self.rect)
     self.rect = pygame.Rect((target.x, target.y), (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
 
   def __place_bomb(self) -> None:
+    '''
+    Places a bomb under the player on a field without bomb or wall
+    '''
     if self.stats['bomb'] > 0 and not self.fields.field_has_bomb_or_wall(self.rect.x, self.rect.y):
       target: pygame.Rect = self.fields.snap_to_grid(self.rect)
       print("place")
@@ -338,6 +360,9 @@ class Player:
       self.__reset_delay()
         
   def __place_barricade(self):
+    '''
+    Places a barricade next to the player on the field that the player is facing
+    '''
     if self.stats['barricade'] > 0:
       target: pygame.Rect = self.fields.snap_to_grid(self.rect)
       if self.direction == 'right':
@@ -355,6 +380,9 @@ class Player:
         self.stats['barricade'] -= 1
 
   def __detonate_bombs(self):
+    '''
+    Detonates the bombs placed during the detonator buff
+    '''
     self.fields.detonate_bombs(1)
     self.stats['detonator'] -= 1
     self.__reset_delay()
@@ -372,16 +400,25 @@ class Player:
     self.__reset_stats()
 
   def __update_delay(self):
+    '''
+    Decrements the delay if it is greater than zero, else switches the countdown to false
+    '''
     if self.delay > 0:
       self.delay -= 1
     else:
       self.countdown = False
 
   def __reset_delay(self):
+    '''
+    Sets the delay to the FPS and the countdown to true
+    '''
     self.delay = Settings.FPS
     self.countdown = True
 
   def __reset_stats(self):
+    '''
+    Resets the stats so that the Powerup buffs are nullified
+    '''
     self.stats = {
       'bomb': 1,
       'explosion': 2,

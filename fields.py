@@ -97,6 +97,9 @@ class Fields:
                        Settings.BLOCK_SIZE, Settings.BLOCK_SIZE)
   
   def field_has_bomb_or_wall(self, x: int, y: int) -> bool:
+    '''
+    Returns if the game field at the given coordinates has a Bomb or Wall object
+    '''
     return any(isinstance(obj, Bomb) for obj in self.get(x, y)) or any(isinstance(obj, Wall) for obj in self.get(x, y))
 
   def load_map(self, lvl: int) -> None:
@@ -145,6 +148,9 @@ class Fields:
           self.__destroy_crumbly_and_barricade_walls()
   
   def detonate_bombs(self, id) -> None:
+    '''
+    Method used for when the player has detonator. Detonates bombs, spawning explosions
+    '''
     for bomb in self.bombs:
       print(bomb.owner)
     for bomb in self.bombs:
@@ -164,6 +170,9 @@ class Fields:
         self.explosions.remove(explosion)
 
   def __destroy_crumbly_and_barricade_walls(self) -> None:
+    '''
+    Destroys Crumbly_walls and Barricade_walls if they collide with an explosion
+    '''
     for wall in self.get_crumbly_and_barricade_walls():
       for explosion in self.explosions:
         if pygame.Rect.colliderect(wall.rect, explosion.rect):
