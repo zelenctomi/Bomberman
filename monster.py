@@ -69,7 +69,7 @@ class Monster:
     '''
     self.is_alive = False
 
-  def __change_direction(self) -> None:
+  def _change_direction(self) -> None:
     '''
     Changes the direction of the monster randomly
     '''
@@ -100,7 +100,7 @@ class Monster:
         return
     self._update_position(self.x_direction, self.y_direction)
 
-  def __randomize_direction(self) -> None:
+  def _randomize_direction(self) -> None:
     '''
     Rolls a chance to change the direction of the monster, then
     calls a function to randomise the new direction if the roll was
