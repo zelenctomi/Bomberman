@@ -18,9 +18,9 @@ class Player:
     self.ghost_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     # Stats #
     self.stats: dict[str, int] = {
-      'bomb': 3,
+      'bomb': 1,
       'explosion': 2,
-      'detonator': 1,
+      'detonator': 0,
       'invulnerability': 0,
       'speed': 0,
       'barricade': 0,
