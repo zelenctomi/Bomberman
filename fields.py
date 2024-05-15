@@ -25,7 +25,7 @@ class Fields:
     '''
     Returns a list of Walls
     '''
-    return [wall for wall in self.walls if not isinstance(wall, Crumbly_wall)]
+    return [wall for wall in self.walls if not isinstance(wall, Crumbly_wall) and not isinstance(wall, Barricade_wall)]
 
   def get_crumbly_walls(self) -> list[Wall]:
     return [wall for wall in self.walls if isinstance(wall, Crumbly_wall)]

@@ -23,7 +23,7 @@ class Player:
       'detonator': 1,
       'invulnerability': 0,
       'speed': 0,
-      'barricade': 0,
+      'barricade': 1,
       'ghost': 0
     }
     # Animation #
