@@ -139,13 +139,12 @@ class Fields:
     Detonates the bomb if the timer runs out.
     '''
     for bomb in self.bombs:
-      if bomb.owner.stats['detonator'] == 0:
-        if bomb.update() < 0:
-          self.explosions.extend(bomb.explode([wall.rect for wall in self.get_walls()],
-                                              [wall.rect for wall in self.get_crumbly_and_barricade_walls()]))
-          self.remove((bomb.rect.x, bomb.rect.y), bomb)
-          bomb.owner.stats['bomb'] += 1
-          self.__destroy_crumbly_and_barricade_walls()
+      if bomb.update() < 0:
+        self.explosions.extend(bomb.explode([wall.rect for wall in self.get_walls()],
+                                            [wall.rect for wall in self.get_crumbly_and_barricade_walls()]))
+        self.remove((bomb.rect.x, bomb.rect.y), bomb)
+        bomb.owner.stats['bomb'] += 1
+        self.__destroy_crumbly_and_barricade_walls()
 
   def update_explosions(self) -> None:
     '''
