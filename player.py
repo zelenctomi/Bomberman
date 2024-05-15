@@ -154,7 +154,6 @@ class Player:
       if key[self.controls['place']]:
         if self.stats['bomb'] == 0 and self.stats['detonator'] > 0 and self.delay == 0:
           self.__detonate_bombs()
-          print("detonator")
         elif self.stats['bomb'] > 0 and self.delay == 0:
           self.__place_bomb()
       if key[self.controls['barricade']]:
@@ -273,7 +272,6 @@ class Player:
     if isinstance(obj, Powerup):
       self.__apply_powerup(obj)
       self.fields.remove((obj.rect.x, obj.rect.y), obj)
-      print('applied')
 
   def __update_bomb_collision(self) -> None:
     '''
@@ -351,13 +349,12 @@ class Player:
     '''
     Places a bomb under the player on a field without bomb or wall
     '''
-    if self.stats['bomb'] > 0 and not self.fields.field_has_bomb_or_wall(self.rect.x, self.rect.y):
+    target: pygame.Rect = self.fields.snap_to_grid(self.rect)
+    if self.stats['bomb'] > 0 and not self.fields.field_has_bomb_or_wall(target.x, target.y):
       target: pygame.Rect = self.fields.snap_to_grid(self.rect)
-      print("place")
       bomb: Bomb = Bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
       self.fields.set((target.x, target.y), bomb)
       self.stats['bomb'] -= 1
-      print('bomb owner stats:', bomb.owner.stats)
       self.bomb = bomb
       self.__reset_delay()
         

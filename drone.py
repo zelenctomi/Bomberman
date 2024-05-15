@@ -35,7 +35,6 @@ class Drone(Monster):
     empty_tile_ahead: bool = False
     if self.target and self.target.x == self.hitbox.x and self.target.y == self.hitbox.y:
       self.target = None
-      print('target reached')
     elif self.target:
       return True
 
@@ -58,7 +57,6 @@ class Drone(Monster):
         if len(tile) == 0:
           empty_tile_ahead = True
           self.target = pygame.Rect(x, y, Settings.BLOCK_SIZE, Settings.BLOCK_SIZE)
-          print(f'{self.hitbox.x} {self.hitbox.y} -> target set: {self.target.x} {self.target.y}')
           break
     return empty_tile_ahead
 
