@@ -20,10 +20,10 @@ class Player:
     self.stats: dict[str, int] = {
       'bomb': 1,
       'explosion': 2,
-      'detonator': 1,
+      'detonator': 0,
       'invulnerability': 0,
       'speed': 0,
-      'barricade': 1,
+      'barricade': 0,
       'ghost': 0
     }
     # Animation #
@@ -170,6 +170,8 @@ class Player:
         y += 1
 
       x, y = self.__move_or_collide(x, y)
+      if self.stats['speed'] > 0:
+        x, y = self.__move_or_collide(x, y)
 
       if x != 0 or y != 0:
         self.prevDirection = self.direction
