@@ -16,7 +16,7 @@ class TestMonsterClass(unittest.TestCase):
         monster_instance = Monster((0,0), test_fields)
         monster_instance.load_assets()
         monster_instance.die()
-        self.assertEqual(monster_instance.is_alive, False)
+        self.assertEqual(monster_instance.alive, False)
     
     def test_change_direction_1(self):
         test_fields: Fields = Fields()
