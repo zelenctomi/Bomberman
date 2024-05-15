@@ -18,9 +18,9 @@ class Player:
     self.ghost_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     # Stats #
     self.stats: dict[str, int] = {
-      'bomb': 1,
+      'bomb': 3,
       'explosion': 2,
-      'detonator': 0,
+      'detonator': 1,
       'invulnerability': 0,
       'speed': 0,
       'barricade': 0,
@@ -385,7 +385,10 @@ class Player:
     '''
     Detonates the bombs placed during the detonator buff
     '''
-    self.fields.detonate_bombs(1)
+    for bomb in self.fields.bombs:
+      if bomb.owner == self:
+        bomb.detonator = False
+        bomb.update(0)
     self.stats['detonator'] -= 1
     self.__reset_delay()
     

@@ -146,20 +146,6 @@ class Fields:
           self.remove((bomb.rect.x, bomb.rect.y), bomb)
           bomb.owner.stats['bomb'] += 1
           self.__destroy_crumbly_and_barricade_walls()
-  
-  def detonate_bombs(self, id) -> None:
-    '''
-    Method used for when the player has detonator. Detonates bombs, spawning explosions
-    '''
-    for bomb in self.bombs:
-      print(bomb.owner)
-    for bomb in self.bombs:
-      # if bomb.id == id:
-        self.explosions.extend(bomb.explode([wall.rect for wall in self.get_walls()],
-                                            [wall.rect for wall in self.get_crumbly_and_barricade_walls()]))
-        self.remove((bomb.rect.x, bomb.rect.y), bomb)
-        bomb.owner.stats['bomb'] += 1
-        self.__destroy_crumbly_and_barricade_walls()
 
   def update_explosions(self) -> None:
     '''
