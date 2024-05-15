@@ -92,7 +92,7 @@ class Game:
         self.screen.blit(self.ghost_surface, powerup.rect)
 
     for monster in self.monsters:
-      if monster.is_alive:
+      if monster.alive:
         self.screen.blit(monster.surface, monster.rect)
 
     for player in self.players:
@@ -152,7 +152,6 @@ class Game:
       for monster in self.monsters:
         if pygame.Rect.colliderect(monster.rect, explosion.rect):
           monster.die()
-          self.monsters.remove(monster)  # So the monster doesn't get drawn after death
       for bomb in self.fields.bombs:
         if pygame.Rect.colliderect(explosion.rect, bomb.rect):
           bomb.update(0)
@@ -162,9 +161,10 @@ class Game:
     Checks if monsters collide with players. If so, then kills the affected players
     '''
     for monster in self.monsters:
-      for player in self.players:
-        if pygame.Rect.colliderect(player.rect, monster.rect):
-          player.die()
+      if monster.alive:
+        for player in self.players:
+          if pygame.Rect.colliderect(player.rect, monster.hitbox):
+            player.die()
 
   def __handle_game_over(self) -> None:
     '''

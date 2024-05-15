@@ -1,6 +1,7 @@
 import random
 from player import Player
 from monster import Monster
+from drone import Drone
 from fields import Fields
 from settings import Settings
 
@@ -29,9 +30,14 @@ class Spawner:
     spawn_points: list[tuple[int, int]] = self.__get_monster_spawn_points()
     for _ in range(count):
       spawn: tuple[int, int] = spawn_points[random.randint(0, len(spawn_points) - 1)]
-      monster: Monster = Monster(spawn, self.fields)
+      monster: Monster = self.__get_random_monster(spawn)
       self.monsters.append(monster)
+    # The Drone should have the biggest z-index, so it should be at the end of the list
+    self.monsters.sort(key=lambda monster: isinstance(monster, Drone))
     return self.monsters
+  
+  def __get_random_monster(self, spawn: tuple[int, int]) -> Monster:
+    return random.choice([Monster(spawn, self.fields), Drone(spawn, self.fields)])
 
   def __get_player_spawn_points(self) -> list[tuple[int, int]]:
     '''
