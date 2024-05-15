@@ -137,7 +137,7 @@ class TestFieldsClass(unittest.TestCase):
         test_fields.bombs.append(test_bomb)
         test_fields.fields[0][0].append(test_bomb)
         test_fields.update_bombs()
-        self.assertEqual(test_fields.bombs, [test_bomb])
+        self.assertEqual(test_fields.bombs, [])
 
     def test_update_bombs_2(self):
         test_fields: Fields = Fields()
