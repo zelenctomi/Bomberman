@@ -22,7 +22,7 @@ class TestBombClass(unittest.TestCase):
         test_bomb.update()
         test_bomb.update()
         test_bomb.update()
-        self.assertEqual(test_bomb.timer, 180)
+        self.assertEqual(test_bomb.timer, 177)
 
     def test_explode_1(self):
         test_fields: Fields = Fields()
@@ -39,7 +39,7 @@ class TestBombClass(unittest.TestCase):
         test_player.load_assets(0)
         test_bomb: Bomb = Bomb((0, 0), 50, test_player)
         test_bomb.update_frame()
-        self.assertEqual(test_bomb.frame, 0)
+        self.assertEqual(test_bomb.frame, 1)
 
     def test_update_frame_2(self):
         test_fields: Fields = Fields()
@@ -48,7 +48,7 @@ class TestBombClass(unittest.TestCase):
         test_bomb: Bomb = Bomb((0, 0), 50, test_player)
         test_bomb.update_frame()
         test_bomb.update_frame()
-        self.assertEqual(test_bomb.frame, 0)
+        self.assertEqual(test_bomb.frame, 2)
 
     def test_update_surface(self):
         test_fields: Fields = Fields()
