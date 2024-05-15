@@ -27,11 +27,11 @@ class Settings:
 
   # Player #
   P1_CONTROLS: dict[str, int] = {'left': pygame.K_a, 'right': pygame.K_d,
-                                 'up': pygame.K_w, 'down': pygame.K_s, 'place': pygame.K_SPACE}
+                                 'up': pygame.K_w, 'down': pygame.K_s, 'place': pygame.K_SPACE, 'barricade': pygame.K_e}
   P2_CONTROLS: dict[str, int] = {'left': pygame.K_LEFT, 'right': pygame.K_RIGHT,
-                                 'up': pygame.K_UP, 'down': pygame.K_DOWN, 'place': pygame.K_RETURN}
+                                 'up': pygame.K_UP, 'down': pygame.K_DOWN, 'place': pygame.K_RETURN, 'barricade': pygame.K_9}
   P3_CONTROLS: dict[str, int] = {'left': pygame.K_j, 'right': pygame.K_l,
-                                 'up': pygame.K_i, 'down': pygame.K_k, 'place': pygame.K_o}
+                                 'up': pygame.K_i, 'down': pygame.K_k, 'place': pygame.K_o, 'barricade': pygame.K_p}
   CONTROLS: list[dict[str, int]] = [P1_CONTROLS, P2_CONTROLS, P3_CONTROLS]
   # These colors are subtracted from the original to create new ones
   P2_COLOR: tuple[int, int, int] = (50, 0, 75)
@@ -40,3 +40,8 @@ class Settings:
   # Bomb #
   BOMB_TIMER: int = 3 # Seconds
   BOMB_FRAMES: int = 12
+
+  # Extra powerups
+  EXTRA_POWERUPS_TIMER: int = 12
+  SCOREBOARD_RECT_1: tuple[int, int] = (0, 635)
+

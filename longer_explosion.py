@@ -7,4 +7,7 @@ class Longer_explosion(Powerup):
     super().__init__(coord, size)
 
   def get_bonus(self) -> tuple[str, int]:
+    '''
+    Serves to apply the bonus upon pickup
+    '''
     return "explosion", 1

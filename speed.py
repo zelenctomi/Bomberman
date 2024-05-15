@@ -1,8 +1,8 @@
-import pygame
 from powerup import Powerup
 
 
-class Extra_bomb(Powerup):
+class Speed(Powerup):
+
   def __init__(self, coord: tuple[int, int], size: int):
     super().__init__(coord, size)
 
@@ -10,4 +10,4 @@ class Extra_bomb(Powerup):
     '''
     Serves to apply the bonus upon pickup
     '''
-    return "bomb", 1
+    return "speed", 1

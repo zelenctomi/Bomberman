@@ -63,6 +63,9 @@ class Menu():
     self.__create_maps()
 
   def __render(self) -> None:
+    '''
+    Renders menu screen
+    '''
     self.__apply_effects()
     self.screen.blit(self.background, (0, 0))
     self.screen.blit(self.title_text, self.title_pos)
@@ -72,6 +75,9 @@ class Menu():
     self.__render_maps()
 
   def __apply_effects(self) -> None:
+    '''
+    Renders the players' text and position on the menu
+    '''
     if self.player_count == 2:
       self.p2_text = self.p2_hover_text
       self.p3_text = self.p3_normal_text
@@ -86,6 +92,9 @@ class Menu():
       self.pointer_pos = self.pointer_p3_pos
 
   def __create_maps(self) -> None:
+    '''
+    Loads maps from map.json
+    '''
     WALL: int = 1
     CRUMBLY: int = 2
     with open('map.json', 'r') as file:
@@ -107,6 +116,9 @@ class Menu():
       self.map_pos = (self.map_pos[0] + self.map_size[0] + 75, self.map_pos[1])
 
   def __render_maps(self) -> None:
+    '''
+    Renders maps on the main menu selection screen
+    '''
     THICKNESS: int = 5
     for map in self.maps:
       lvl: int = self.maps.index(map) + 1
@@ -129,6 +141,9 @@ class Menu():
             self.screen.blit(self.wall_assets[0], wall.rect)
 
   def __handle_mouse_hover(self, mouse_pos: tuple[int, int]) -> None:
+    '''
+    Handles hovering over the items in the menu screen
+    '''
     mouse_on_p2: bool = pygame.Rect.collidepoint(pygame.Rect(self.p2_pos, self.p2_text.get_size()), mouse_pos)
     mouse_on_p3: bool = pygame.Rect.collidepoint(pygame.Rect(self.p3_pos, self.p3_text.get_size()), mouse_pos)
     if mouse_on_p2:
@@ -141,6 +156,9 @@ class Menu():
         self.level = self.maps.index(map) + 1
 
   def __handle_key_arrow(self, key: int) -> None:
+    '''
+    Handles navigating the menu via the arrow keys
+    '''
     if key == pygame.K_UP:
       self.player_count = 2
     elif key == pygame.K_DOWN:
@@ -159,6 +177,9 @@ class Menu():
     return event.type == pygame.MOUSEBUTTONDOWN or (event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN)
 
   def run(self) -> None:
+    '''
+    Initiates the menu and starts the game if a selection is made
+    '''
     start: bool = False
     while not start:
       self.__render()

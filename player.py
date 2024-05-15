@@ -10,12 +10,21 @@ class Player:
     self.fields: Fields = fields
     self.alive: bool = True
     self.bomb: (Bomb | None) = None
+    self.delay: int = 0 # Delay will be 1s
+    self.countdown: bool = False
     self.diagonal_move: tuple[int, int] = (1, 0)
+    self.invulnerability_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
+    self.speed_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
+    self.ghost_timer: int = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
     # Stats #
     self.stats: dict[str, int] = {
       'bomb': 1,
       'explosion': 2,
-      'detonator': 0
+      'detonator': 1,
+      'invulnerability': 0,
+      'speed': 0,
+      'barricade': 0,
+      'ghost': 0
     }
     # Animation #
     self.frame: int = 0
@@ -100,11 +109,17 @@ class Player:
     self.surface = self.idleDown[0]
 
   def die(self) -> None:
-    if self.alive:
+    '''
+    Kills the player if they don't have an active invulnerability buff
+    '''
+    if self.alive and self.stats['invulnerability'] == 0:
       self.alive = False
       self.frame = 0
 
   def update_frame(self) -> None:
+    '''
+    Updates the player frames for the movement animation
+    '''
     if self.alive:
       self.__update_surface()
       if self.direction == self.prevDirection and self.frame < 7:
@@ -119,18 +134,32 @@ class Player:
         return
 
   def __update_surface(self) -> None:
+    '''
+    Updates player texture based on animation frame
+    '''
     event: str = 'walk' if not self.idle else 'idle'
     event = 'death' if not self.alive else event
     direction: str = self.direction
     self.surface = getattr(self, f'{event}{direction.capitalize()}')[self.frame]
 
   def move(self) -> None:
+    '''
+    Moves the player based on key press of they are alive.
+    Checks if collison happens and toggles idle of so
+    '''
     if self.alive:
       key: tuple[bool, ...] = pygame.key.get_pressed()
       x: int = 0
       y: int = 0
       if key[self.controls['place']]:
-        self.__place_bomb()
+        if self.stats['bomb'] == 0 and self.stats['detonator'] > 0 and self.delay == 0:
+          self.__detonate_bombs()
+          print("detonator")
+        elif self.stats['bomb'] > 0 and self.delay == 0:
+          self.__place_bomb()
+      if key[self.controls['barricade']]:
+        if self.stats['barricade'] > 0:
+          self.__place_barricade()
       if key[self.controls['left']]:
         x += -1
       if key[self.controls['right']]:
@@ -149,7 +178,13 @@ class Player:
       else:
         self.idle = True
 
+      if self.countdown:
+        self.__update_delay()
+
   def __move_or_collide(self, x: int, y: int) -> tuple[int, int]:
+    '''
+    Tries to move the player if no collision happens
+    '''
     potential_collisions: list[GameObject] = self.fields.get_surrounding_objects(self.rect)
     self.__update_bomb_collision()
     for obj in potential_collisions:
@@ -163,18 +198,27 @@ class Player:
     return x, y
 
   def __update_position(self, x: int, y: int) -> None:
+    '''
+    Updates the player coordinates
+    '''
     self.rect.x += x
     self.rect.y += y
 
   def __collides(self, x: int, y: int, obj: GameObject) -> bool:
+    '''
+    Checks if a dummy objects collides with a GameObject that is not the player's bomb
+    '''
     dummy: pygame.Rect = self.rect.copy()
     dummy.x += x
     dummy.y += y
-    if pygame.Rect.colliderect(obj.rect, dummy) and obj != self.bomb:
+    if pygame.Rect.colliderect(obj.rect, dummy) and obj != self.bomb and self.stats['ghost'] == 0 or dummy.x < Settings.BLOCK_SIZE or dummy.x > 13 * Settings.BLOCK_SIZE or dummy.y < Settings.BLOCK_SIZE or dummy.y > 11 * Settings.BLOCK_SIZE:
       return True
     return False
 
   def __check_collision(self, x: int, y: int, obj) -> tuple[int, int]:  # TODO: Refactor
+    '''
+    Checks for collisions
+    '''
     collided: bool = False
     diagonal: bool = True if x != 0 and y != 0 else False
     if self.__collides(x, 0, obj):
@@ -189,7 +233,7 @@ class Player:
       else:
         y = 0
       collided = True
-    if collided:
+    if collided or (not collided and self.stats['ghost'] > 0):
       self.__check_powerup(obj)
       if abs(x + y) == 1:
         self.diagonal_move = (x, y)
@@ -220,33 +264,167 @@ class Player:
     return slideX, slideY
 
   def __check_powerup(self, obj: GameObject) -> None:
+    '''
+    Checks if an object is a Powerup. If so, then applies its effects
+    and removes it from the fields matrix
+    '''
     if isinstance(obj, Powerup):
       self.__apply_powerup(obj)
       self.fields.remove((obj.rect.x, obj.rect.y), obj)
+      print('applied')
 
   def __update_bomb_collision(self) -> None:
+    '''
+    Checks if the player is no longer standing on their own bomb
+    '''
     potential_collisions: list[GameObject] = self.fields.get(self.rect.x, self.rect.y)
     if self.bomb != None and self.bomb not in potential_collisions:
       self.bomb = None
 
   def __apply_powerup(self, powerup: Powerup) -> None:
+    '''
+    Applies the Powerup to the player
+    '''
     stat: str
     value: int
     stat, value = powerup.get_bonus()
     self.stats[stat] += value
+    if stat == 'invulnerability':
+      self.invulnerability_timer = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
+    elif stat == 'speed':
+      self.speed_timer = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
+    elif stat == 'ghost':
+      self.ghost_timer = Settings.EXTRA_POWERUPS_TIMER * Settings.FPS
+    
+  def check_extra_powerups(self):
+    '''
+    Calls the update method for invulnerability, speed and ghost,
+    decreasing their lifetime and removing them, if they expire
+    '''
+    if self.stats['invulnerability'] > 0:
+      self.__update_invulnerability()
+    if self.stats['speed'] > 0:
+      self.__update_speed()
+    if self.stats['ghost'] > 0:
+      self.__update_ghost()
+
+  def __update_invulnerability(self):
+    '''
+    Decreasing the lifetime of the invulnerability buff and removes it, if it expires
+    '''
+    self.invulnerability_timer -= 1
+    if self.invulnerability_timer == 0:
+      self.stats['invulnerability'] = 0
+
+  def __update_speed(self):
+    '''
+    Decreasing the lifetime of the speed buff and removes it, if it expires
+    '''
+    self.speed_timer -= 1
+    if self.speed_timer == 0:
+      self.stats['speed'] = 0
+
+  def __update_ghost(self):
+    '''
+    Decreasing the ghost of the speed buff and removes it, if it expires
+    '''
+    self.ghost_timer -= 1
+    if self.ghost_timer == 0:
+      self.stats['ghost'] = 0
+      for wall in self.fields.walls:
+        if self.stats['ghost'] == 0:
+          if wall.rect.collidepoint(self.rect.centerx, self.rect.centery):
+            self.die()
+          else:
+            self.player_snap_to_grid()
+
+  def player_snap_to_grid(self):
+    '''
+    Places the player to a valid field if they wander off using ghost and it expires
+    '''
+    target: pygame.Rect = self.fields.snap_to_grid(self.rect)
+    self.rect = pygame.Rect((target.x, target.y), (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
 
   def __place_bomb(self) -> None:
-    if self.stats['bomb'] > 0 and not self.fields.field_has_bomb(self.rect.x, self.rect.y):
+    '''
+    Places a bomb under the player on a field without bomb or wall
+    '''
+    if self.stats['bomb'] > 0 and not self.fields.field_has_bomb_or_wall(self.rect.x, self.rect.y):
       target: pygame.Rect = self.fields.snap_to_grid(self.rect)
+      print("place")
       bomb: Bomb = Bomb((target.x, target.y), Settings.BLOCK_SIZE, self)
       self.fields.set((target.x, target.y), bomb)
       self.stats['bomb'] -= 1
+      print('bomb owner stats:', bomb.owner.stats)
       self.bomb = bomb
+      self.__reset_delay()
+        
+  def __place_barricade(self):
+    '''
+    Places a barricade next to the player on the field that the player is facing
+    '''
+    if self.stats['barricade'] > 0:
+      target: pygame.Rect = self.fields.snap_to_grid(self.rect)
+      if self.direction == 'right':
+        target.x += Settings.BLOCK_SIZE
+      elif self.direction == 'left':
+        target.x -= Settings.BLOCK_SIZE
+      elif self.direction == 'up':
+        target.y -= Settings.BLOCK_SIZE
+      elif self.direction == 'down':
+        target.y += Settings.BLOCK_SIZE
+      if not self.fields.field_has_bomb_or_wall(target.x, target.y):
+        barricade: Barricade_wall = Barricade_wall((target.x, target.y), Settings.BLOCK_SIZE)
+        self.fields.set((target.x, target.y), barricade)
+        self.player_snap_to_grid()
+        self.stats['barricade'] -= 1
 
+  def __detonate_bombs(self):
+    '''
+    Detonates the bombs placed during the detonator buff
+    '''
+    self.fields.detonate_bombs(1)
+    self.stats['detonator'] -= 1
+    self.__reset_delay()
+    
   def respawn(self, coord: tuple[int, int]) -> None:
+    '''
+    Respawns the player
+    '''
     self.rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.alive = True
     self.frame = 0
     self.direction = 'down'
     self.prevDirection = 'down'
     self.surface = self.idleDown[0]
+    self.__reset_stats()
+
+  def __update_delay(self):
+    '''
+    Decrements the delay if it is greater than zero, else switches the countdown to false
+    '''
+    if self.delay > 0:
+      self.delay -= 1
+    else:
+      self.countdown = False
+
+  def __reset_delay(self):
+    '''
+    Sets the delay to the FPS and the countdown to true
+    '''
+    self.delay = Settings.FPS
+    self.countdown = True
+
+  def __reset_stats(self):
+    '''
+    Resets the stats so that the Powerup buffs are nullified
+    '''
+    self.stats = {
+      'bomb': 1,
+      'explosion': 2,
+      'detonator': 0,
+      'invulnerability': 0,
+      'speed': 0,
+      'barricade': 0,
+      'ghost': 0
+    }

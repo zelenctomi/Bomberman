@@ -3,6 +3,9 @@ from menu import Menu
 
 
 def main() -> None:
+  '''
+  Starts the game
+  '''
   start: Menu = Menu()
   start.run()
 

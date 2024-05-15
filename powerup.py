@@ -6,4 +6,7 @@ class Powerup:
     self.rect: pygame.Rect = pygame.Rect(coord, (size, size))
 
   def get_bonus(self) -> tuple[str, int]:
+    '''
+    Applies the Powerup bonus (abstract)
+    '''
     ...

@@ -46,6 +46,9 @@ class Monster:
     self.surface = self.down[0]
 
   def update_frame(self) -> None:
+    '''
+    Updates the animation frame based on the movement direction
+    '''
     self.__update_surface()
     if self.direction == self.prevDirection and self.frame < len(self.down) - 1:
       self.frame += 1
@@ -53,13 +56,23 @@ class Monster:
       self.frame = 0
 
   def __update_surface(self) -> None:
+    '''
+    Updates the texture of the monster based on frame
+    '''
+    event: str = 'hop'
     direction: str = self.direction
     self.surface = getattr(self, f'{direction}')[self.frame]
 
   def die(self) -> None:
-    self.alive = False
+    '''
+    Kills the monster
+    '''
+    self.is_alive = False
 
-  def _change_direction(self) -> None:
+  def __change_direction(self) -> None:
+    '''
+    Changes the direction of the monster randomly
+    '''
     directions: list[tuple[int, int, str]] = Monster.DIRECTIONS.copy()
     directions.remove((self.x_direction, self.y_direction, self.direction))
     self.x_direction, self.y_direction, self.direction = directions[random.randint(0, 2)]
@@ -73,6 +86,11 @@ class Monster:
     return False
 
   def move(self) -> None:
+    '''
+    Moves the monster. The monster has a chance to randomly change
+    direction. If an object is in the way of the monster, then changes
+    the direction of it.
+    '''
     self.prevDirection = self.direction
     self._randomize_direction()
     potential_collisions: list[GameObject] = self.fields.get_surrounding_objects(self.rect)
@@ -82,7 +100,12 @@ class Monster:
         return
     self._update_position(self.x_direction, self.y_direction)
 
-  def _randomize_direction(self) -> None:
+  def __randomize_direction(self) -> None:
+    '''
+    Rolls a chance to change the direction of the monster, then
+    calls a function to randomise the new direction if the roll was
+    a success
+    '''
     r: int = random.randint(0, 100)
     if r == 50:
       self._change_direction()
@@ -98,6 +121,9 @@ class Monster:
     self.elapsed = 0
 
   def respawn(self, coord: tuple[int, int]) -> None:
+    '''
+    Respawns the monster at given coordinates and restarts the animation
+    '''
     self.rect = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
     self.rect.y = self.rect.y - self.rectOffset
     self.hitbox = pygame.Rect(coord, (Settings.BLOCK_SIZE, Settings.BLOCK_SIZE))
