@@ -67,7 +67,7 @@ class Monster:
     '''
     Kills the monster
     '''
-    self.is_alive = False
+    self.alive = False
 
   def _change_direction(self) -> None:
     '''
