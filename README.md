@@ -1,5 +1,7 @@
 ## Bomberman - Work in Progress
 
+![](assets/Screenshots/normal-screenshot.png)
+
 **Welcome to Bomberman!** This classic bomb-blasting game is currently under development using Python and Pygame. 
 
 ### Controls
@@ -20,6 +22,7 @@
 * **Soundscapes:** The game will soon be filled with enthralling sound effects to immerse you in the Bomberman world.
 * **Power-up Display:** Stay informed! We'll add a visual indicator for your active power-up.
 
+![](assets/Screenshots/explosion-screenshot.png)
 
 ### How to Run
 
@@ -38,3 +41,5 @@ We welcome your contributions! Here's how you can help:
 ### Stay Tuned!
 
 This project is actively evolving. Look forward to future updates with new features and improvements!
+
+![](assets/Screenshots/gameover-screenshot.png)
