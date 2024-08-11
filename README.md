@@ -1,8 +1,8 @@
 ## Bomberman - Work in Progress
 
-![](assets/Screenshots/normal-screenshot.png)
-
 **Welcome to Bomberman!** This classic bomb-blasting game is currently under development using Python and Pygame. 
+
+![](assets/Screenshots/normal-screenshot.png)
 
 ### Controls
 
