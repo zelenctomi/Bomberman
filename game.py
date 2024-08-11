@@ -216,7 +216,8 @@ class Game:
     then stops the game loop
     '''
     if self.gameover.proceed and any(pygame.key.get_pressed()):
-      self.running = False
+      # self.running = False
+      pass
 
   def run(self) -> None:
     '''
